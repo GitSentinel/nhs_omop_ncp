@@ -1,0 +1,47 @@
+# Data
+data/raw/
+data/processed/
+*.duckdb
+*.parquet
+*.zip
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# virtual environments
+.venv/
+.env
+
+# MLflow
+mlflow_runs/
+
+# Ruff / Mypy caches
+.ruff_cache/
+.mypy_cache/
+
+# R artifacts 
+*.Rhistory
+*.RData
+*.Rproj
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Secrets
+*.pem
+*.key
+secrets/
