@@ -15,6 +15,9 @@ dependencies = [
     "langchain>=0.3.0",
     "langchain-community>=0.3.0",
     "langchain-ollama>=0.2.0",
+    "deepagents>=0.1.0",
+    "langchain-mcp-adapters>=0.1.0",
+    "langgraph>=0.2.0",
 
     # Validation & config
     "pydantic>=2.7.0",
