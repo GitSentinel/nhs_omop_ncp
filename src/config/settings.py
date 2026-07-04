@@ -18,7 +18,7 @@ class Settings(BaseSettings):
 
     # Inference backend
     ollama_base_url: str = "http://localhost:11434"
-    ollama_model: str = "llama3"
+    ollama_model: str = "llama3.1"
 
     # MLflow
     mlflow_tracking_uri: str = str(PROJECT_ROOT / "mlflow_runs")
