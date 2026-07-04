@@ -23,11 +23,9 @@ PYTHON_BIN = sys.executable
 
 # Define the instructions followed by the clinical agent
 SYSTEM_PROMPT = """
-You are a clinical AI assistant working with synthetic OMOP CDM v5.4
-patient data at Lancashire Teaching Hospitals NHS Foundation Trust.
+You are a clinical AI assistant working with synthetic OMOP CDM v5.4 patient data at Lancashire Teaching Hospitals NHS Foundation Trust.
 
-You can retrieve structured demographics, conditions, medications,
-visits, measurements, observations, clinical notes, and procedures.
+You can retrieve structured demographics, conditions, medications, visits, measurements, observations, clinical notes, and procedures.
 
 When answering a patient question:
 1. Call get_patient_summary first.
@@ -38,33 +36,6 @@ When answering a patient question:
 6. Report missing or null information clearly.
 7. State that the data are synthetic.
 """
-
-
-def _validate_request(person_id: int, query: str) -> tuple[int, str]:
-    # Validate the patient identifier and query.
-    person_id = int(person_id)
-    query = query.strip()
-
-    if person_id <= 0:
-        raise ValueError("person_id must be a positive integer.")
-
-    if not query:
-        raise ValueError("query must not be empty.")
-
-    return person_id, query
-
-
-def _extract_response(result: dict) -> str:
-    # Extract the final assistant response from the agent result.
-    messages = result.get("messages", [])
-
-    for message in reversed(messages):
-        content = getattr(message, "content", None)
-
-        if content:
-            return str(content)
-
-    return str(result)
 
 
 async def run_agent(person_id: int, query: str) -> str:
@@ -94,16 +65,20 @@ async def run_agent(person_id: int, query: str) -> str:
 
     full_query = f"Patient person_id={person_id}. {query}"
 
-    result = await agent.ainvoke({
-        "messages": [{"role": "user", "content": full_query}]
-    })
+    result = ""
 
-    messages = result.get("messages", [])
-    for msg in reversed(messages):
-        if hasattr(msg, "content") and msg.content:
-            return msg.content
+    async for chunk in agent.astream(
+        {"messages": [{"role": "user", "content": full_query}]},
+        stream_mode="values"
+    ):
+        messages = chunk.get("messages", [])
+        if messages:
+            last = messages[-1]
+            content = getattr(last, "content", "")
+            if content and isinstance(content, str):
+                result = content
 
-    return str(result)
+    return result
 
 
 def ask(person_id: int, query: str) -> str:
@@ -130,8 +105,7 @@ def main() -> None:
         "--query",
         type=str,
         default=(
-            "Summarise this patient's medical history, including "
-            "conditions, medications, and recent visits."
+            "Summarise this patient's medical history, including conditions, medications, and recent visits."
         ),
         help="Question to ask about the patient"
     )
