@@ -45,3 +45,7 @@ desktop.ini
 *.pem
 *.key
 secrets/
+
+#MLRuns
+mlflow_runs/
+mlruns/

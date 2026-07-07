@@ -4,9 +4,10 @@ import asyncio
 import sys
 from pathlib import Path
 
+import mlflow
 from deepagents import create_deep_agent
 from langchain_mcp_adapters.client import MultiServerMCPClient
-from langchain_ollama import ChatOllama
+from langchain_openai import ChatOpenAI
 
 from src.config.settings import settings
 
@@ -37,14 +38,55 @@ When answering a patient question:
 7. State that the data are synthetic.
 """
 
+# Setup MLflow for logging
+def _setup_mlflow() -> None:
+    Path("mlflow_runs").mkdir(exist_ok=True)
 
-async def run_agent(person_id: int, query: str) -> str:
-    llm = ChatOllama(
-        model=settings.ollama_model,
-        base_url=settings.ollama_base_url,
+    # Configure the MLflow tracking location
+    mlflow.set_tracking_uri(
+        settings.mlflow_tracking_uri
+    )
+
+    # Select or create the configured experiment
+    mlflow.set_experiment(
+        settings.mlflow_experiment_name
+    )
+
+# Make the LLM client
+def _make_llm() -> ChatOpenAI:
+    return ChatOpenAI(
+        model=settings.azure_openai_deployment,
+        base_url=settings.azure_openai_endpoint,
+        api_key=settings.azure_openai_api_key,
         temperature=0,
     )
 
+# Validate the patient identifier and user query
+def _validate_request(person_id: int, query: str) -> tuple[int, str]:
+    # Validate the patient identifier and user query
+    person_id = int(person_id)
+    query = query.strip()
+
+    if person_id <= 0:
+        raise ValueError("person_id must be a positive integer.")
+
+    if not query:
+        raise ValueError("query must not be empty.")
+
+    return person_id, query
+
+# Run the agent
+async def run_agent(person_id: int, query: str) -> str:
+    # Validate the patient identifier and user query
+    person_id, query = _validate_request(
+        person_id,
+        query
+    )
+
+    # Create the LLM client
+    llm = _make_llm()
+
+    # Create the MCP client
     client = MultiServerMCPClient(
         {
             "omop": {
@@ -55,8 +97,12 @@ async def run_agent(person_id: int, query: str) -> str:
         }
     )
 
+    # Get the tools from the MCP server
     tools = await client.get_tools()
 
+    mlflow.log_param("tools_count", len(tools))
+
+    # Create the agent
     agent = create_deep_agent(
         model=llm,
         tools=tools,
@@ -64,28 +110,63 @@ async def run_agent(person_id: int, query: str) -> str:
     )
 
     full_query = f"Patient person_id={person_id}. {query}"
-
     result = ""
+    tool_calls_made = []
 
     async for chunk in agent.astream(
         {"messages": [{"role": "user", "content": full_query}]},
         stream_mode="values"
     ):
+        # Process the chunks of the agent response
         messages = chunk.get("messages", [])
+
+        # Process the last message in the chunk
         if messages:
             last = messages[-1]
             content = getattr(last, "content", "")
+            tool_calls = getattr(last, "tool_calls", [])
+
+            # Process the tool calls in the last message
+            if tool_calls:
+                for tc in tool_calls:
+                    tool_calls_made.append(tc.get("name", "unknown"))
+            
+            # Process the content of the last message
             if content and isinstance(content, str):
                 result = content
+
+    mlflow.log_param("tool_calls_sequence", " → ".join(tool_calls_made))
+    mlflow.log_param("tool_calls_count", len(tool_calls_made))
+    mlflow.log_text(result, "agent_response.txt")
+    mlflow.log_text(query, "query.txt")
 
     return result
 
 
 def ask(person_id: int, query: str) -> str:
-    # Run the asynchronous agent from synchronous Python code.
-    return asyncio.run(
-        run_agent(person_id, query)
-    )
+    _setup_mlflow()
+
+    with mlflow.start_run(
+        run_name=f"patient_{person_id}",
+        tags={
+            "person_id": str(person_id),
+            "sprint": "sprint_2",
+            "placement": "lancashire_teaching_hospitals",
+            "backend" : "azure_openai",
+            "model" : settings.azure_openai_deployment,
+            "dataset" : "delphi-100k",
+            "omop_version" : "5.4",
+        }
+    ):
+        # Log the parameters
+        mlflow.log_param("person_id", person_id)
+        mlflow.log_param("query", query)
+        mlflow.log_param("model", settings.azure_openai_deployment)
+
+        # Run the asynchronous agent from synchronous Python code.
+        return asyncio.run(
+            run_agent(person_id, query)
+        )
 
 
 def main() -> None:

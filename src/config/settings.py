@@ -16,12 +16,13 @@ class Settings(BaseSettings):
     # Patient isolation (baked in at server startup)
     person_id: int = 1
 
-    # Inference backend
-    ollama_base_url: str = "http://localhost:11434"
-    ollama_model: str = "llama3.1"
+    # Azure OpenAI
+    azure_openai_api_key: str = ""
+    azure_openai_endpoint: str = "https://openai-omop-dev-01.services.ai.azure.com/openai/v1"
+    azure_openai_deployment: str = "gpt-5-nano"
 
     # MLflow
-    mlflow_tracking_uri: str = str(PROJECT_ROOT / "mlflow_runs")
+    mlflow_tracking_uri: str = "sqlite:///mlflow_runs/mlflow.db"
     mlflow_experiment_name: str = "nhs_omop_agent"
 
 settings = Settings()

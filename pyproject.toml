@@ -7,29 +7,28 @@ dependencies = [
     # Data layer
     "duckdb>=1.1.0",
     "ibis-framework[duckdb]>=9.0.0",
-
     # MCP server
     "fastmcp>=2.0.0",
-
     # Agent orchestration
     "langchain>=0.3.0",
     "langchain-community>=0.3.0",
     "langchain-ollama>=0.2.0",
+    "langchain-openai>=0.3.0",
+    "openai>=1.50.0",
     "deepagents>=0.1.0",
     "langchain-mcp-adapters>=0.1.0",
     "langgraph>=0.2.0",
-
     # Validation & config
     "pydantic>=2.7.0",
     "pydantic-settings>=2.3.0",
-
     # MLOps
     "mlflow>=2.14.0",
-
     # Utilities
     "python-dotenv>=1.0.0",
     "rich>=13.0.0",
     "typer>=0.12.0",
+    "mlflow-skinny>=3.14.0",
+    "duckdb-engine>=0.17.0",
 ]
 
 [project.optional-dependencies]
