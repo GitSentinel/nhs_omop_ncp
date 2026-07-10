@@ -12,13 +12,23 @@ from langchain_openai import ChatOpenAI
 from src.config.settings import settings
 
 
-# Define the MCP server file and Python executable
+# Define the OMOP MCP server file and Python executable
 SERVER_PATH = str(
     Path(__file__).resolve().parents[2]
     / "src"
     / "mcp_server"
     / "server.py"
 )
+
+# Define the skills MCP server file
+SKILLS_SERVER_PATH = str(
+    Path(__file__).resolve().parents[2] 
+    / "src" 
+    / "mcp_server" 
+    / "skills_server.py"
+)
+
+# Define the Python executable
 PYTHON_BIN = sys.executable
 
 
@@ -89,11 +99,19 @@ async def run_agent(person_id: int, query: str) -> str:
     # Create the MCP client
     client = MultiServerMCPClient(
         {
+            # Define the OMOP MCP server
             "omop": {
                 "command": PYTHON_BIN,
                 "args": [SERVER_PATH],
                 "transport": "stdio",
-            }
+            },
+            
+            # Define the skills MCP server
+            "skills": {
+                "command": PYTHON_BIN,
+                "args": [SKILLS_SERVER_PATH],
+                "transport": "stdio",
+            },
         }
     )
 

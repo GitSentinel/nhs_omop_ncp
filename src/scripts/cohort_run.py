@@ -13,18 +13,11 @@ from src.data_access.connection import get_table
 
 # Define the clinical questions used across the cohort
 QUERIES = [
-    (
-        "Summarise this patient's medical history, including conditions, medications, and recent visits."
-    ),
-    (
-        "What conditions does this patient have? What medications has this patient been prescribed?"
-    ),
-    (
-        "What recent measurements and laboratory values are recorded for this patient?"
-    ),
-    (
-        "Provide a clinical summary of this patient's visit history and procedures."
-    ),
+    "Summarise this patient's medical history including conditions, medications and recent visits.",
+    "What conditions does this patient have and what medications have been prescribed?",
+    "What recent measurements and laboratory values are recorded for this patient?",
+    "Provide a clinical summary of this patient's visit history and procedures.",
+    "Based on this patient's conditions, which FastPIFU specialty skill is most relevant and what does it say about PIFU suitability?",
 ]
 
 # Define where cohort results will be stored
