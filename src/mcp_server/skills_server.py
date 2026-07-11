@@ -31,10 +31,12 @@ SPECIALTY_MAP = {
     "orthopaedics": "orthopaedics.md",
     "spinal": "spinal.md",
     "urology": "urology.md",
+    "omop_clinical_reasoning": "omop_clinical_reasoning.md",
 }
 
 # Define keywords used for approximate condition routing
 CONDITION_SPECIALTY_MAP = {
+    # Cardiology
     "cardiology": (
         "heart",
         "cardiac",
@@ -51,6 +53,7 @@ CONDITION_SPECIALTY_MAP = {
         "postural tachycardia syndrome",
     ),
 
+    # Gastroenterology
     "gastroenterology": (
         "liver",
         "cirrhosis",
@@ -66,6 +69,7 @@ CONDITION_SPECIALTY_MAP = {
         "nafld",
     ),
 
+    # Dermatology
     "dermatology": (
         "skin",
         "dermatology",
@@ -79,6 +83,7 @@ CONDITION_SPECIALTY_MAP = {
         "skin lesion",
     ),
 
+    # Orthopaedics
     "orthopaedics": (
         "joint",
         "knee",
@@ -92,6 +97,7 @@ CONDITION_SPECIALTY_MAP = {
         "bone injury",
     ),
 
+    # Ophthalmology
     "ophthalmology": (
         "eye",
         "ocular",
@@ -104,6 +110,7 @@ CONDITION_SPECIALTY_MAP = {
         "diabetic retinopathy",
     ),
 
+    # Urology
     "urology": (
         "bladder",
         "prostate",
@@ -117,6 +124,7 @@ CONDITION_SPECIALTY_MAP = {
         "urethra",
     ),
 
+    # Gynaecology
     "gynaecology": (
         "gynaecology",
         "gynaecological",
@@ -128,6 +136,7 @@ CONDITION_SPECIALTY_MAP = {
         "vaginal prolapse",
     ),
 
+    # ENT
     "ent": (
         "ear",
         "nose",
@@ -141,6 +150,7 @@ CONDITION_SPECIALTY_MAP = {
         "tinnitus",
     ),
 
+    # Spinal
     "spinal": (
         "spine",
         "spinal",
@@ -152,6 +162,7 @@ CONDITION_SPECIALTY_MAP = {
         "sciatica",
     ),
 
+    # General Surgery
     "general_surgery": (
         "hernia",
         "gallbladder",
@@ -162,6 +173,7 @@ CONDITION_SPECIALTY_MAP = {
         "bowel resection",
     ),
     
+    # OMFS
     "omfs": (
         "jaw",
         "dental",
@@ -257,11 +269,7 @@ async def skills_lifespan(
 mcp = FastMCP(
     name="nhs-fastpifu-skills",
     instructions=(
-        "FastPIFU clinical skills server for Lancashire Teaching "
-        "Hospitals NHS Foundation Trust. Call list_skills first, "
-        "then use get_skill to retrieve the relevant specialty "
-        "protocol. Condition-based routing is a keyword-based "
-        "suggestion and must not be treated as a clinical decision."
+        "FastPIFU clinical skills server for Lancashire Teaching Hospitals NHS Foundation Trust. \nCall list_skills first, then use get_skill to retrieve the relevant specialty protocol. \nCondition-based routing is a keyword-based suggestion and must not be treated as a clinical decision."
     ),
     lifespan=skills_lifespan
 )
@@ -281,14 +289,12 @@ def _get_skill_content(
 
     if specialty not in SPECIALTY_MAP:
         return (
-            f"Specialty '{specialty}' is not recognised. "
-            f"Available specialties: {', '.join(available)}"
+            f"Specialty '{specialty}' is not recognised. \nAvailable specialties: {', '.join(available)}"
         )
 
     if specialty not in loaded_skills:
         return (
-            f"The skill file for '{specialty}' is not available. "
-            "Run: uv run python src/scripts/download_skills.py"
+            f"The skill file for '{specialty}' is not available. \nRun: uv run python src/scripts/download_skills.py"
         )
 
     log.info("Returning FastPIFU skill: %s", specialty)
@@ -365,11 +371,19 @@ def get_skill_for_condition(
     available = sorted(_get_loaded_skills(ctx))
 
     return (
-        f"No FastPIFU specialty was matched for "
-        f"'{condition_name}'. Available specialties: "
-        f"{', '.join(available)}. Call get_skill with the "
-        "most appropriate specialty."
+        f"No FastPIFU specialty was matched for '{condition_name}'. \nAvailable specialties: {', '.join(available)}. \nCall get_skill with the most appropriate specialty."
     )
+
+@mcp.tool()
+def get_omop_reasoning_guide(ctx: Context) -> str:
+    # Return the OMOP clinical reasoning guide for this agent.
+    path = SKILLS_DIR / "omop_clinical_reasoning.md"
+
+    if not path.exists():
+        return "OMOP reasoning guide not found. Run download_skills.py first."
+    
+    log.info("get_omop_reasoning_guide loaded")
+    return path.read_text(encoding="utf-8")
 
 
 # Start the stdio server when executed directly
