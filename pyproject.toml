@@ -33,12 +33,13 @@ dependencies = [
 
 [project.optional-dependencies]
 finetune = [
-    "torch>=2.3.0",
+    "torch>=2.7.0",
     "transformers>=4.42.0",
     "peft>=0.11.0",
     "datasets>=2.20.0",
     "accelerate>=0.31.0",
     "bitsandbytes>=0.43.0",
+    "scikit-learn>=1.5.0",
 ]
 dev = [
     "pytest>=8.0.0",
@@ -77,3 +78,13 @@ dev = [
     "ipykernel>=7.3.0",
     "jupyter>=1.1.1",
 ]
+
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cu128", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
