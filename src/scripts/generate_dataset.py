@@ -1,77 +1,35 @@
 import json
 import random
+import sys
 from pathlib import Path
 
+# Project Root Setup
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+# Project Configuration
+from config import (
+    FINETUNE_DIR,
+    N_DATASET_SAMPLES,
+    TREATMENT_KEYWORDS,
+    ROUTINE_KEYWORDS,
+)
+
+# OMOP Data Access
 from src.data_access.connection import get_table
 
 # Reproducibility
 random.seed(42)
 
 # Output Configuration
-OUTPUT_DIR = Path("data/finetune")
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+FINETUNE_DIR.mkdir(parents=True, exist_ok=True)
 
-OUTPUT_PATH = OUTPUT_DIR / "clinic_letters_labelled.json"
-
-# Treatment Event Keywords
-TREATMENT_KEYWORDS = [
-    "procedure",
-    "operation",
-    "surgery",
-    "theatre",
-    "treatment",
-    "intervention",
-    "injection",
-    "biopsy",
-    "excision",
-    "repair",
-    "removal",
-    "transplant",
-    "admitted",
-    "admission",
-    "inpatient",
-    "referred for",
-    "referral to",
-    "discharged",
-    "consent obtained",
-    "consent signed",
-    "scheduled for",
-    "booked for",
-    "listed for",
-    "clock stop",
-    "rtt",
-    "18 week",
-    "commenced treatment",
-    "started treatment",
-    "prescribed",
-    "initiated therapy",
-]
-
-# Routine Follow-Up Keywords
-ROUTINE_KEYWORDS = [
-    "routine follow-up",
-    "follow up in",
-    "review in",
-    "stable",
-    "no change",
-    "unchanged",
-    "monitoring",
-    "surveillance",
-    "watchful waiting",
-    "continue current",
-    "no new concerns",
-    "appointment in",
-    "clinic in",
-    "doing well",
-    "no intervention required",
-    "conservative management",
-    "reassured",
-]
+OUTPUT_PATH = FINETUNE_DIR / "clinic_letters_labelled.json"
 
 
 def label_note(note_text: str) -> int:
-    """Assign a treatment-event or routine-follow-up label."""
-
     text_lower = note_text.lower()
 
     treatment_score = sum(
@@ -92,8 +50,6 @@ def label_note(note_text: str) -> int:
 
 
 def format_sample(row) -> dict:
-    """Convert a dataframe row into the output JSON structure."""
-
     label = int(row.label)
 
     return {
@@ -111,11 +67,9 @@ def format_sample(row) -> dict:
 
 
 def generate_dataset(n_samples: int = 600) -> None:
-    """Generate and save the labelled clinic-letter dataset."""
-
     print(f"Generating labelled dataset ({n_samples} samples)...")
 
-    # OMOP Note Extraction
+    # OMOP note extraction
     note = get_table("note")
 
     notes_df = (
@@ -134,7 +88,7 @@ def generate_dataset(n_samples: int = 600) -> None:
 
     print(f"  Fetched {len(notes_df):,} notes from DuckDB")
 
-    # Note Length Filtering
+    # Note length filtering
     notes_df["note_length"] = notes_df["note_text"].str.len()
 
     notes_df = notes_df[
@@ -146,7 +100,7 @@ def generate_dataset(n_samples: int = 600) -> None:
         f"{len(notes_df):,} notes"
     )
 
-    # Heuristic Label Generation
+    # Heuristic label generation
     notes_df["label"] = notes_df["note_text"].apply(label_note)
 
     # Reproducible Sampling
@@ -159,13 +113,13 @@ def generate_dataset(n_samples: int = 600) -> None:
 
     print(f"  Label distribution: {label_counts.to_dict()}")
 
-    # Train and Test Split
+    # Train and test split
     n_train = int(len(samples) * 0.8)
 
     train = samples.iloc[:n_train]
     test = samples.iloc[n_train:]
 
-    # Dataset Structure
+    # Dataset structure
     dataset = {
         "task": "binary_classification",
         "description": (
@@ -188,7 +142,7 @@ def generate_dataset(n_samples: int = 600) -> None:
         ],
     }
 
-    # Dataset Saving
+    # Dataset saving
     with open(OUTPUT_PATH, "w", encoding="utf-8") as file:
         json.dump(
             dataset,
@@ -197,7 +151,7 @@ def generate_dataset(n_samples: int = 600) -> None:
             ensure_ascii=False,
         )
 
-    # Dataset Summary
+    # Dataset summary
     print()
     print("=" * 60)
     print("DATASET GENERATION COMPLETE")
@@ -209,7 +163,7 @@ def generate_dataset(n_samples: int = 600) -> None:
     print(f"  Treatment event     : {int(label_counts.get(1, 0)):,}")
     print(f"  Output path         : {OUTPUT_PATH}")
 
-    # Sample Inspection
+    # Sample inspection
     print("\nSample training examples:")
 
     for example in dataset["train"][:3]:
@@ -218,4 +172,4 @@ def generate_dataset(n_samples: int = 600) -> None:
 
 
 if __name__ == "__main__":
-    generate_dataset(n_samples=600)
+    generate_dataset(n_samples=N_DATASET_SAMPLES)

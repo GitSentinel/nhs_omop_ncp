@@ -1,395 +1,152 @@
 import logging
-import re
+import sys
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
 
+# Project Root Setup
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+# MCP Server Library
 from fastmcp import Context, FastMCP
 
-
-# Configure server logging
-logging.basicConfig(level=logging.INFO)
-log = logging.getLogger(__name__)
-
-# Define the directory containing downloaded skill documents
-SKILLS_DIR = (
-    Path(__file__).resolve().parent
-    / "resources"
-    / "skills"
+# Project Configuration
+from config import (
+    CONDITION_SPECIALTY_MAP,
+    SKILLS_DIR,
+    SPECIALTY_MAP,
 )
 
-# Map accepted specialty names to their local files
-SPECIALTY_MAP = {
-    "cardiology": "cardiology.md",
-    "dermatology": "dermatology.md",
-    "ent": "ent.md",
-    "gastroenterology": "gastroenterology.md",
-    "general_surgery": "general_surgery.md",
-    "gynaecology": "gynaecology.md",
-    "omfs": "omfs.md",
-    "ophthalmology": "ophthalmology.md",
-    "orthopaedics": "orthopaedics.md",
-    "spinal": "spinal.md",
-    "urology": "urology.md",
-    "omop_clinical_reasoning": "omop_clinical_reasoning.md",
-}
+# Logging Setup
+logging.basicConfig(level=logging.INFO)
 
-# Define keywords used for approximate condition routing
-CONDITION_SPECIALTY_MAP = {
-    # Cardiology
-    "cardiology": (
-        "heart",
-        "cardiac",
-        "arrhythmia",
-        "atrial fibrillation",
-        "heart failure",
-        "angina",
-        "myocardial",
-        "coronary",
-        "cardiomyopathy",
-        "pericarditis",
-        "valve disease",
-        "bundle branch block",
-        "postural tachycardia syndrome",
-    ),
-
-    # Gastroenterology
-    "gastroenterology": (
-        "liver",
-        "cirrhosis",
-        "hepatitis",
-        "crohn disease",
-        "crohn's disease",
-        "colitis",
-        "coeliac disease",
-        "gastrointestinal",
-        "inflammatory bowel disease",
-        "fatty liver disease",
-        "masld",
-        "nafld",
-    ),
-
-    # Dermatology
-    "dermatology": (
-        "skin",
-        "dermatology",
-        "dermatological",
-        "melanoma",
-        "acne",
-        "psoriasis",
-        "eczema",
-        "keratosis",
-        "skin carcinoma",
-        "skin lesion",
-    ),
-
-    # Orthopaedics
-    "orthopaedics": (
-        "joint",
-        "knee",
-        "hip",
-        "shoulder",
-        "fracture",
-        "osteoarthritis",
-        "carpal tunnel",
-        "tendon",
-        "ligament",
-        "bone injury",
-    ),
-
-    # Ophthalmology
-    "ophthalmology": (
-        "eye",
-        "ocular",
-        "retina",
-        "retinal",
-        "glaucoma",
-        "cataract",
-        "macular",
-        "visual impairment",
-        "diabetic retinopathy",
-    ),
-
-    # Urology
-    "urology": (
-        "bladder",
-        "prostate",
-        "urology",
-        "urological",
-        "urinary",
-        "incontinence",
-        "kidney stone",
-        "renal stone",
-        "ureter",
-        "urethra",
-    ),
-
-    # Gynaecology
-    "gynaecology": (
-        "gynaecology",
-        "gynaecological",
-        "uterine",
-        "ovarian",
-        "pelvic",
-        "endometriosis",
-        "uterine prolapse",
-        "vaginal prolapse",
-    ),
-
-    # ENT
-    "ent": (
-        "ear",
-        "nose",
-        "throat",
-        "sinus",
-        "tonsil",
-        "hearing",
-        "nasal",
-        "septum",
-        "otitis",
-        "tinnitus",
-    ),
-
-    # Spinal
-    "spinal": (
-        "spine",
-        "spinal",
-        "lumbar",
-        "intervertebral disc",
-        "scoliosis",
-        "vertebra",
-        "back pain",
-        "sciatica",
-    ),
-
-    # General Surgery
-    "general_surgery": (
-        "hernia",
-        "gallbladder",
-        "colorectal",
-        "cholecystectomy",
-        "haemorrhoid",
-        "anal fistula",
-        "bowel resection",
-    ),
-    
-    # OMFS
-    "omfs": (
-        "jaw",
-        "dental",
-        "oral",
-        "maxillofacial",
-        "mandibular",
-        "temporomandibular",
-        "tmj",
-    ),
-}
+log = logging.getLogger(__name__)
 
 
-def _normalise_specialty(specialty: str) -> str:
+def normalise_specialty_name(specialty: str) -> str:
     return (
         specialty
-        .casefold()
+        .lower()
         .strip()
-        .replace("-", "_")
         .replace(" ", "_")
+        .replace("-", "_")
     )
 
 
-def _normalise_condition(condition_name: str) -> str:
-    # Replace punctuation with spaces and remove repeated whitespace
-    cleaned = re.sub(
-        r"[^a-z0-9]+",
-        " ",
-        condition_name.casefold()
-    )
-
-    return " ".join(cleaned.split())
-
-
-def _keyword_matches(
-    condition_name: str,
-    keyword: str
-) -> bool:
-    normalised_keyword = _normalise_condition(keyword)
-
-    # Use word boundaries to avoid partial matches such as ear in heart
-    pattern = rf"\b{re.escape(normalised_keyword)}\b"
-
-    return re.search(pattern, condition_name) is not None
+def get_available_skills() -> list[str]:
+    # Available Skill Detection
+    return sorted([
+        specialty
+        for specialty, filename in SPECIALTY_MAP.items()
+        if (SKILLS_DIR / filename).exists()
+    ])
 
 
 @asynccontextmanager
-async def skills_lifespan(
-    _server: FastMCP
-) -> AsyncIterator[dict]:
-    log.info("FastPIFU Skills MCP server starting")
-    log.info("Loading skills from: %s", SKILLS_DIR)
+async def skills_lifespan(server: FastMCP) -> AsyncIterator[dict]:
+    # Startup Metadata
+    log.info("Skills MCP server starting up")
 
-    loaded_skills = {}
+    available_skills = get_available_skills()
 
-    # Load each available skill document into memory
-    for specialty, filename in SPECIALTY_MAP.items():
-        skill_path = SKILLS_DIR / filename
-
-        if not skill_path.is_file():
-            log.warning(
-                "Skill file not found for %s: %s",
-                specialty,
-                skill_path
-            )
-            continue
-
-        try:
-            loaded_skills[specialty] = skill_path.read_text(
-                encoding="utf-8"
-            )
-        except (OSError, UnicodeDecodeError) as error:
-            log.warning(
-                "Could not load skill file for %s: %s",
-                specialty,
-                error
-            )
-
-    log.info(
-        "Loaded %d FastPIFU skills: %s",
-        len(loaded_skills),
-        sorted(loaded_skills)
-    )
+    log.info("Available skills: %s", available_skills)
 
     try:
-        # Share the loaded documents with every tool request
-        yield {"skills": loaded_skills}
+        yield {"available_skills": available_skills}
     finally:
-        loaded_skills.clear()
-        log.info("FastPIFU Skills MCP server stopped")
+        log.info("Skills MCP server shut down")
 
 
-# Create the FastPIFU skills server
+# MCP Server Setup
 mcp = FastMCP(
     name="nhs-fastpifu-skills",
     instructions=(
-        "FastPIFU clinical skills server for Lancashire Teaching Hospitals NHS Foundation Trust. \nCall list_skills first, then use get_skill to retrieve the relevant specialty protocol. \nCondition-based routing is a keyword-based suggestion and must not be treated as a clinical decision."
+        "FastPIFU clinical skills server for Lancashire Teaching "
+        "Hospitals NHS FT. Provides specialty-specific PIFU clinical "
+        "protocol documents. Call list_skills first, then get_skill "
+        "for the relevant specialty."
     ),
-    lifespan=skills_lifespan
+    lifespan=skills_lifespan,
 )
-
-
-def _get_loaded_skills(ctx: Context) -> dict[str, str]:
-    return ctx.lifespan_context["skills"]
-
-
-def _get_skill_content(
-    specialty: str,
-    ctx: Context
-) -> str:
-    specialty = _normalise_specialty(specialty)
-    loaded_skills = _get_loaded_skills(ctx)
-    available = sorted(loaded_skills)
-
-    if specialty not in SPECIALTY_MAP:
-        return (
-            f"Specialty '{specialty}' is not recognised. \nAvailable specialties: {', '.join(available)}"
-        )
-
-    if specialty not in loaded_skills:
-        return (
-            f"The skill file for '{specialty}' is not available. \nRun: uv run python src/scripts/download_skills.py"
-        )
-
-    log.info("Returning FastPIFU skill: %s", specialty)
-
-    return loaded_skills[specialty]
 
 
 @mcp.tool()
 def list_skills(ctx: Context) -> list[str]:
-    available = sorted(_get_loaded_skills(ctx))
+    # Skill List Retrieval
+    available_skills = ctx.lifespan_context["available_skills"]
 
-    log.info(
-        "list_skills available_count=%d",
-        len(available)
-    )
+    log.info("list_skills - %d skills available", len(available_skills))
 
-    return available
+    return available_skills
 
 
 @mcp.tool()
-def get_skill(
-    specialty: str,
-    ctx: Context
-) -> str:
-    return _get_skill_content(
-        specialty,
-        ctx
-    )
+def get_skill(specialty: str, ctx: Context) -> str:
+    # Specialty Lookup
+    specialty_key = normalise_specialty_name(specialty)
+
+    if specialty_key not in SPECIALTY_MAP:
+        available_skills = ctx.lifespan_context["available_skills"]
+
+        return (
+            f"Specialty '{specialty_key}' not found. "
+            f"Available: {', '.join(available_skills)}"
+        )
+
+    # Skill File Loading
+    skill_path = SKILLS_DIR / SPECIALTY_MAP[specialty_key]
+
+    if not skill_path.exists():
+        return f"Skill file for '{specialty_key}' not downloaded yet."
+
+    log.info("get_skill specialty=%s", specialty_key)
+
+    return skill_path.read_text(encoding="utf-8")
 
 
 @mcp.tool()
-def get_skill_for_condition(
-    condition_name: str,
-    ctx: Context
-) -> str:
-    condition_name = condition_name.strip()
+def get_skill_for_condition(condition_name: str, ctx: Context) -> str:
+    # Condition Matching
+    condition_lower = condition_name.lower().strip()
 
-    if not condition_name:
-        return "A condition name must be provided."
-
-    normalised_condition = _normalise_condition(
-        condition_name
-    )
-
-    # Search the specialty routing keywords in their defined order
     for specialty, keywords in CONDITION_SPECIALTY_MAP.items():
-        matched_keyword = next(
-            (
-                keyword
-                for keyword in keywords
-                if _keyword_matches(
-                    normalised_condition,
-                    keyword
-                )
-            ),
-            None
-        )
+        if any(keyword.lower() in condition_lower for keyword in keywords):
+            log.info(
+                "get_skill_for_condition %s -> %s",
+                condition_name,
+                specialty,
+            )
 
-        if matched_keyword is None:
-            continue
+            return get_skill(specialty, ctx)
 
-        log.info(
-            "Condition '%s' matched specialty '%s' using keyword '%s'",
-            condition_name,
-            specialty,
-            matched_keyword
-        )
-
-        return _get_skill_content(
-            specialty,
-            ctx
-        )
-
-    available = sorted(_get_loaded_skills(ctx))
+    # Fallback Response
+    available_skills = ctx.lifespan_context["available_skills"]
 
     return (
-        f"No FastPIFU specialty was matched for '{condition_name}'. \nAvailable specialties: {', '.join(available)}. \nCall get_skill with the most appropriate specialty."
+        f"No specific skill matched '{condition_name}'. "
+        f"Available: {', '.join(available_skills)}. "
+        "Try get_skill() with the most relevant specialty."
     )
+
 
 @mcp.tool()
 def get_omop_reasoning_guide(ctx: Context) -> str:
-    # Return the OMOP clinical reasoning guide for this agent.
-    path = SKILLS_DIR / "omop_clinical_reasoning.md"
+    # Reasoning Guide Loading
+    guide_path = SKILLS_DIR / "omop_clinical_reasoning.md"
 
-    if not path.exists():
-        return "OMOP reasoning guide not found. Run download_skills.py first."
-    
+    if not guide_path.exists():
+        return "OMOP reasoning guide not found."
+
     log.info("get_omop_reasoning_guide loaded")
-    return path.read_text(encoding="utf-8")
+
+    return guide_path.read_text(encoding="utf-8")
 
 
-# Start the stdio server when executed directly
 if __name__ == "__main__":
-    log.info(
-        "Starting NHS FastPIFU Skills MCP server using stdio"
-    )
+    # Server Execution
+    log.info("Starting NHS FastPIFU Skills MCP server over stdio")
 
     mcp.run(transport="stdio")
