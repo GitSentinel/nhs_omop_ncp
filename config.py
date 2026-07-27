@@ -9,10 +9,11 @@ PYTHON_BIN   = str(Path(sys.executable))
 DUCKDB_PATH         = PROJECT_ROOT / "data" / "processed" / "omop_v54.duckdb"
 FINETUNE_DIR        = PROJECT_ROOT / "data" / "finetune"
 COHORT_OUTPUT_DIR   = PROJECT_ROOT / "data" / "cohort_run_outputs"
-# DATASET_PATH        = FINETUNE_DIR / "clinic_letters_labelled.json"
-DATASET_PATH = FINETUNE_DIR / "clinic_letters_azure_labelled.json"
+SOURCE_DATASET_PATH = FINETUNE_DIR / "clinic_letters_labelled.json"
 AZURE_DATASET_PATH  = FINETUNE_DIR / "clinic_letters_azure_labelled.json"
 FINETUNE_OUTPUT_DIR = FINETUNE_DIR / "qwen35_4b_lora_adapter"
+
+DATASET_PATH = AZURE_DATASET_PATH
 
 # MCP server paths 
 OMOP_SERVER_PATH   = PROJECT_ROOT / "src" / "mcp_server" / "server.py"
@@ -31,6 +32,9 @@ MLFLOW_EXPERIMENT_FINETUNE = "nhs_omop_finetune"
 # Fine-tuning 
 BASE_MODEL = "Qwen/Qwen3.5-4B"
 MAX_LENGTH = 384
+
+# Dataset generation 
+N_DATASET_SAMPLES = 3000
 
 # QLoRA config
 QLORA_CONFIG = dict(
@@ -81,10 +85,7 @@ Classify the following clinic letter as either a treatment event or routine foll
 Clinic letter:
 {text}
 
-Classification (output 0 for routine_followup or 1 for treatment_event):"""
-
-# Dataset generation 
-N_DATASET_SAMPLES = 6000
+Classification (output 0 for routine_followup or 1 for treatment_event):"""  
 
 # Treatment keywords
 TREATMENT_KEYWORDS = [
@@ -122,37 +123,37 @@ COHORT_QUERIES = [
 
 # FastPIFU skills
 SPECIALTY_MAP = {
-    "cardiology"              : "cardiology.md",
-    "dermatology"             : "dermatology.md",
-    "ent"                     : "ent.md",
-    "gastroenterology"        : "gastroenterology.md",
-    "general_surgery"         : "general_surgery.md",
-    "gynaecology"             : "gynaecology.md",
-    "omfs"                    : "omfs.md",
-    "ophthalmology"           : "ophthalmology.md",
-    "orthopaedics"            : "orthopaedics.md",
-    "spinal"                  : "spinal.md",
-    "urology"                 : "urology.md",
+    "cardiology" : "cardiology.md",
+    "dermatology" : "dermatology.md",
+    "ent" : "ent.md",
+    "gastroenterology" : "gastroenterology.md",
+    "general_surgery" : "general_surgery.md",
+    "gynaecology" : "gynaecology.md",
+    "omfs" : "omfs.md",
+    "ophthalmology" : "ophthalmology.md",
+    "orthopaedics" : "orthopaedics.md",
+    "spinal" : "spinal.md",
+    "urology" : "urology.md",
     "omop_clinical_reasoning" : "omop_clinical_reasoning.md",
 }
 
 # Condition specialty map
 CONDITION_SPECIALTY_MAP = {
-    "cardiology"       : ["heart", "cardiac", "arrhythmia", "atrial", "valve", "failure", "angina", "myocardial", "coronary", "pots", "lbbb", "bundle branch", "pericarditis", "brugada syndrome"],
+    "cardiology" : ["heart", "cardiac", "arrhythmia", "atrial", "valve", "failure", "angina", "myocardial", "coronary", "pots", "lbbb", "bundle branch", "pericarditis", "brugada syndrome"],
     "gastroenterology" : ["liver", "cirrhosis", "hepatitis", "bowel", "crohn", "colitis", "gastro", "coeliac", "iron deficiency", "anaemia", "masld", "nafld", "ulcerative colitis"],
-    "dermatology"      : ["skin", "dermat", "melanoma", "acne", "psoriasis", "eczema", "keratosis", "carcinoma", "mole"],
-    "orthopaedics"     : ["joint", "knee", "hip", "shoulder", "fracture", "arthritis", "carpal", "tendon", "ligament", "bone", "spondylolisthesis"],
-    "ophthalmology"    : ["eye", "ocular", "retina", "glaucoma", "cataract", "macular", "visual", "diabetic eye"],
-    "urology"          : ["kidney", "bladder", "prostate", "urolog", "renal", "urinary", "incontinence"],
-    "gynaecology"      : ["gynaecolog", "uterine", "ovarian", "pelvic", "endometriosis", "prolapse"],
-    "ent"              : ["ear", "nose", "throat", "sinus", "tonsil", "hearing", "nasal", "septum"],
-    "spinal"           : ["spine", "spinal", "lumbar", "disc", "scoliosis", "vertebra", "back pain", "sciatica"],
-    "general_surgery"  : ["hernia", "gallbladder", "colorectal", "cholecystectomy", "haemorrhoid", "fistula", "bowel resection"],
-    "omfs"             : ["jaw", "dental", "oral", "maxillofacial", "mandibular", "temporomandibular", "tmj"],
+    "dermatology" : ["skin", "dermat", "melanoma", "acne", "psoriasis", "eczema", "keratosis", "carcinoma", "mole"],
+    "orthopaedics" : ["joint", "knee", "hip", "shoulder", "fracture", "arthritis", "carpal", "tendon", "ligament", "bone", "spondylolisthesis"],
+    "ophthalmology" : ["eye", "ocular", "retina", "glaucoma", "cataract", "macular", "visual", "diabetic eye"],
+    "urology" : ["kidney", "bladder", "prostate", "urolog", "renal", "urinary", "incontinence"],
+    "gynaecology" : ["gynaecolog", "uterine", "ovarian", "pelvic", "endometriosis", "prolapse"],
+    "ent" : ["ear", "nose", "throat", "sinus", "tonsil", "hearing", "nasal", "septum"],
+    "spinal": ["spine", "spinal", "lumbar", "disc", "scoliosis", "vertebra", "back pain", "sciatica"],
+    "general_surgery" : ["hernia", "gallbladder", "colorectal", "cholecystectomy", "haemorrhoid", "fistula", "bowel resection"],
+    "omfs" : ["jaw", "dental", "oral", "maxillofacial", "mandibular", "temporomandibular", "tmj"],
 }
 
 # Agent system prompt
-AGENT_SYSTEM_PROMPT = """You are a clinical AI assistant working with synthetic OMOP CDM v5.4 patient data
+AGENT_SYSTEM_PROMPT = """You are a clinical AI assistant working with synthetic patient data
 at Lancashire Teaching Hospitals NHS FT. You have access to tools that retrieve structured
 patient data and clinical protocol documents.
 

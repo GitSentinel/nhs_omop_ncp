@@ -15,7 +15,8 @@ from langchain_openai import ChatOpenAI
 # Project Configuration
 from config import (
     AZURE_DATASET_PATH,
-    DATASET_PATH,
+    SOURCE_DATASET_PATH,
+    N_DATASET_SAMPLES,
 )
 
 from src.config.settings import settings
@@ -39,7 +40,17 @@ Clinic letter:
 Reply with ONLY the digit 0 or 1. Nothing else."""
 
 
+def resolve_dataset_path(path: Path, default_filename: str) -> Path:
+    # Path Resolution
+    if path.suffix:
+        return path
+
+    return path / default_filename
+
+
 def make_llm() -> ChatOpenAI:
+    """Create the Azure OpenAI labelling model."""
+
     # Azure OpenAI Client Setup
     return ChatOpenAI(
         model=settings.azure_openai_deployment,
@@ -51,7 +62,7 @@ def make_llm() -> ChatOpenAI:
 
 def parse_label(content: str) -> int:
     # Label Parsing
-    content = content.strip()
+    content = str(content).strip()
 
     if content.startswith("1"):
         return 1
@@ -87,8 +98,14 @@ def label_with_azure(
 
 
 def load_source_samples(n_samples: int) -> list[dict]:
+    # Source Path Setup
+    source_path = resolve_dataset_path(
+        SOURCE_DATASET_PATH,
+        "clinic_letters_labelled.json",
+    )
+
     # Dataset Loading
-    with open(DATASET_PATH, "r", encoding="utf-8") as file:
+    with open(source_path, "r", encoding="utf-8") as file:
         data = json.load(file)
 
     # Sample Selection
@@ -123,8 +140,7 @@ def build_relabelled_example(
     }
 
 
-def relabel(n_samples: int = 1200) -> None:
-    # Run Setup
+def relabel(n_samples: int = N_DATASET_SAMPLES) -> None:
     print(
         "Re-labelling "
         f"{n_samples:,} samples with Azure OpenAI "
@@ -132,6 +148,10 @@ def relabel(n_samples: int = 1200) -> None:
     )
 
     samples = load_source_samples(n_samples)
+
+    if not samples:
+        raise ValueError("No source samples found for re-labelling.")
+
     llm = make_llm()
 
     relabelled = []
@@ -141,7 +161,10 @@ def relabel(n_samples: int = 1200) -> None:
 
     # Re-Labelling Loop
     for index, example in enumerate(samples):
-        new_label, label_failed = label_with_azure(example["text"], llm)
+        new_label, label_failed = label_with_azure(
+            example["text"],
+            llm,
+        )
 
         relabelled_example = build_relabelled_example(
             example,
@@ -189,9 +212,14 @@ def relabel(n_samples: int = 1200) -> None:
     }
 
     # Dataset Saving
-    AZURE_DATASET_PATH.parent.mkdir(parents=True, exist_ok=True)
+    azure_dataset_path = resolve_dataset_path(
+        AZURE_DATASET_PATH,
+        "clinic_letters_azure_labelled.json",
+    )
 
-    with open(AZURE_DATASET_PATH, "w", encoding="utf-8") as file:
+    azure_dataset_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with open(azure_dataset_path, "w", encoding="utf-8") as file:
         json.dump(
             dataset,
             file,
@@ -208,8 +236,8 @@ def relabel(n_samples: int = 1200) -> None:
     print(f"  Failed labels       : {n_failed:,}")
     print(f"  Label 0 (routine)   : {label_counts[0]:,}")
     print(f"  Label 1 (treatment) : {label_counts[1]:,}")
-    print(f"  Output              : {AZURE_DATASET_PATH}")
+    print(f"  Output              : {azure_dataset_path}")
 
 
 if __name__ == "__main__":
-    relabel(n_samples=1200)
+    relabel()

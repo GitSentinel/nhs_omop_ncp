@@ -11,7 +11,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 # Project Configuration
 from config import (
-    FINETUNE_DIR,
+    SOURCE_DATASET_PATH,
     N_DATASET_SAMPLES,
     TREATMENT_KEYWORDS,
     ROUTINE_KEYWORDS,
@@ -24,22 +24,31 @@ from src.data_access.connection import get_table
 random.seed(42)
 
 # Output Configuration
-FINETUNE_DIR.mkdir(parents=True, exist_ok=True)
+OUTPUT_PATH = (
+    SOURCE_DATASET_PATH
+    if SOURCE_DATASET_PATH.suffix
+    else SOURCE_DATASET_PATH / "clinic_letters_labelled.json"
+)
 
-OUTPUT_PATH = FINETUNE_DIR / "clinic_letters_labelled.json"
+OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 
 def label_note(note_text: str) -> int:
+    # Text Normalisation
     text_lower = note_text.lower()
 
+    # Keyword Scoring
     treatment_score = sum(
-        keyword in text_lower for keyword in TREATMENT_KEYWORDS
+        keyword in text_lower
+        for keyword in TREATMENT_KEYWORDS
     )
 
     routine_score = sum(
-        keyword in text_lower for keyword in ROUTINE_KEYWORDS
+        keyword in text_lower
+        for keyword in ROUTINE_KEYWORDS
     )
 
+    # Label Assignment
     if treatment_score > routine_score:
         return 1
 
@@ -50,6 +59,7 @@ def label_note(note_text: str) -> int:
 
 
 def format_sample(row) -> dict:
+    # Label Formatting
     label = int(row.label)
 
     return {
@@ -67,9 +77,10 @@ def format_sample(row) -> dict:
 
 
 def generate_dataset(n_samples: int = 600) -> None:
-    print(f"Generating labelled dataset ({n_samples} samples)...")
+    # Run Setup
+    print(f"Generating labelled dataset ({n_samples:,} samples)...")
 
-    # OMOP note extraction
+    # OMOP Note Extraction
     note = get_table("note")
 
     notes_df = (
@@ -88,7 +99,7 @@ def generate_dataset(n_samples: int = 600) -> None:
 
     print(f"  Fetched {len(notes_df):,} notes from DuckDB")
 
-    # Note length filtering
+    # Note Length Filtering
     notes_df["note_length"] = notes_df["note_text"].str.len()
 
     notes_df = notes_df[
@@ -96,16 +107,22 @@ def generate_dataset(n_samples: int = 600) -> None:
     ].copy()
 
     print(
-        "  After length filter (100–2000 characters): "
+        "  After length filter (100-2000 characters): "
         f"{len(notes_df):,} notes"
     )
 
-    # Heuristic label generation
+    if len(notes_df) < n_samples:
+        raise ValueError(
+            f"Requested {n_samples:,} samples, but only "
+            f"{len(notes_df):,} valid notes remain after filtering."
+        )
+
+    # Heuristic Label Generation
     notes_df["label"] = notes_df["note_text"].apply(label_note)
 
     # Reproducible Sampling
     samples = notes_df.sample(
-        n=min(n_samples, len(notes_df)),
+        n=n_samples,
         random_state=42,
     ).reset_index(drop=True)
 
@@ -113,13 +130,13 @@ def generate_dataset(n_samples: int = 600) -> None:
 
     print(f"  Label distribution: {label_counts.to_dict()}")
 
-    # Train and test split
+    # Train and Test Split
     n_train = int(len(samples) * 0.8)
 
     train = samples.iloc[:n_train]
     test = samples.iloc[n_train:]
 
-    # Dataset structure
+    # Dataset Structure
     dataset = {
         "task": "binary_classification",
         "description": (
@@ -142,7 +159,7 @@ def generate_dataset(n_samples: int = 600) -> None:
         ],
     }
 
-    # Dataset saving
+    # Dataset Saving
     with open(OUTPUT_PATH, "w", encoding="utf-8") as file:
         json.dump(
             dataset,
@@ -151,7 +168,7 @@ def generate_dataset(n_samples: int = 600) -> None:
             ensure_ascii=False,
         )
 
-    # Dataset summary
+    # Dataset Summary
     print()
     print("=" * 60)
     print("DATASET GENERATION COMPLETE")
@@ -163,7 +180,7 @@ def generate_dataset(n_samples: int = 600) -> None:
     print(f"  Treatment event     : {int(label_counts.get(1, 0)):,}")
     print(f"  Output path         : {OUTPUT_PATH}")
 
-    # Sample inspection
+    # Sample Inspection
     print("\nSample training examples:")
 
     for example in dataset["train"][:3]:

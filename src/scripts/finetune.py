@@ -78,7 +78,7 @@ def format_example(text: str, label: int, tokenizer) -> dict:
     )["input_ids"]
 
     # Prompt Truncation
-    max_prompt_len = MAX_LENGTH - len(response_ids)
+    max_prompt_len = max(0, MAX_LENGTH - len(response_ids))
     prompt_ids = prompt_ids[:max_prompt_len]
 
     # Input and Label Construction
@@ -115,7 +115,7 @@ def load_splits(tokenizer) -> tuple[Dataset, Dataset, dict]:
 
 def parse_generated_label(generated_text: str) -> int:
     # Label Parsing
-    generated_text = generated_text.strip()
+    generated_text = str(generated_text).strip()
 
     if generated_text.startswith("1"):
         return 1
@@ -127,14 +127,13 @@ def evaluate_generative(
     model,
     tokenizer,
     test_raw: list,
-    max_examples: int = 200,
-) -> dict:  
+) -> dict:
     # Evaluation Setup
     model.eval()
 
     predictions = []
     labels = []
-    sample = test_raw[:max_examples]
+    sample = test_raw
 
     print(f"\nRunning generative evaluation on {len(sample):,} test examples...")
 
@@ -166,7 +165,7 @@ def evaluate_generative(
         labels.append(int(example["label"]))
 
         if (index + 1) % 50 == 0:
-            print(f"  {index + 1}/{len(sample)} evaluated...")
+            print(f"  {index + 1:,}/{len(sample):,} evaluated...")
 
     # Metric Calculation
     labels_arr = np.array(labels)
@@ -204,7 +203,7 @@ def print_run_header() -> None:
 
     # Run Header
     print("=" * 65)
-    print("NHS OMOP MCP - Sprint 3 QLoRA Fine-Tuning")
+    print("QLoRA Fine-Tuning")
     print("=" * 65)
     print(f"Base model : {BASE_MODEL}")
     print(f"Device     : {device_name}")
@@ -213,7 +212,7 @@ def print_run_header() -> None:
     print()
 
 
-def run_finetune() -> None:
+def run_finetune() -> None: 
     # GPU Check
     if not torch.cuda.is_available():
         raise RuntimeError("CUDA GPU is required for this 4-bit QLoRA run.")
@@ -328,7 +327,12 @@ def run_finetune() -> None:
         print("\nStarting QLoRA fine-tuning...")
         trainer.train()
 
-        # Generative Evaluation
+        # Full Test-Set Evaluation
+        print(
+            f"Automatically evaluating full test split: "
+            f"{len(raw_data['test']):,} examples"
+        )
+
         eval_metrics = evaluate_generative(
             model,
             tokenizer,
