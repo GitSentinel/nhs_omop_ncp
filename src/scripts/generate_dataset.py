@@ -1,5 +1,14 @@
+"""
+Generate Provisional Source Clinic-Letter Dataset
+
+Extracts synthetic OMOP clinic letters and assigns provisional heuristic labels before Azure OpenAI re-labelling.
+
+Run:
+uv run python src/scripts/generate_dataset.py
+"""
+
 import json
-import random
+import math
 import sys
 from pathlib import Path
 
@@ -20,8 +29,13 @@ from config import (
 # OMOP Data Access
 from src.data_access.connection import get_table
 
-# Reproducibility
-random.seed(42)
+# Dataset Configuration
+MIN_NOTE_CHARS = 100
+MAX_NOTE_CHARS = 2000
+TEXT_CHAR_LIMIT = 1000
+FETCH_MULTIPLIER = 3
+TRAIN_FRACTION = 0.8
+RANDOM_SEED = 42
 
 # Output Configuration
 OUTPUT_PATH = (
@@ -33,9 +47,33 @@ OUTPUT_PATH = (
 OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 
-def label_note(note_text: str) -> int:
+def normalise_label(value) -> int | None:
+    """Convert a provisional label value into 0, 1, or None."""
+
+    # Missing Label Handling
+    if value is None:
+        return None
+
+    if isinstance(value, float) and math.isnan(value):
+        return None
+
+    # Binary Label Handling
+    try:
+        label = int(value)
+    except (TypeError, ValueError):
+        return None
+
+    if label in (0, 1):
+        return label
+
+    return None
+
+
+def label_note(note_text: str) -> int | None:
+    """Assign a provisional keyword-based label to one clinic letter."""
+
     # Text Normalisation
-    text_lower = note_text.lower()
+    text_lower = str(note_text).lower()
 
     # Keyword Scoring
     treatment_score = sum(
@@ -48,37 +86,48 @@ def label_note(note_text: str) -> int:
         for keyword in ROUTINE_KEYWORDS
     )
 
-    # Label Assignment
+    # Provisional Label Assignment
     if treatment_score > routine_score:
         return 1
 
     if routine_score > treatment_score:
         return 0
 
-    return random.choice([0, 1])
+    return None
+
+
+def label_name(label: int | None) -> str:
+    """Return the text label name for a provisional class."""
+
+    # Label Name Mapping
+    return {
+        0: "routine_followup",
+        1: "treatment_event",
+        None: "uncertain",
+    }[label]
 
 
 def format_sample(row) -> dict:
-    # Label Formatting
-    label = int(row.label)
+    """Convert a dataframe row into the source JSON format."""
+
+    # Provisional Label Formatting
+    label = normalise_label(row.label)
 
     return {
         "note_id": int(row.note_id),
         "person_id": int(row.person_id),
         "note_date": str(row.note_date),
-        "text": row.note_text[:1000],
+        "text": str(row.note_text)[:TEXT_CHAR_LIMIT],
         "label": label,
-        "label_name": (
-            "treatment_event"
-            if label == 1
-            else "routine_followup"
-        ),
+        "label_name": label_name(label),
     }
 
 
-def generate_dataset(n_samples: int = 600) -> None:
+def generate_dataset(n_samples: int = N_DATASET_SAMPLES) -> None:
+    """Generate and save the provisional source clinic-letter dataset."""
+
     # Run Setup
-    print(f"Generating labelled dataset ({n_samples:,} samples)...")
+    print(f"Generating provisional dataset ({n_samples:,} samples)...")
 
     # OMOP Note Extraction
     note = get_table("note")
@@ -93,7 +142,7 @@ def generate_dataset(n_samples: int = 600) -> None:
         )
         .filter(note.note_text.notnull())
         .order_by(note.note_id)
-        .limit(n_samples * 3)
+        .limit(n_samples * FETCH_MULTIPLIER)
         .execute()
     )
 
@@ -103,11 +152,14 @@ def generate_dataset(n_samples: int = 600) -> None:
     notes_df["note_length"] = notes_df["note_text"].str.len()
 
     notes_df = notes_df[
-        notes_df["note_length"].between(100, 2000)
+        notes_df["note_length"].between(
+            MIN_NOTE_CHARS,
+            MAX_NOTE_CHARS,
+        )
     ].copy()
 
     print(
-        "  After length filter (100-2000 characters): "
+        f"  After length filter ({MIN_NOTE_CHARS}-{MAX_NOTE_CHARS} characters): "
         f"{len(notes_df):,} notes"
     )
 
@@ -117,21 +169,27 @@ def generate_dataset(n_samples: int = 600) -> None:
             f"{len(notes_df):,} valid notes remain after filtering."
         )
 
-    # Heuristic Label Generation
+    # Provisional Heuristic Labelling
     notes_df["label"] = notes_df["note_text"].apply(label_note)
 
     # Reproducible Sampling
     samples = notes_df.sample(
         n=n_samples,
-        random_state=42,
+        random_state=RANDOM_SEED,
     ).reset_index(drop=True)
 
-    label_counts = samples["label"].value_counts().sort_index()
+    # Label Distribution Summary
+    label_counts = samples["label"].value_counts(
+        dropna=True,
+    ).sort_index()
 
-    print(f"  Label distribution: {label_counts.to_dict()}")
+    uncertain_count = int(samples["label"].isna().sum())
 
-    # Train and Test Split
-    n_train = int(len(samples) * 0.8)
+    print(f"  Provisional label distribution: {label_counts.to_dict()}")
+    print(f"  Provisional uncertain labels  : {uncertain_count:,}")
+
+    # Source Split Retained for Backward Compatibility
+    n_train = int(len(samples) * TRAIN_FRACTION)
 
     train = samples.iloc[:n_train]
     test = samples.iloc[n_train:]
@@ -140,15 +198,18 @@ def generate_dataset(n_samples: int = 600) -> None:
     dataset = {
         "task": "binary_classification",
         "description": (
-            "Classify synthetic OMOP clinic letters as treatment "
-            "event (1) or routine follow-up (0)"
+            "Synthetic OMOP clinic letters with provisional heuristic "
+            "labels. Final labels are assigned by relabel_dataset.py."
         ),
         "label_map": {
             "0": "routine_followup",
             "1": "treatment_event",
+            "null": "uncertain",
         },
+        "n_total": len(samples),
         "n_train": len(train),
         "n_test": len(test),
+        "n_uncertain": uncertain_count,
         "train": [
             format_sample(row)
             for _, row in train.iterrows()
@@ -178,6 +239,7 @@ def generate_dataset(n_samples: int = 600) -> None:
     print(f"  Test samples        : {len(test):,}")
     print(f"  Routine follow-up   : {int(label_counts.get(0, 0)):,}")
     print(f"  Treatment event     : {int(label_counts.get(1, 0)):,}")
+    print(f"  Uncertain           : {uncertain_count:,}")
     print(f"  Output path         : {OUTPUT_PATH}")
 
     # Sample Inspection
