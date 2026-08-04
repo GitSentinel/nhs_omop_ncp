@@ -1,0 +1,400 @@
+{
+  "task": "pifu_eligibility_3class",
+  "split": "challenge",
+  "label_map": {
+    "NOT_ELIGIBLE": 0,
+    "BORDERLINE": 1,
+    "ELIGIBLE": 2
+  },
+  "n_samples": 24,
+  "class_counts": {
+    "ELIGIBLE": 5,
+    "NOT_ELIGIBLE": 19
+  },
+  "samples": [
+    {
+      "sample_id": "CS_EC_WPW_PIFU_745",
+      "text": "NHS England\nLeeds Teaching Hospitals NHS Trust\nCardiology Department\nLeeds General Infirmary, Great George Street, LS1 3EX\nTel: 0113 243 2799\n\nDate: 15/03/2024\n\nDr S. Khan\nGreenwood Medical Centre\n34 Main Street\nM1 1AA\n\nDear Dr S. Khan,\n\nRe: Ms William Evans\nDOB: 07/02/1992\nNHS Number: 399 587 4896\n\n**Outpatient Clinic Letter — Wolff-Parkinson-White Syndrome**\n\nThank you for referring Ms William Evans with a history of Wolff-Parkinson-White (WPW) syndrome who underwent successful radiofrequency catheter ablation of an accessory pathway 8 months ago.\n\n**Post-Ablation Review:**\nMs William Evans reports complete resolution of palpitations since ablation. No pre-excitation on today's 12-lead ECG — delta waves have resolved confirming successful accessory pathway ablation. No episodes of SVT, no presyncope or syncope. Exercise tolerance excellent. Pre-ablation echocardiogram showed structurally normal heart, preserved EF 65%. No antiarrhythmic medications are required.\n\n**Decision & Plan:**\nThis is an excellent clinical outcome. Ms William Evans has been fully counselled regarding symptoms of WPW recurrence: rapid palpitations, presyncope, or syncope. They understand to contact the arrhythmia PIFU line immediately if these develop, given the potential for rapid conduction via an accessory pathway.\n\n**Ms William Evans is placed on a Patient-Initiated Follow-Up (PIFU) pathway for 12 months.** No antiarrhythmic medication required. No routine hospital appointment scheduled. Driving advice given in line with DVLA guidance for WPW post-successful ablation.\nYours sincerely,\n\nDr Fiona Lester, Consultant in Cardiac Electrophysiology\n\ncc: Patient (copy enclosed)\n",
+      "label": 2,
+      "label_name": "ELIGIBLE",
+      "source": "pifu_edge_cases",
+      "metadata": {
+        "document_type": "clinic_letter",
+        "specialty": "Cardiology",
+        "referral_reason": "Wolff-Parkinson-White syndrome",
+        "clock_stop_event_type": "Active Monitoring - Patient Initiated (PIFU)",
+        "non_clock_stop_scenario": null,
+        "hard_negative": false,
+        "expected_reasoning": "CLOCK STOP — PIFU. Post-ablation WPW with confirmed accessory pathway elimination (delta wave resolution on ECG). Completely asymptomatic, structurally normal heart, no medications required. Meets NHS England arrhythmia PIFU criteria: post-ablation, stable, asymptomatic, with clear re-contact pathway. Patient counselled on recurrence symptoms. PIFU is appropriate. **Expected verdict: For PIFU.**"
+      }
+    },
+    {
+      "sample_id": "NCS_EC_WPW_NO_287",
+      "text": "NHS England\nLeeds Teaching Hospitals NHS Trust\nCardiology Department\nLeeds General Infirmary, Great George Street, LS1 3EX\nTel: 0113 243 2799\n\nDate: 16/09/2024\n\nDr S. Khan\nGreenwood Medical Centre\n34 Main Street\nM1 1AA\n\nDear Dr S. Khan,\n\nRe: Dr James Thomas\nDOB: 27/08/2006\nNHS Number: 276 911 4133\n\n**Outpatient Clinic Letter — Wolff-Parkinson-White Syndrome**\n\nThank you for referring Dr James Thomas with newly identified WPW pattern on ECG following investigation of symptomatic palpitations.\n\n**Assessment:**\nDr James Thomas is a 22-year-old with a 6-month history of rapid palpitations, one episode of presyncope. 12-lead ECG confirms WPW pattern with short PR interval and delta waves. Electrophysiology (EP) study has been arranged to risk-stratify the accessory pathway — specifically to assess antegrade refractory period and shortest pre-excited RR interval during AF, which will determine the arrhythmic risk. Echo: structurally normal heart.\n\nA decision regarding ablation will be made following the EP study. Given the symptomatic nature and the need for formal risk stratification, PIFU is not appropriate at this stage. We will review Dr James Thomas in clinic following the EP study results.\nYours sincerely,\n\nDr James Whitfield, Consultant Interventional Cardiologist\n\ncc: Patient (copy enclosed)\n",
+      "label": 0,
+      "label_name": "NOT_ELIGIBLE",
+      "source": "pifu_edge_cases",
+      "metadata": {
+        "document_type": "clinic_letter",
+        "specialty": "Cardiology",
+        "referral_reason": "Wolff-Parkinson-White syndrome",
+        "clock_stop_event_type": null,
+        "non_clock_stop_scenario": "Awaiting Investigations or Results",
+        "hard_negative": false,
+        "expected_reasoning": "NON-CLOCK STOP — Awaiting Investigations or Results. Newly symptomatic WPW with presyncope, pending EP study for risk stratification and ablation planning. Timed follow-up is mandatory. PIFU exclusion: active investigation underway, pending intervention, and symptomatic accessory pathway not yet characterised. **Expected verdict: Not for PIFU.**"
+      }
+    },
+    {
+      "sample_id": "NCS_EC_BRU_NO_173",
+      "text": "NHS England\nLeeds Teaching Hospitals NHS Trust\nCardiology Department\nLeeds General Infirmary, Great George Street, LS1 3EX\nTel: 0113 243 2799\n\nDate: 25/04/2024\n\nDr S. Khan\nGreenwood Medical Centre\n34 Main Street\nM1 1AA\n\nDear Dr S. Khan,\n\nRe: Ms William Taylor\nDOB: 18/05/2002\nNHS Number: 646 580 4358\n\n**Outpatient Clinic Letter — Brugada Syndrome**\n\nThank you for referring Ms William Taylor with a diagnosis of Brugada syndrome, identified following resuscitated ventricular fibrillation (VF) arrest 18 months ago.\n\n**Background:**\nMs William Taylor was successfully resuscitated and underwent ICD implantation shortly after the arrest. They carry a Class I indication for secondary prevention ICD. Genetic testing confirmed SCN5A mutation (p.Arg1432Gln). One first-degree relative has been referred for family cascade screening.\n\n**Current Review:**\nMs William Taylor has had two appropriate ICD shocks in the past 12 months for VF episodes. Device interrogation today confirms appropriate sensing and pacing thresholds. Quinidine therapy is being considered to reduce VF burden. Psychological support has been arranged following the impact of ICD shocks.\n\n**Assessment & Plan:**\nGiven the history of VF arrest, confirmed pathogenic SCN5A mutation, ongoing ICD therapy and appropriate shocks, ongoing device follow-up and specialist review at 3-monthly intervals is mandatory. PIFU is absolutely contraindicated in this patient. Clinic review booked in 3 months.\nYours sincerely,\n\nDr Simon Okafor, Consultant Electrophysiologist\n\ncc: Patient (copy enclosed)\n",
+      "label": 0,
+      "label_name": "NOT_ELIGIBLE",
+      "source": "pifu_edge_cases",
+      "metadata": {
+        "document_type": "clinic_letter",
+        "specialty": "Cardiology",
+        "referral_reason": "Brugada syndrome",
+        "clock_stop_event_type": null,
+        "non_clock_stop_scenario": "Follow-up Appointment Booked",
+        "hard_negative": false,
+        "expected_reasoning": "NON-CLOCK STOP — Follow-up Appointment Booked. High-risk Brugada syndrome with confirmed VF arrest, ICD with recent appropriate shocks, ongoing arrhythmic burden, and consideration of antiarrhythmic therapy. Multiple hard PIFU exclusions: complex device patient with recent ICD therapies, active medication changes under review, and life-threatening arrhythmia history. Mandatory timed specialist follow-up. **Expected verdict: Not for PIFU.**"
+      }
+    },
+    {
+      "sample_id": "CS_EC_ANG_PIFU_857",
+      "text": "NHS England\nLeeds Teaching Hospitals NHS Trust\nCardiology Department\nLeeds General Infirmary, Great George Street, LS1 3EX\nTel: 0113 243 2799\n\nDate: 21/02/2024\n\nDr S. Khan\nGreenwood Medical Centre\n34 Main Street\nM1 1AA\n\nDear Dr S. Khan,\n\nRe: Mr Thomas Green\nDOB: 15/10/1950\nNHS Number: 821 651 2250\n\n**Outpatient Clinic Letter — Stable Angina**\n\nThank you for referring Mr Thomas Green with chronic stable angina for ongoing management review.\n\n**Clinical Review:**\nMr Thomas Green has a 3-year history of stable exertional angina. Coronary angiogram 2 years ago demonstrated moderate single-vessel disease (mid-LAD 60% stenosis) — not amenable to revascularisation at that time given the lesion characteristics. Mr Thomas Green is on optimised medical therapy: Bisoprolol 5mg od, Amlodipine 10mg od, Isosorbide mononitrate 30mg od, Atorvastatin 80mg od, Aspirin 75mg od, and GTN spray PRN.\n\nAt today's review, Mr Thomas Green reports stable angina symptoms — exertional chest tightness on hills or stairs only, completely relieved by GTN within 2 minutes, with no change in pattern for 18 months. No rest pain, no nocturnal symptoms, no radiation to jaw or arm at rest. Exercise tolerance approximately 6 METs. BP 128/74, HR 58. CCS Class I–II stable angina.\n\n**Decision & Plan:**\nMr Thomas Green has been counselled on red flag symptoms warranting urgent review: change in anginal pattern (increasing frequency, lower threshold, rest pain), prolonged chest pain >20 minutes unresponsive to GTN, new radiation pattern, or associated presyncope. They are fully aware of these symptoms and confident in recognising deterioration.\n\n**Mr Thomas Green has been placed on a Patient-Initiated Follow-Up (PIFU) pathway for 12 months.** Annual lipid profile, renal function and medication review to continue in primary care. They have been provided with the cardiology PIFU contact number. No routine hospital appointment is scheduled. Patient in full agreement with this plan.\nYours sincerely,\n\nDr Tariq Hassan, Consultant Cardiologist\n\ncc: Patient (copy enclosed)\n",
+      "label": 2,
+      "label_name": "ELIGIBLE",
+      "source": "pifu_edge_cases",
+      "metadata": {
+        "document_type": "clinic_letter",
+        "specialty": "Cardiology",
+        "referral_reason": "stable angina",
+        "clock_stop_event_type": "Active Monitoring - Patient Initiated (PIFU)",
+        "non_clock_stop_scenario": null,
+        "hard_negative": false,
+        "expected_reasoning": "CLOCK STOP — PIFU. Stable CCS I–II chronic angina on optimised medical therapy, stable symptom pattern for 18 months, no adverse features. No specific NHS England PIFU guideline for stable angina, but general SOP eligibility criteria are met: clinically stable, patient health-literate, able to recognise deterioration, no secondary care monitoring requirement for medications. PIFU appropriate. **Expected verdict: For PIFU.**"
+      }
+    },
+    {
+      "sample_id": "NCS_EC_HOCM_NO_555",
+      "text": "NHS England\nLeeds Teaching Hospitals NHS Trust\nCardiology Department\nLeeds General Infirmary, Great George Street, LS1 3EX\nTel: 0113 243 2799\n\nDate: 24/02/2024\n\nDr S. Khan\nGreenwood Medical Centre\n34 Main Street\nM1 1AA\n\nDear Dr S. Khan,\n\nRe: Mrs William Williams\nDOB: 19/08/2001\nNHS Number: 947 181 9814\n\n**Outpatient Clinic Letter — Hypertrophic Obstructive Cardiomyopathy**\n\nThank you for referring Mrs William Williams with hypertrophic obstructive cardiomyopathy (HOCM) for specialist cardiology review.\n\n**Clinical Assessment:**\nMrs William Williams has a confirmed diagnosis of HOCM with significant LV outflow tract (LVOT) obstruction. TTE today demonstrates maximum wall thickness 22mm (septal), LVOT gradient at rest 52 mmHg rising to 88 mmHg with Valsalva manoeuvre. LV systolic function preserved (EF 68%) but diastolic dysfunction grade II. Mild mitral regurgitation secondary to SAM.\n\nMrs William Williams reports exertional dyspnoea (NYHA III), pre-syncopal episodes on exertion (twice in past 3 months), and chest tightness. Family history: first-degree relative with sudden cardiac death at age 34. HCM Risk-SCD 5-year score calculated at 6.8% — ICD implantation is being recommended and discussed with the patient.\n\n**Sudden Death Risk Stratification:**\nGiven the HCM Risk-SCD score >6%, symptomatic LVOT obstruction, family history of SCD, and exertional presyncope, ICD implantation is strongly recommended. The patient has been referred to the inherited cardiac conditions (ICC) MDT. Genetic testing (MYBPC3, MYH7 panel) has been requested. Family cascade screening recommended.\n\n**PIFU is not appropriate.** Mandatory 3-monthly cardiology review is required. Disopyramide has been commenced for LVOT obstruction symptom management pending assessment for septal reduction therapy.\nYours sincerely,\n\nDr Priya Nair, Consultant Heart Failure Specialist\n\ncc: Patient (copy enclosed)\n",
+      "label": 0,
+      "label_name": "NOT_ELIGIBLE",
+      "source": "pifu_edge_cases",
+      "metadata": {
+        "document_type": "clinic_letter",
+        "specialty": "Cardiology",
+        "referral_reason": "hypertrophic obstructive cardiomyopathy",
+        "clock_stop_event_type": null,
+        "non_clock_stop_scenario": "Follow-up Appointment Booked",
+        "hard_negative": false,
+        "expected_reasoning": "NON-CLOCK STOP — Follow-up Appointment Booked. Symptomatic HOCM with significant LVOT obstruction, exertional presyncope, family history of SCD, and high HCM Risk-SCD score. ICD implantation recommended, ICC MDT referral made, genetic testing pending, new antiarrhythmic commenced. Multiple hard PIFU exclusions: complex high-risk condition, pending intervention, active medication changes, and mandatory surveillance echocardiography. **Expected verdict: Not for PIFU.**"
+      }
+    },
+    {
+      "sample_id": "CS_EC_IHD_PIFU_720",
+      "text": "NHS England\nLeeds Teaching Hospitals NHS Trust\nCardiology Department\nLeeds General Infirmary, Great George Street, LS1 3EX\nTel: 0113 243 2799\n\nDate: 19/01/2025\n\nDr S. Khan\nGreenwood Medical Centre\n34 Main Street\nM1 1AA\n\nDear Dr S. Khan,\n\nRe: Dr Emily Walker\nDOB: 17/01/1948\nNHS Number: 948 963 7620\n\n**Outpatient Clinic Letter — Ischaemic Heart Disease**\n\nThank you for referring Dr Emily Walker for cardiology follow-up following NSTEMI and successful percutaneous coronary intervention (PCI) to the right coronary artery (RCA) 14 months ago.\n\n**Clinical Review:**\nDr Emily Walker has made an excellent recovery. They completed cardiac rehabilitation 12 months ago. At today's review: no chest pain, no exertional dyspnoea, no palpitations. Exercise tolerance excellent (>8 METs on functional assessment). On guideline-directed therapy: Ticagrelor 90mg bd (completing 12-month DAPT, switching to Aspirin 75mg od from next month), Atorvastatin 80mg od (LDL 1.4 mmol/L), Ramipril 10mg od, Bisoprolol 2.5mg od. BP 122/70, HR 62. Echocardiogram 6 months post-PCI: preserved EF 58%, no regional wall motion abnormality.\n\n**Decision & Plan:**\nDr Emily Walker has been counselled on symptoms of ACS recurrence requiring emergency presentation: chest pain at rest, new exertional chest pain, prolonged pain unresponsive to GTN, or associated breathlessness, sweating or radiation. They are clear on when to call 999.\n\n**Dr Emily Walker has been placed on a Patient-Initiated Follow-Up (PIFU) pathway for 12 months.** Ongoing medication management and annual cardiovascular review to continue with their GP. No routine hospital cardiology appointment is required. Patient fully in agreement.\nYours sincerely,\n\nDr Fiona Lester, Consultant in Cardiac Electrophysiology\n\ncc: Patient (copy enclosed)\n",
+      "label": 2,
+      "label_name": "ELIGIBLE",
+      "source": "pifu_edge_cases",
+      "metadata": {
+        "document_type": "discharge_letter",
+        "specialty": "Cardiology",
+        "referral_reason": "ischaemic heart disease",
+        "clock_stop_event_type": "Active Monitoring - Patient Initiated (PIFU)",
+        "non_clock_stop_scenario": null,
+        "hard_negative": false,
+        "expected_reasoning": "CLOCK STOP — PIFU. Post-NSTEMI/PCI, 14 months post-procedure, completed cardiac rehab, asymptomatic, preserved EF, LDL at target, stable GDMT. No specific NHS PIFU guideline for post-MI/stable IHD, but general SOP eligibility criteria clearly met: stable, asymptomatic, health-literate, knows ACS red flags, no secondary care monitoring requirement. PIFU is appropriate for stable IHD in the post-acute phase. **Expected verdict: For PIFU.**"
+      }
+    },
+    {
+      "sample_id": "NCS_EC_LQT_NO_153",
+      "text": "NHS England\nLeeds Teaching Hospitals NHS Trust\nCardiology Department\nLeeds General Infirmary, Great George Street, LS1 3EX\nTel: 0113 243 2799\n\nDate: 07/01/2024\n\nDr S. Khan\nGreenwood Medical Centre\n34 Main Street\nM1 1AA\n\nDear Dr S. Khan,\n\nRe: Dr Amara Wilson\nDOB: 16/07/1971\nNHS Number: 855 241 7296\n\n**Outpatient Clinic Letter — Long Qt Syndrome**\n\nThank you for referring Dr Amara Wilson with congenital long QT syndrome (LQTS), confirmed LQT1 (KCNQ1 mutation).\n\n**Current Review:**\nDr Amara Wilson is maintained on Propranolol 80mg bd. Resting QTc on today's ECG is 468ms (prolonged but stable vs previous 471ms). No syncopal episodes in past 6 months. However, Dr Amara Wilson had one episode of presyncope during exercise 3 months ago, which has been further investigated. 24-hour Holter showed short runs of Torsades de Pointes (TdP) associated with sympathetic activation. ICD implantation is under active discussion given the TdP episodes despite beta-blockade.\n\n**Assessment & Plan:**\nThe management of LQTS requires careful lifelong specialist supervision given the risk of life-threatening arrhythmia. Drug interactions with QT-prolonging medications must be actively managed and require regular secondary care oversight. Genetic cascade screening of first-degree relatives is ongoing. ICD discussion to continue at next clinic.\n\nPIFU is not appropriate for this patient. Mandatory 6-monthly cardiology review required. Next clinic appointment in 3 months to finalise ICD decision.\nYours sincerely,\n\nDr Rachel Moore, Consultant Cardiologist\n\ncc: Patient (copy enclosed)\n",
+      "label": 0,
+      "label_name": "NOT_ELIGIBLE",
+      "source": "pifu_edge_cases",
+      "metadata": {
+        "document_type": "clinic_letter",
+        "specialty": "Cardiology",
+        "referral_reason": "long QT syndrome",
+        "clock_stop_event_type": null,
+        "non_clock_stop_scenario": "Follow-up Appointment Booked",
+        "hard_negative": false,
+        "expected_reasoning": "NON-CLOCK STOP — Follow-up Appointment Booked. LQT1 with documented TdP on Holter despite beta-blockade, pending ICD decision, ongoing cascade screening. Multiple hard PIFU exclusions: life-threatening arrhythmia risk requiring specialist drug interaction monitoring, active ICD discussion, presyncope on treatment. Timed follow-up mandatory. **Expected verdict: Not for PIFU.**"
+      }
+    },
+    {
+      "sample_id": "CS_EC_DCM_PIFU_582",
+      "text": "NHS England\nLeeds Teaching Hospitals NHS Trust\nCardiology Department\nLeeds General Infirmary, Great George Street, LS1 3EX\nTel: 0113 243 2799\n\nDate: 29/01/2024\n\nDr S. Khan\nGreenwood Medical Centre\n34 Main Street\nM1 1AA\n\nDear Dr S. Khan,\n\nRe: Miss Sarah Walker\nDOB: 14/02/1959\nNHS Number: 362 616 9009\n\n**Outpatient Clinic Letter — Dilated Cardiomyopathy**\n\nThank you for referring Miss Sarah Walker with dilated cardiomyopathy (DCM) for ongoing review.\n\n**Clinical Review:**\nMiss Sarah Walker was diagnosed with DCM 3 years ago (initial EF 30%). They have been on optimised GDMT for 30 months: Sacubitril/Valsartan 97/103mg bd, Carvedilol 25mg bd, Spironolactone 25mg od, Dapagliflozin 10mg od. Most recent echo (3 months ago) shows significant improvement in LV function — EF now 50% (from nadir of 28%). LVEDV normalised. No significant MR. ICD was implanted 2.5 years ago for primary prevention (EF <35% at diagnosis) — device interrogation today shows no therapies delivered in 24 months, stable sensing and pacing thresholds. Remote device monitoring is active via the home monitoring system.\n\nMiss Sarah Walker is NYHA Class I, asymptomatic, back in full-time employment, BP 114/68, HR 56, eGFR 62 (stable), K+ 4.4. No admissions in 2 years.\n\n**Decision & Plan:**\nRemarkable recovery of LV function on GDMT. Miss Sarah Walker has been counselled on symptoms of deterioration: worsening breathlessness, ankle swelling, weight gain >2kg in 48 hours, or palpitations. They understand to contact the heart failure PIFU line if any develop, and that the remote ICD monitoring system provides a safety net.\n\n**Miss Sarah Walker has been placed on a PIFU pathway for 12 months.** ICD remote monitoring will continue. Annual echo and bloods via the heart failure service. No routine clinic appointment scheduled. Patient in full agreement.\nYours sincerely,\n\nDr Tariq Hassan, Consultant Cardiologist\n\ncc: Patient (copy enclosed)\n",
+      "label": 2,
+      "label_name": "ELIGIBLE",
+      "source": "pifu_edge_cases",
+      "metadata": {
+        "document_type": "clinic_letter",
+        "specialty": "Cardiology",
+        "referral_reason": "dilated cardiomyopathy",
+        "clock_stop_event_type": "Active Monitoring - Patient Initiated (PIFU)",
+        "non_clock_stop_scenario": null,
+        "hard_negative": false,
+        "expected_reasoning": "CLOCK STOP — PIFU. DCM with significant EF recovery to 50% on optimised GDMT, NYHA Class I, no hospitalisations in 2 years, stable biochemistry, ICD with no therapies and active remote monitoring providing safety net. General SOP and NHS HF PIFU eligibility criteria met. Remote monitoring mitigates the ICD device concern. **Expected verdict: For PIFU (with moderate-high confidence).**"
+      }
+    },
+    {
+      "sample_id": "NCS_EC_SARC_NO_689",
+      "text": "NHS England\nLeeds Teaching Hospitals NHS Trust\nCardiology Department\nLeeds General Infirmary, Great George Street, LS1 3EX\nTel: 0113 243 2799\n\nDate: 17/04/2025\n\nDr S. Khan\nGreenwood Medical Centre\n34 Main Street\nM1 1AA\n\nDear Dr S. Khan,\n\nRe: Mr David Roberts\nDOB: 03/01/1974\nNHS Number: 963 597 6782\n\n**Outpatient Clinic Letter — Cardiac Sarcoidosis**\n\nThank you for referring Mr David Roberts with known pulmonary and cardiac sarcoidosis for cardiology MDT review.\n\n**MDT Discussion:**\nMr David Roberts has biopsy-proven sarcoidosis with cardiac involvement confirmed on cardiac MRI (late gadolinium enhancement in the basal septum and lateral wall, consistent with cardiac sarcoidosis). Current treatment: Prednisolone 20mg od (tapering regime), Methotrexate 15mg weekly as steroid-sparing agent.\n\nHolter monitoring last month showed: frequent non-sustained VT (NSVT) runs up to 10 beats, complete heart block on one occasion (3-second pause). ICD was implanted with DDD pacing capability 6 months ago. Latest device interrogation: 3 ATP therapies delivered for VT in the past 3 months.\n\n**MDT Recommendations:**\nImmunosuppression regime to be reviewed by respiratory MDT — consideration of escalation to second-line agent (Azathioprine or Mycophenolate). Steroid dose increase discussed to suppress arrhythmic burden. Repeat cardiac MRI in 6 months to assess fibrosis progression. Mandatory 3-monthly cardiology review in view of ongoing ICD therapies and complex immunosuppression management. PIFU is entirely inappropriate for this patient.\nYours sincerely,\n\nDr James Whitfield, Consultant Interventional Cardiologist\n\ncc: Patient (copy enclosed)\n",
+      "label": 0,
+      "label_name": "NOT_ELIGIBLE",
+      "source": "pifu_edge_cases",
+      "metadata": {
+        "document_type": "mdt_letter",
+        "specialty": "Cardiology",
+        "referral_reason": "cardiac sarcoidosis",
+        "clock_stop_event_type": null,
+        "non_clock_stop_scenario": "MDT Decision Without Patient Communication",
+        "hard_negative": false,
+        "expected_reasoning": "NON-CLOCK STOP — MDT Decision Without Patient Communication. Complex cardiac sarcoidosis with active VT, ICD therapies, intermittent complete heart block, and complex titrating immunosuppression. Multiple absolute PIFU exclusions: active life-threatening arrhythmia, ICD with recent therapies, medication requiring secondary care monitoring, pending further investigations. PIFU entirely contraindicated. **Expected verdict: Not for PIFU.**"
+      }
+    },
+    {
+      "sample_id": "CS_EC_HTN_DISC_577",
+      "text": "NHS England\nLeeds Teaching Hospitals NHS Trust\nCardiology Department\nLeeds General Infirmary, Great George Street, LS1 3EX\nTel: 0113 243 2799\n\nDate: 15/02/2024\n\nDr S. Khan\nGreenwood Medical Centre\n34 Main Street\nM1 1AA\n\nDear Dr S. Khan,\n\nRe: Mr Sarah Hughes\nDOB: 25/01/1998\nNHS Number: 817 108 4930\n\n**Outpatient Clinic Letter — Hypertension**\n\nThank you for referring Mr Sarah Hughes for specialist hypertension review. Mr Sarah Hughes was referred following apparent resistant hypertension despite three agents.\n\n**Assessment:**\nFollowing specialist review, secondary causes of hypertension have been excluded (normal renal artery Doppler, normal aldosterone:renin ratio, normal 24-hour urine catecholamines). Ambulatory BP monitoring (ABPM) confirmed true hypertension (daytime mean 158/94 mmHg). Medication reconciliation identified poor adherence as the primary driver — tablet burden rationalised from four agents to two (Amlodipine 10mg od + Perindopril 8mg od). Education provided regarding importance of medication adherence.\n\n**Decision & Plan:**\nRepeat ABPM in 3 months via primary care. Ongoing BP management is appropriate for primary care and does not require ongoing specialist input. Mr Sarah Hughes has been formally discharged from the cardiology hypertension clinic. No further hospital follow-up is required. Annual cardiovascular risk review, renal function and electrolyte monitoring to continue in primary care as per NICE NG136.\nYours sincerely,\n\nDr Tariq Hassan, Consultant Cardiologist\n\ncc: Patient (copy enclosed)\n",
+      "label": 0,
+      "label_name": "NOT_ELIGIBLE",
+      "source": "pifu_edge_cases",
+      "metadata": {
+        "document_type": "clinic_letter",
+        "specialty": "Cardiology",
+        "referral_reason": "hypertension",
+        "clock_stop_event_type": "Discharge to Primary Care",
+        "non_clock_stop_scenario": null,
+        "hard_negative": false,
+        "expected_reasoning": "CLOCK STOP — Discharge to Primary Care. Secondary hypertension excluded, medication rationalised, BP management now appropriate for primary care. Hypertension rarely warrants PIFU from secondary care — the natural endpoint is discharge to GP, not PIFU. Ongoing management in primary care with ABPM follow-up is appropriate. **Expected verdict: Not for PIFU (discharged to primary care instead).**"
+      }
+    },
+    {
+      "sample_id": "NCS_EC_AMYL_NO_265",
+      "text": "NHS England\nLeeds Teaching Hospitals NHS Trust\nCardiology Department\nLeeds General Infirmary, Great George Street, LS1 3EX\nTel: 0113 243 2799\n\nDate: 30/01/2025\n\nDr S. Khan\nGreenwood Medical Centre\n34 Main Street\nM1 1AA\n\nDear Dr S. Khan,\n\nRe: Mr George Hughes\nDOB: 28/03/2001\nNHS Number: 345 367 4439\n\n**Outpatient Clinic Letter — Cardiac Amyloidosis**\n\nThank you for referring Mr George Hughes with a diagnosis of transthyretin cardiac amyloidosis (ATTR-CA), wild-type, confirmed on bone scintigraphy (Perugini grade 3).\n\n**Clinical Review:**\nMr George Hughes is maintained on Tafamidis 61mg od commenced 8 months ago. Heart failure management: Furosemide 80mg od (recently uptitrated), however standard neurohormonal agents (ACEi, beta-blocker) are poorly tolerated given low baseline BP (resting BP today 96/60). eGFR 38 ml/min/1.73m² (declining from 52 over past 6 months). NYHA III. AF present — rate controlled with Digoxin (standard beta-blocker not tolerated). INR 2.8 on warfarin.\n\n**Assessment & Plan:**\nProgressive ATTR-CA with declining renal function and worsening heart failure. Diuretic titration requires close monitoring. Warfarin management requires regular INR checks in secondary care given unstable renal function. Palliative care referral has been made given the progressive nature of ATTR-CA and patient's expressed preferences. PIFU is not appropriate. Monthly clinic review arranged.\nYours sincerely,\n\nDr Rachel Moore, Consultant Cardiologist\n\ncc: Patient (copy enclosed)\n",
+      "label": 0,
+      "label_name": "NOT_ELIGIBLE",
+      "source": "pifu_edge_cases",
+      "metadata": {
+        "document_type": "clinic_letter",
+        "specialty": "Cardiology",
+        "referral_reason": "cardiac amyloidosis",
+        "clock_stop_event_type": null,
+        "non_clock_stop_scenario": "Follow-up Appointment Booked",
+        "hard_negative": false,
+        "expected_reasoning": "NON-CLOCK STOP — Follow-up Appointment Booked. Progressive ATTR cardiac amyloidosis with declining renal function, NYHA III, active diuretic titration, warfarin requiring secondary care monitoring, and palliative care referral. Multiple hard PIFU exclusions: progressive disease, complex medication monitoring, declining function, NYHA III. **Expected verdict: Not for PIFU.**"
+      }
+    },
+    {
+      "sample_id": "CS_EC_HCM_PIFU_849",
+      "text": "NHS England\nLeeds Teaching Hospitals NHS Trust\nCardiology Department\nLeeds General Infirmary, Great George Street, LS1 3EX\nTel: 0113 243 2799\n\nDate: 22/10/2024\n\nDr S. Khan\nGreenwood Medical Centre\n34 Main Street\nM1 1AA\n\nDear Dr S. Khan,\n\nRe: Mrs David Smith\nDOB: 28/04/2004\nNHS Number: 786 613 7212\n\n**Outpatient Clinic Letter — Hypertrophic Cardiomyopathy**\n\nThank you for referring Mrs David Smith with hypertrophic cardiomyopathy (HCM) for annual surveillance review.\n\n**Clinical Review:**\nMrs David Smith has non-obstructive HCM (maximal wall thickness 16mm, no LVOT gradient at rest or provocation). Diagnosed 4 years ago following family cascade screening (sibling with HCM). Mrs David Smith has never had symptoms: no dyspnoea, no chest pain, no presyncope or syncope, no palpitations. Exercise tolerance excellent (>10 METs). HCM Risk-SCD 5-year score: 1.8% — ICD not indicated. Echo today stable vs 12 months ago (no progression). 48-hour Holter: sinus rhythm throughout, rare isolated PVCs only. No family history of SCD. Genetic testing: MYBPC3 variant of uncertain significance.\n\n**Decision & Plan:**\nMrs David Smith has been counselled regarding HCM and the importance of reporting any new symptoms immediately: chest pain, dyspnoea on exertion, presyncope, palpitations, or significant reduction in exercise tolerance. They understand the condition well and have excellent health literacy. They have been advised regarding activity restrictions per BSH HCM guidelines (avoidance of intense competitive sport).\n\nGiven the low-risk profile, absence of symptoms, no LVOT obstruction, low SCD risk score, and stable echocardiographic findings, **Mrs David Smith has been placed on a PIFU pathway for 12 months.** A surveillance echo and Holter will be arranged at 12 months via the inherited cardiac conditions service. No routine clinic appointment scheduled in the interim. Patient in full agreement.\nYours sincerely,\n\nDr Tariq Hassan, Consultant Cardiologist\n\ncc: Patient (copy enclosed)\n",
+      "label": 2,
+      "label_name": "ELIGIBLE",
+      "source": "pifu_edge_cases",
+      "metadata": {
+        "document_type": "clinic_letter",
+        "specialty": "Cardiology",
+        "referral_reason": "hypertrophic cardiomyopathy",
+        "clock_stop_event_type": "Active Monitoring - Patient Initiated (PIFU)",
+        "non_clock_stop_scenario": null,
+        "hard_negative": false,
+        "expected_reasoning": "CLOCK STOP — PIFU. Non-obstructive HCM, asymptomatic, low HCM Risk-SCD score (1.8%), ICD not indicated, stable echo, no significant arrhythmia on Holter, excellent health literacy. This is a carefully selected low-risk HCM patient where PIFU is appropriate — contrasting with the symptomatic obstructive HOCM case. Surveillance echo/Holter at 12 months is a scheduled investigation, not a timed clinical review. **Expected verdict: For PIFU (moderate confidence — condition requires careful consideration).**"
+      }
+    },
+    {
+      "sample_id": "HN_AF_NEWDX_532",
+      "text": "NHS England\nCity & Royal University Hospitals NHS Foundation Trust\nCardiology Department\nCity Hospital, 1 Hospital Way, M1 2AB\nTel: 0161 123 4567\n\nDate: 12/12/2024\n\nDr L. Chen\nHarbour View Surgery\n5 Quay Street\nBS1 4RB\n\nDear Dr L. Chen,\n\nRe: Mr James Ahmed\nDOB: 08/04/1983\nNHS Number: 242 854 2679\n\n**Outpatient Clinic Letter — Atrial Fibrillation**\n\nThank you for referring Mr James Ahmed who presented with a 3-week history of palpitations and was found to have persistent atrial fibrillation on ECG at your surgery.\n\n**Assessment:**\nMr James Ahmed is a 58-year-old with no prior cardiac history. 12-lead ECG today confirms persistent AF at a ventricular rate of 112bpm. Echocardiogram performed today shows mildly impaired LV function with an ejection fraction of 45%, mild left atrial dilatation (LAD 43mm), and no significant valvular pathology. TFTs are within normal limits. CHA₂DS₂-VASc score is 3 (age, hypertension, female sex).\n\n**Management initiated today:**\nI have commenced Mr James Ahmed on Apixaban 5mg twice daily for stroke prevention, and Bisoprolol 5mg once daily for rate control. I have also referred Mr James Ahmed to the AF clinic for consideration of a rhythm control strategy, including possible DC cardioversion once anticoagulated for a minimum of 4 weeks.\n\nI plan to review Mr James Ahmed in 6 weeks to assess rate control, check renal function and electrolytes (given the new anticoagulation and rate-limiting agent), and discuss the outcome of the AF clinic review regarding rhythm control. At this point we will also reassess LV function, as a degree of tachycardia-mediated cardiomyopathy may be reversible with adequate rate/rhythm control.\n\nIn the interim, Mr James Ahmed has been advised to attend A&E if they develop chest pain, significant breathlessness, presyncope, or sustained rapid palpitations.\nYours sincerely,\n\nDr Fiona Lester, Consultant in Cardiac Electrophysiology\n\ncc: Patient (copy enclosed)\n",
+      "label": 0,
+      "label_name": "NOT_ELIGIBLE",
+      "source": "pifu_hard_negatives",
+      "metadata": {
+        "document_type": "clinic_letter",
+        "specialty": "Cardiology",
+        "referral_reason": "atrial fibrillation",
+        "clock_stop_event_type": null,
+        "non_clock_stop_scenario": "Follow-up Appointment Booked",
+        "hard_negative": true,
+        "expected_reasoning": "NOT FOR PIFU. Multiple exclusion criteria present despite no explicit PIFU mention: (1) New diagnosis of persistent AF — management not yet established. (2) Rate control agent (Bisoprolol) just initiated today — requires response monitoring. (3) LV dysfunction (EF 45%) of uncertain aetiology — tachycardia-mediated cardiomyopathy needs reassessment after rate/rhythm control. (4) DC cardioversion planned — active treatment pathway underway. (5) Renal function monitoring required for new anticoagulation. Per NHS England arrhythmia PIFU guidance: new diagnosis with drug initiation and pending cardioversion is an absolute exclusion. Timed 6-week follow-up is appropriate."
+      }
+    },
+    {
+      "sample_id": "HN_AF_AMIO_559",
+      "text": "NHS England\nGuy's and St Thomas' NHS Foundation Trust\nCardiology Department\nSt Thomas' Hospital, Westminster Bridge Road, SE1 7EH\nTel: 020 7188 7188\n\nDate: 01/01/2025\n\nDr L. Chen\nHarbour View Surgery\n5 Quay Street\nBS1 4RB\n\nDear Dr L. Chen,\n\nRe: Mr James Williams\nDOB: 08/09/1987\nNHS Number: 716 127 4257\n\n**Outpatient Clinic Letter — Atrial Fibrillation**\n\nThank you for referring Mr James Williams with a background of persistent AF managed with Amiodarone for rate and rhythm control.\n\n**Current Review:**\nMr James Williams has been on Amiodarone 200mg once daily for 14 months following failed flecainide therapy. Today they remain in sinus rhythm (confirmed on ECG). They report no palpitations and feel well. Exercise tolerance is adequate for daily activities.\n\n**Monitoring bloods today:**\nLFTs: ALT 68 U/L (mildly elevated, up from 42 U/L at last review 3 months ago). TFTs: TSH 0.3 mU/L (borderline low, previously 1.8 mU/L). Free T4 18.2 pmol/L (normal). Renal function: eGFR 61 ml/min/1.73m² (stable). Chest X-ray today: no pulmonary infiltrates, cardiothoracic ratio within normal limits.\n\nThe mildly rising ALT and borderline low TSH require close observation — both are recognised side effects of Amiodarone. I have not changed the dose at this stage but will recheck LFTs and TFTs in 6 weeks. If ALT continues to rise or TSH suppresses further, dose reduction or switch to an alternative agent will be considered.\n\nI will review Mr James Williams in 6 weeks with repeat bloods. They have been counselled on symptoms of Amiodarone toxicity: new breathlessness, visual disturbance, skin photosensitivity, and symptoms of thyroid dysfunction.\nYours sincerely,\n\nDr Simon Okafor, Consultant Electrophysiologist\n\ncc: Patient (copy enclosed)\n",
+      "label": 0,
+      "label_name": "NOT_ELIGIBLE",
+      "source": "pifu_hard_negatives",
+      "metadata": {
+        "document_type": "clinic_letter",
+        "specialty": "Cardiology",
+        "referral_reason": "atrial fibrillation",
+        "clock_stop_event_type": null,
+        "non_clock_stop_scenario": "Follow-up Appointment Booked",
+        "hard_negative": true,
+        "expected_reasoning": "NOT FOR PIFU. Patient is in sinus rhythm and subjectively well — superficially might appear stable — but is on Amiodarone with rising ALT and borderline TSH suppression. Amiodarone requires mandatory regular secondary care monitoring (LFTs, TFTs, CXR, ophthalmology) and active dose review is underway. Per NHS England arrhythmia PIFU guidance and general SOP: medicines requiring regular and robust secondary care monitoring are a contraindication to PIFU. The symptom stability is misleading — the medication monitoring requirement alone excludes PIFU."
+      }
+    },
+    {
+      "sample_id": "HN_PAL_SVT_204",
+      "text": "NHS England\nUniversity Hospitals Midlands NHS Foundation Trust\nCardiology Department\nQueen Elizabeth Hospital, Mindelsohn Way, B15 2TH\nTel: 0121 627 2000\n\nDate: 22/05/2024\n\nDr J. Smith\nRiverside Surgery\n1 High Street\nAN1 1AA\n\nDear Dr J. Smith,\n\nRe: Dr Robert Shah\nDOB: 01/03/1945\nNHS Number: 814 532 6574\n\n**Outpatient Clinic Letter — Palpitations**\n\nThank you for referring Dr Robert Shah with a 2-year history of episodic palpitations. Following Holter monitoring arranged by your practice (which captured a 4-minute episode of narrow complex tachycardia at 182bpm that terminated spontaneously), Dr Robert Shah was seen in the arrhythmia clinic today.\n\n**History:**\nDr Robert Shah reports approximately 1–2 episodes of rapid regular palpitations per month, lasting between 2 and 15 minutes, with associated lightheadedness during episodes. One episode required attendance at A&E where IV adenosine was administered, confirming SVT. The episodes are having a significant impact on Dr Robert Shah's quality of life and work attendance.\n\n**Assessment:**\nThe Holter findings and adenosine response are consistent with AVNRT (the commonest form of SVT). Echocardiogram is structurally normal, EF 63%. Resting ECG: sinus rhythm, no pre-excitation.\n\n**Plan:**\nGiven the frequency, symptom burden, and functional impact, I have discussed the option of catheter ablation with Dr Robert Shah, who is keen to proceed. I have therefore listed Dr Robert Shah for an electrophysiology (EP) study and radiofrequency catheter ablation of the slow pathway. The waiting time is approximately 3–4 months. In the meantime, I have prescribed Verapamil 40mg three times daily as a bridging measure for symptom control. We will review Dr Robert Shah in clinic 6 weeks post-ablation.\nYours sincerely,\n\nDr Priya Nair, Consultant Heart Failure Specialist\n\ncc: Patient (copy enclosed)\n",
+      "label": 0,
+      "label_name": "NOT_ELIGIBLE",
+      "source": "pifu_hard_negatives",
+      "metadata": {
+        "document_type": "clinic_letter",
+        "specialty": "Cardiology",
+        "referral_reason": "palpitations",
+        "clock_stop_event_type": null,
+        "non_clock_stop_scenario": "Treatment Scheduled (Not Started)",
+        "hard_negative": true,
+        "expected_reasoning": "NOT FOR PIFU. Confirmed SVT (AVNRT) with planned ablation — patient is on the waiting list for an EP study and catheter ablation. Active treatment pathway underway with a new rate-limiting medication (Verapamil) just initiated as a bridge. Per NHS England arrhythmia PIFU guidance: patients with pending arrhythmia procedures are excluded from PIFU. Post-ablation PIFU would be appropriate if the procedure is successful and the patient remains asymptomatic at the 6-week review."
+      }
+    },
+    {
+      "sample_id": "HN_PAL_ILR_487",
+      "text": "NHS England\nNorth Bristol NHS Trust\nCardiology Department\nSouthmead Hospital, Southmead Road, BS10 5NB\nTel: 0117 950 5050\n\nDate: 08/01/2025\n\nDr R. Ahmed\nThe Willows Practice\n12 Park Lane\nLS2 3PQ\n\nDear Dr R. Ahmed,\n\nRe: Mr George Taylor\nDOB: 28/06/1978\nNHS Number: 718 370 1711\n\n**Outpatient Clinic Letter — Palpitations**\n\nThank you for referring Mr George Taylor with a 6-month history of episodic palpitations associated with presyncope on two occasions.\n\n**Investigations to date:**\nResting 12-lead ECG: sinus rhythm, no pre-excitation, normal QTc (432ms), no Brugada pattern. 24-hour Holter: sinus rhythm throughout, no significant arrhythmia captured. Echocardiogram: structurally normal heart, EF 64%. Bloods including TFTs, FBC, U&Es, glucose, and magnesium: all normal.\n\n**Assessment:**\nDespite standard investigations, no arrhythmic cause has been identified. However, the two episodes of presyncope associated with palpitations are clinically concerning and warrant further evaluation. A standard Holter has been unrevealing, likely due to the infrequent nature of the episodes.\n\n**Plan:**\nI have discussed with Mr George Taylor the option of an implantable loop recorder (ILR) to achieve long-term cardiac rhythm monitoring. Mr George Taylor is agreeable and I have added them to the ILR insertion list (waiting time approximately 6–8 weeks). Once the ILR is in situ, Mr George Taylor will be enrolled in our remote monitoring programme and episodes will be reviewed by the arrhythmia nurse team. We will arrange a clinic review once a rhythm diagnosis has been established.\nYours sincerely,\n\nDr Rachel Moore, Consultant Cardiologist\n\ncc: Patient (copy enclosed)\n",
+      "label": 0,
+      "label_name": "NOT_ELIGIBLE",
+      "source": "pifu_hard_negatives",
+      "metadata": {
+        "document_type": "clinic_letter",
+        "specialty": "Cardiology",
+        "referral_reason": "palpitations",
+        "clock_stop_event_type": null,
+        "non_clock_stop_scenario": "Awaiting Investigations or Results",
+        "hard_negative": true,
+        "expected_reasoning": "NOT FOR PIFU. Symptomatic palpitations with presyncope — the underlying cause has not been established despite standard investigation. An ILR is being implanted specifically to diagnose the arrhythmia. Per NHS England arrhythmia PIFU guidance: PIFU requires a confirmed diagnosis with a management plan in place. The diagnostic workup is ongoing and a pending procedure (ILR insertion) is planned. PIFU is not appropriate until the rhythm is characterised and management established."
+      }
+    },
+    {
+      "sample_id": "HN_VD_MODAS_PROG_333",
+      "text": "NHS England\nCity & Royal University Hospitals NHS Foundation Trust\nCardiology Department\nCity Hospital, 1 Hospital Way, M1 2AB\nTel: 0161 123 4567\n\nDate: 26/12/2024\n\nDr A. Patel\nThe Poplars Surgery\n24 High Street\nB17 8PP\n\nDear Dr A. Patel,\n\nRe: Mr Grace Roberts\nDOB: 21/10/1947\nNHS Number: 982 470 4150\n\n**Outpatient Clinic Letter — Valve Disease**\n\nThank you for referring Mr Grace Roberts with moderate aortic stenosis for ongoing review.\n\n**Clinical Assessment:**\nMr Grace Roberts is a 72-year-old with known moderate aortic stenosis under annual echocardiographic surveillance. They currently report mild exertional dyspnoea when climbing two flights of stairs, but deny chest pain, presyncope or syncope at rest. Exercise tolerance overall remains reasonable for their age.\n\n**Echocardiographic Comparison:**\nTTE today: peak aortic velocity 3.4 m/s, mean gradient 26 mmHg, AVA 1.1 cm² (indexed AVA 0.62 cm²/m²). This represents a meaningful change compared to the TTE 12 months ago (peak velocity 2.8 m/s, mean gradient 18 mmHg, AVA 1.3 cm²). LV ejection fraction preserved at 58%. No significant MR. Mild concentric LVH.\n\n**Assessment:**\nThe rate of haemodynamic progression (Vmax increase of 0.6 m/s/year, mean gradient increase of 8 mmHg/year) exceeds the expected rate and is a recognised predictor of earlier symptom onset and need for intervention. Although Mr Grace Roberts does not yet meet criteria for aortic valve replacement (AVR), I am bringing the surveillance interval forward to 6 months in view of the rapid progression.\n\nAn exercise tolerance test has also been arranged to unmask latent symptoms and objectively assess functional capacity. I have discussed with Mr Grace Roberts that if their symptoms progress or the echo shows further deterioration, we will refer for valve intervention assessment. They have been asked to report any new chest pain, syncope, or worsening breathlessness immediately.\nYours sincerely,\n\nDr Tariq Hassan, Consultant Cardiologist\n\ncc: Patient (copy enclosed)\n",
+      "label": 0,
+      "label_name": "NOT_ELIGIBLE",
+      "source": "pifu_hard_negatives",
+      "metadata": {
+        "document_type": "clinic_letter",
+        "specialty": "Cardiology",
+        "referral_reason": "valve disease",
+        "clock_stop_event_type": null,
+        "non_clock_stop_scenario": "Follow-up Appointment Booked",
+        "hard_negative": true,
+        "expected_reasoning": "NOT FOR PIFU. Moderate AS with documented rapid haemodynamic progression (Vmax +0.6 m/s/year, mean gradient +8 mmHg/year) and mild exertional symptoms. Per NHS England valve disease PIFU guidance: rapid echocardiographic progression and emerging symptoms are exclusion criteria. Surveillance interval has been shortened to 6 months precisely because of the progression risk. An exercise tolerance test is pending. This patient requires timed follow-up, not PIFU. The clinical stability is superficial — the echo trajectory tells a different story."
+      }
+    },
+    {
+      "sample_id": "HN_VD_MR_LVD_463",
+      "text": "NHS England\nUniversity Hospitals Midlands NHS Foundation Trust\nCardiology Department\nQueen Elizabeth Hospital, Mindelsohn Way, B15 2TH\nTel: 0121 627 2000\n\nDate: 21/11/2024\n\nDr S. Khan\nGreenwood Medical Centre\n34 Main Street\nM1 1AA\n\nDear Dr S. Khan,\n\nRe: Ms Mohammed Gupta\nDOB: 28/02/1986\nNHS Number: 489 384 8428\n\n**Outpatient Clinic Letter — Valve Disease**\n\nThank you for referring Ms Mohammed Gupta with mitral regurgitation for annual review.\n\n**Clinical Review:**\nMs Mohammed Gupta is a 61-year-old with known mitral regurgitation due to myxomatous mitral valve disease. They remain in sinus rhythm and report no resting symptoms. They do describe mild exertional fatigue when walking uphill, which they attribute to deconditioning rather than cardiac limitation.\n\n**Echocardiographic Review:**\nTTE today confirms moderate-to-severe mitral regurgitation. Vena contracta 7mm, EROA estimated at 0.38 cm², regurgitant volume approximately 52 ml. Left ventricular dimensions: LVESD 40mm, LVEDD 59mm (LVEDVI 68 ml/m²). LV ejection fraction 56% — note this is at the lower end of normal for a patient with significant volume loading from MR. Left atrial dimension 46mm.\n\n**Assessment:**\nThe degree of MR and LV dimensions are now approaching the thresholds for surgical intervention per ESC and AHA/ACC guidelines (LVESD ≥40mm, EF ≤60%). Although Ms Mohammed Gupta does not yet meet hard surgical criteria, this is a 'watchful waiting with intent' situation. I am arranging a cardiothoracic surgical valve clinic referral for pre-emptive assessment, and I would like to repeat the echocardiogram in 4 months given the trajectory. Ms Mohammed Gupta has been advised that if they develop any increase in exertional symptoms, or if their EF falls below 60% or LVESD exceeds 40mm, we would recommend proceeding to mitral valve repair.\nYours sincerely,\n\nDr Priya Nair, Consultant Heart Failure Specialist\n\ncc: Patient (copy enclosed)\n",
+      "label": 0,
+      "label_name": "NOT_ELIGIBLE",
+      "source": "pifu_hard_negatives",
+      "metadata": {
+        "document_type": "clinic_letter",
+        "specialty": "Cardiology",
+        "referral_reason": "valve disease",
+        "clock_stop_event_type": null,
+        "non_clock_stop_scenario": "Follow-up Appointment Booked",
+        "hard_negative": true,
+        "expected_reasoning": "NOT FOR PIFU. Moderate-to-severe MR with LV dimensions at surgical thresholds (LVESD 40mm, EF 56% in context of significant volume loading). Surgical referral has been made and repeat echo in 4 months. Per NHS England valve disease PIFU guidance: PIFU is indicated for mild-to-moderate stable valve disease — moderate-to-severe disease with LV remodelling approaching intervention criteria requires timed surveillance. The absence of overt symptoms is misleading — the echocardiographic findings mandate close follow-up."
+      }
+    },
+    {
+      "sample_id": "HN_VD_WARF_488",
+      "text": "NHS England\nUniversity Hospitals Midlands NHS Foundation Trust\nCardiology Department\nQueen Elizabeth Hospital, Mindelsohn Way, B15 2TH\nTel: 0121 627 2000\n\nDate: 30/09/2024\n\nDr J. Smith\nRiverside Surgery\n1 High Street\nAN1 1AA\n\nDear Dr J. Smith,\n\nRe: Mrs Isla Thomas\nDOB: 22/11/1956\nNHS Number: 173 723 3803\n\n**Discharge Summary — Valve Disease**\n\nThank you for referring Mrs Isla Thomas who underwent mechanical mitral valve replacement 18 months ago and has been transferred to our valve clinic for ongoing follow-up.\n\n**Current Review:**\nMrs Isla Thomas is anticoagulated with warfarin (target INR 3.0–3.5 for mechanical mitral valve). At today's clinic, the INR was 2.3 — subtherapeutic on two of the last four checks (INR values: 3.1, 2.1, 3.4, 2.3). Mrs Isla Thomas denies any dietary changes or missed doses, though they do report variable appetite due to intercurrent illness over the past 3 months.\n\n**Haemodynamic Assessment:**\nTTE today: mechanical valve in mitral position functioning normally, no evidence of valve thrombosis, mean gradient 5 mmHg (within normal limits for the prosthesis). LV function preserved, EF 60%. The patient is in sinus rhythm.\n\n**Plan:**\nThe INR instability in the context of a mechanical mitral valve is of concern — sub-therapeutic anticoagulation carries a significant risk of valve thrombosis, which can be life-threatening. I have increased the weekly warfarin dose by 10% and arranged for a repeat INR check in 2 weeks via the anticoagulation clinic. I would also like to investigate the variable INR further — I have requested LFTs to exclude evolving hepatic dysfunction as a contributing factor. Clinic review in 3 months with repeat echo and INR trend review.\nYours sincerely,\n\nDr James Whitfield, Consultant Interventional Cardiologist\n\ncc: Patient (copy enclosed)\n",
+      "label": 0,
+      "label_name": "NOT_ELIGIBLE",
+      "source": "pifu_hard_negatives",
+      "metadata": {
+        "document_type": "discharge_letter",
+        "specialty": "Cardiology",
+        "referral_reason": "valve disease",
+        "clock_stop_event_type": null,
+        "non_clock_stop_scenario": "Follow-up Appointment Booked",
+        "hard_negative": true,
+        "expected_reasoning": "NOT FOR PIFU. Mechanical prosthetic valve on warfarin with documented INR instability. Per NHS England valve disease PIFU guidance: prosthetic valve patients requiring anticoagulation adjustment are excluded from PIFU. The INR instability and dose change make timed follow-up mandatory. The valve itself is functioning normally — it is the anticoagulation management, not the valve haemodynamics, that drives the PIFU exclusion here. A superficial reading of the TTE findings might suggest stability, but the anticoagulation picture is the critical factor."
+      }
+    },
+    {
+      "sample_id": "HN_HF_ARNI_EGF_374",
+      "text": "NHS England\nLeeds Teaching Hospitals NHS Trust\nCardiology Department\nLeeds General Infirmary, Great George Street, LS1 3EX\nTel: 0113 243 2799\n\nDate: 27/04/2024\n\nDr A. Patel\nThe Poplars Surgery\n24 High Street\nB17 8PP\n\nDear Dr A. Patel,\n\nRe: Ms Sunita Patel\nDOB: 18/04/1956\nNHS Number: 801 432 1916\n\n**Outpatient Clinic Letter — Heart Failure**\n\nThank you for referring Ms Sunita Patel with heart failure with reduced ejection fraction (HFrEF) for ongoing specialist review.\n\n**Background:**\nMs Sunita Patel has a 2-year history of HFrEF secondary to dilated cardiomyopathy (EF 32% at diagnosis). They were previously on Enalapril which was switched to Sacubitril/Valsartan (ARNI) 97/103mg twice daily 8 weeks ago. Other medications: Carvedilol 12.5mg bd (dose increased from 6.25mg bd 3 months ago), Eplerenone 25mg od, Dapagliflozin 10mg od.\n\n**Clinical Review:**\nMs Sunita Patel is clinically well today — no oedema, clear chest, weight stable. They report improved energy levels since starting the ARNI and feel considerably better than 3 months ago. NYHA Class II. BP 108/64, HR 62.\n\n**Bloods today:**\neGFR: 38 ml/min/1.73m² — this has declined from 52 ml/min/1.73m² measured 4 weeks ago (prior to Carvedilol uptitration) and 61 ml/min/1.73m² 3 months ago. Potassium: 5.3 mmol/L (elevated — was 4.6 mmol/L previously). Sodium: 136 mmol/L. BNP: 310 pg/mL (improved from 580 pg/mL at last review).\n\n**Plan:**\nThe declining eGFR and hyperkalaemia are likely a combined effect of the ARNI initiation and Carvedilol uptitration. I am holding the Eplerenone temporarily and rechecking U&Es in 2 weeks. Depending on the trajectory, we may need to reduce the ARNI dose. I will review Ms Sunita Patel formally in 4 weeks.\nYours sincerely,\n\nDr James Whitfield, Consultant Interventional Cardiologist\n\ncc: Patient (copy enclosed)\n",
+      "label": 0,
+      "label_name": "NOT_ELIGIBLE",
+      "source": "pifu_hard_negatives",
+      "metadata": {
+        "document_type": "clinic_letter",
+        "specialty": "Cardiology",
+        "referral_reason": "heart failure",
+        "clock_stop_event_type": null,
+        "non_clock_stop_scenario": "Follow-up Appointment Booked",
+        "hard_negative": true,
+        "expected_reasoning": "NOT FOR PIFU. Clinically the patient feels better and is NYHA II — a superficial read might suggest stability. However, eGFR has fallen from 61 to 38 ml/min/1.73m² and potassium is 5.3 mmol/L following recent ARNI initiation and Carvedilol uptitration. Active medication adjustment is underway (Eplerenone withheld, ARNI dose under review). Per NHS England HF PIFU guidance: recent medication changes requiring monitoring and declining renal function are explicit exclusion criteria. Symptomatic improvement does not override the biochemical picture."
+      }
+    },
+    {
+      "sample_id": "HN_HF_NONCOMPLIANT_242",
+      "text": "NHS England\nUniversity Hospitals Midlands NHS Foundation Trust\nCardiology Department\nQueen Elizabeth Hospital, Mindelsohn Way, B15 2TH\nTel: 0121 627 2000\n\nDate: 21/07/2024\n\nDr R. Ahmed\nThe Willows Practice\n12 Park Lane\nLS2 3PQ\n\nDear Dr R. Ahmed,\n\nRe: Mr Thomas Murphy\nDOB: 23/06/1964\nNHS Number: 317 771 9179\n\n**Outpatient Clinic Letter — Heart Failure**\n\nThank you for referring Mr Thomas Murphy with heart failure with preserved ejection fraction (HFpEF) for ongoing management.\n\n**Clinical Review:**\nMr Thomas Murphy is a 79-year-old with HFpEF, atrial fibrillation, type 2 diabetes, and CKD Stage 3b (eGFR 32 ml/min/1.73m²). They attended clinic today accompanied by their daughter, who reports significant concern about Mr Thomas Murphy's adherence to their medication and self-monitoring plan. On direct questioning, Mr Thomas Murphy acknowledges that they have not been weighing themselves daily as previously advised, and has missed several doses of Furosemide over the past month 'because they felt fine.'\n\n**Examination:**\nOn examination today there is mild ankle oedema bilaterally (1+ pitting to mid-shin). Chest: mild bibasal crackles. Weight today 84.2kg — up from 81.8kg documented 3 months ago. BP 146/88. HR 88 bpm in AF.\n\n**Assessment & Plan:**\nThis represents a mild fluid overload episode related to diuretic non-compliance. Furosemide dose has been increased from 40mg to 80mg once daily for 2 weeks, then to be reviewed. I have reinforced the importance of daily weighing and the fluid restriction advice with both Mr Thomas Murphy and their daughter. However, I have significant concerns about Mr Thomas Murphy's ability to reliably self-manage on a PIFU-type pathway given the documented non-compliance with both medication and monitoring, and the complex comorbidity profile. I will arrange a 6-week clinic review to reassess fluid balance and diuretic dose.\nYours sincerely,\n\nDr Priya Nair, Consultant Heart Failure Specialist\n\ncc: Patient (copy enclosed)\n",
+      "label": 0,
+      "label_name": "NOT_ELIGIBLE",
+      "source": "pifu_hard_negatives",
+      "metadata": {
+        "document_type": "clinic_letter",
+        "specialty": "Cardiology",
+        "referral_reason": "heart failure",
+        "clock_stop_event_type": null,
+        "non_clock_stop_scenario": "Follow-up Appointment Booked",
+        "hard_negative": true,
+        "expected_reasoning": "NOT FOR PIFU. Mild fluid overload due to documented medication and monitoring non-compliance. The patient has not adhered to the daily weighing protocol and has self-discontinued diuretics. Per NHS England HF PIFU guidance and general SOP: PIFU requires documented patient activation, confidence, and ability to self-monitor. This patient has actively demonstrated the opposite. The complex comorbidity (AF, DM, CKD 3b) and active diuretic uptitration further exclude PIFU. Notably the document does not explicitly say 'not for PIFU' — but the clinical picture is unambiguous."
+      }
+    },
+    {
+      "sample_id": "HN_HF_POSTADMIT_605",
+      "text": "NHS England\nUniversity Hospitals Midlands NHS Foundation Trust\nCardiology Department\nQueen Elizabeth Hospital, Mindelsohn Way, B15 2TH\nTel: 0121 627 2000\n\nDate: 04/07/2024\n\nDr J. Smith\nRiverside Surgery\n1 High Street\nAN1 1AA\n\nDear Dr J. Smith,\n\nRe: Mrs Ava Green\nDOB: 09/12/1966\nNHS Number: 698 538 7543\n\n**Outpatient Clinic Letter — Heart Failure**\n\nThank you for referring Mrs Ava Green for post-discharge heart failure clinic review. Mrs Ava Green was admitted to the cardiology ward 6 weeks ago with acutely decompensated heart failure requiring IV diuresis.\n\n**Post-Discharge Review:**\nMrs Ava Green has made good progress since discharge. They are on Furosemide 80mg od (increased from 40mg at discharge), Sacubitril/Valsartan 49/51mg bd (half target dose), Carvedilol 6.25mg bd, Dapagliflozin 10mg od, and Spironolactone 25mg od.\n\n**Clinical Findings:**\nNo ankle oedema today. Chest clear. Weight 78.1kg (down from 83.4kg at admission, stable over past 2 weeks). NYHA Class II. BP 122/74, HR 68. eGFR 44 ml/min/1.73m², K+ 4.7 mmol/L. BNP 420 pg/mL (down from 1,840 pg/mL at admission but still elevated).\n\n**Plan:**\nGood clinical recovery. I plan to uptitrate the Sacubitril/Valsartan to 97/103mg bd at the next visit in 4 weeks if renal function and blood pressure remain stable. The Carvedilol will also be uptitrated once the ARNI is at target dose. I will review Mrs Ava Green in 4 weeks with repeat U&Es. The heart failure nurse specialist team will provide telephone support in the interim and Mrs Ava Green has been given clear instructions on daily weighing and when to call.\nYours sincerely,\n\nDr Fiona Lester, Consultant in Cardiac Electrophysiology\n\ncc: Patient (copy enclosed)\n",
+      "label": 0,
+      "label_name": "NOT_ELIGIBLE",
+      "source": "pifu_hard_negatives",
+      "metadata": {
+        "document_type": "clinic_letter",
+        "specialty": "Cardiology",
+        "referral_reason": "heart failure",
+        "clock_stop_event_type": null,
+        "non_clock_stop_scenario": "Follow-up Appointment Booked",
+        "hard_negative": true,
+        "expected_reasoning": "NOT FOR PIFU. Despite good symptomatic recovery, this patient was admitted with acutely decompensated HF only 6 weeks ago — well within the 3-month post-hospitalisation exclusion window per NHS England HF PIFU guidance. Additionally, GDMT uptitration is actively underway (ARNI at half-dose, Carvedilol uptitration planned), BNP remains significantly elevated, and biochemical monitoring is required. All three core HF PIFU exclusion criteria are simultaneously present. The clinical improvement is real but the patient is not yet in a stable, optimised state suitable for PIFU."
+      }
+    },
+    {
+      "sample_id": "HN_POTS_PARTIAL_710",
+      "text": "NHS England\nGuy's and St Thomas' NHS Foundation Trust\nCardiology Department\nSt Thomas' Hospital, Westminster Bridge Road, SE1 7EH\nTel: 020 7188 7188\n\nDate: 01/11/2024\n\nDr A. Patel\nThe Poplars Surgery\n24 High Street\nB17 8PP\n\nDear Dr A. Patel,\n\nRe: Mr Ethan Jones\nDOB: 04/03/1945\nNHS Number: 742 263 7916\n\n**Outpatient Clinic Letter — Pots**\n\nThank you for referring Mr Ethan Jones with confirmed POTS for follow-up review. Mr Ethan Jones was diagnosed 5 months ago on tilt table testing (HR increment 42bpm at 10 minutes, no significant hypotension).\n\n**Current Management:**\nMr Ethan Jones is on Ivabradine 5mg twice daily (commenced 2 months ago), increased salt and fluid intake (2.5L/day), compression stockings grade II. They were referred to the POTS rehabilitation programme but have been unable to engage regularly due to fatigue and transport difficulties.\n\n**Current Clinical Status:**\nActive stand test today: HR increment 28bpm at 10 minutes (improved from 42bpm at diagnosis but still above the 30bpm diagnostic threshold). Mr Ethan Jones reports daily presyncope episodes (approximately 3–4 per day when standing), significant fatigue, and cognitive difficulties ('brain fog'). They are currently not working and are largely housebound on bad days. Mood assessment today suggests moderate anxiety and low mood.\n\n**Plan:**\nThere has been some haemodynamic improvement on Ivabradine but the symptom burden remains severe. I am increasing Ivabradine to 7.5mg twice daily and will review the response in 8 weeks. I am also making a referral to the liaison psychiatry service for management of the anxiety and low mood, which are likely perpetuating the functional limitation. A physiotherapy re-referral has also been made with home-based exercise initially given the transport barriers.\nYours sincerely,\n\nDr James Whitfield, Consultant Interventional Cardiologist\n\ncc: Patient (copy enclosed)\n",
+      "label": 0,
+      "label_name": "NOT_ELIGIBLE",
+      "source": "pifu_hard_negatives",
+      "metadata": {
+        "document_type": "clinic_letter",
+        "specialty": "Cardiology",
+        "referral_reason": "POTS",
+        "clock_stop_event_type": null,
+        "non_clock_stop_scenario": "Follow-up Appointment Booked",
+        "hard_negative": true,
+        "expected_reasoning": "NOT FOR PIFU. POTS with only partial treatment response — HR increment still elevated, daily presyncope episodes, significant functional limitation (housebound, not working), mood comorbidity, and active medication uptitration. No dedicated NHS PIFU pathway exists for POTS; applying general SOP criteria: patient does not meet the stability, functional, or self-monitoring requirements. Specifically: active medication titration underway, incomplete treatment response, frequent presyncope (safety concern), and inability to engage with rehabilitation raises questions about capacity for self-managed care. Timed 8-week review appropriate."
+      }
+    },
+    {
+      "sample_id": "HN_POTS_AUTOIMM_448",
+      "text": "NHS England\nLeeds Teaching Hospitals NHS Trust\nCardiology Department\nLeeds General Infirmary, Great George Street, LS1 3EX\nTel: 0113 243 2799\n\nDate: 15/12/2024\n\nDr L. Chen\nHarbour View Surgery\n5 Quay Street\nBS1 4RB\n\nDear Dr L. Chen,\n\nRe: Miss Harry Thomas\nDOB: 28/01/1965\nNHS Number: 796 838 2876\n\n**Outpatient Clinic Letter — Pots**\n\nThank you for referring Miss Harry Thomas with a 9-month history of orthostatic intolerance, fatigue and palpitations. POTS was confirmed at our clinic 3 months ago (HR increment 34bpm on active stand test, no hypotension).\n\n**Current Review:**\nMiss Harry Thomas has made reasonable progress on conservative management: salt loading, 2.5L fluid daily, compression stockings. They report presyncope approximately twice weekly (down from daily at diagnosis) and can now manage a 20-minute walk. They have not yet started pharmacological therapy as we are awaiting the results of the autoimmune POTS screen before committing to a treatment strategy.\n\n**Outstanding Investigations:**\nAutoimmune POTS panel sent 6 weeks ago — results still outstanding: anti-ganglionic AChR antibodies, VGCC antibodies, and anti-adrenergic receptor antibodies. These results are clinically important as autoimmune POTS may respond to immunotherapy (IVIG, rituximab) rather than standard autonomic agents. I am also awaiting a skin biopsy result (sent for intraepidermal nerve fibre density assessment) to evaluate for small fibre neuropathy as a co-diagnosis.\n\n**Plan:**\nI will review Miss Harry Thomas in clinic once all outstanding results are received (anticipated 4–6 weeks). At that point we will formulate a definitive treatment plan. Miss Harry Thomas has been advised to contact us urgently if symptoms worsen significantly or if syncope (rather than presyncope) occurs.\nYours sincerely,\n\nDr Tariq Hassan, Consultant Cardiologist\n\ncc: Patient (copy enclosed)\n",
+      "label": 0,
+      "label_name": "NOT_ELIGIBLE",
+      "source": "pifu_hard_negatives",
+      "metadata": {
+        "document_type": "clinic_letter",
+        "specialty": "Cardiology",
+        "referral_reason": "POTS",
+        "clock_stop_event_type": null,
+        "non_clock_stop_scenario": "Awaiting Investigations or Results",
+        "hard_negative": true,
+        "expected_reasoning": "NOT FOR PIFU. POTS with improving symptoms on conservative management — superficially might suggest progress toward stability. However, the autoimmune POTS screen and skin biopsy are pending, pharmacological therapy has not been started, and the treatment strategy has not been finalised. Applying general SOP criteria (no dedicated NHS POTS pathway): diagnosis is not yet fully characterised (secondary autoimmune cause not excluded), treatment not optimised, and outstanding investigations would change management. PIFU requires an established diagnosis and a stable, optimised treatment plan — neither is present here."
+      }
+    }
+  ]
+}

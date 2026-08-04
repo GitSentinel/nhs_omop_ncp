@@ -56,14 +56,14 @@ PIFU_FINETUNE_DIR = (
 
 PIFU_OUTPUT_DIR = (
     PIFU_FINETUNE_DIR
-    / "qwen35_9b_pifu_lora_3epochs_same_protocol"
+    / "qwen35_9b_pifu_lora"
 )
 
 PIFU_EVALUATION_DIR = (
     PROJECT_ROOT
     / "data"
     / "evaluations"
-    / "pifu_cardiology_same_protocol"
+    / "pifu_cardiology"
 )
 
 # MLflow Configuration

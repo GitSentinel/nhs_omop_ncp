@@ -1,8 +1,20 @@
 # Data
-data/
+data/raw/
+data/processed/
+data/cohort_run_outputs/
+data/external/fastpifu_cardiology/raw/
+data/external/fastpifu_cardiology/extracted/
+data/finetune/qwen*/
+data/finetune/**/checkpoint-*/
 *.duckdb
 *.parquet
 *.zip
+
+# Model weight files
+*.safetensors
+*.bin
+*.pt
+*.pth
 
 # Python
 __pycache__/
@@ -18,9 +30,6 @@ build/
 # virtual environments
 .venv/
 .env
-
-# MLflow
-mlflow_runs/
 
 # Ruff / Mypy caches
 .ruff_cache/
