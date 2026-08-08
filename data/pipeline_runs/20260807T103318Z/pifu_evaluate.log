@@ -1,0 +1,239 @@
+COMMAND: uv run --extra finetune python src/scripts/evaluate_pifu.py
+
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+`torch_dtype` is deprecated! Use `dtype` instead!
+====================================================================
+FASTPIFU MODEL EVALUATION
+====================================================================
+Base model     : Qwen/Qwen3.5-9B
+Adapter        : /home/jacinth/nhs_omop_ncp/data/finetune/qwen35_9b_pifu_lora
+External test  : 150
+Challenge test : 24
+
+========================================
+Evaluating BASE model...
+========================================
+Loading base model: Qwen/Qwen3.5-9B
+
+Fetching 4 files:   0%|          | 0/4 [00:00<?, ?it/s]
+Fetching 4 files: 100%|██████████| 4/4 [00:00<00:00, 1908.02it/s]
+The fast path is not available because one of the required library is not installed. Falling back to torch implementation. To install follow https://github.com/fla-org/flash-linear-attention#installation and https://github.com/Dao-AILab/causal-conv1d
+
+Loading weights:   0%|          | 0/427 [00:00<?, ?it/s]
+Loading weights:   0%|          | 1/427 [00:00<02:09,  3.29it/s]
+Loading weights:   0%|          | 2/427 [00:00<02:32,  2.78it/s]
+Loading weights:   4%|▎         | 15/427 [00:00<00:15, 26.85it/s]
+Loading weights:   7%|▋         | 28/427 [00:00<00:08, 48.61it/s]
+Loading weights:  10%|█         | 43/427 [00:01<00:05, 69.16it/s]
+Loading weights:  13%|█▎        | 54/427 [00:01<00:06, 53.91it/s]
+Loading weights:  15%|█▌        | 66/427 [00:01<00:07, 46.44it/s]
+Loading weights:  19%|█▊        | 80/427 [00:01<00:06, 55.84it/s]
+Loading weights:  21%|██        | 88/427 [00:02<00:06, 48.81it/s]
+Loading weights:  22%|██▏       | 95/427 [00:02<00:07, 46.02it/s]
+Loading weights:  24%|██▎       | 101/427 [00:02<00:07, 45.61it/s]
+Loading weights:  27%|██▋       | 117/427 [00:02<00:04, 67.15it/s]
+Loading weights:  30%|██▉       | 126/427 [00:02<00:04, 67.84it/s]
+Loading weights:  31%|███▏      | 134/427 [00:02<00:04, 65.66it/s]
+Loading weights:  34%|███▍      | 147/427 [00:02<00:03, 78.65it/s]
+Loading weights:  37%|███▋      | 156/427 [00:03<00:03, 69.22it/s]
+Loading weights:  40%|████      | 172/427 [00:03<00:02, 86.57it/s]
+Loading weights:  43%|████▎     | 184/427 [00:03<00:02, 92.94it/s]
+Loading weights:  46%|████▌     | 195/427 [00:03<00:02, 93.97it/s]
+Loading weights:  48%|████▊     | 205/427 [00:03<00:02, 81.18it/s]
+Loading weights:  50%|█████     | 214/427 [00:03<00:02, 83.05it/s]
+Loading weights:  53%|█████▎    | 227/427 [00:03<00:02, 88.85it/s]
+Loading weights:  56%|█████▌    | 240/427 [00:03<00:01, 96.56it/s]
+Loading weights:  59%|█████▉    | 253/427 [00:04<00:01, 90.64it/s]
+Loading weights:  62%|██████▏   | 264/427 [00:04<00:01, 94.67it/s]
+Loading weights:  65%|██████▌   | 279/427 [00:04<00:01, 106.09it/s]
+Loading weights:  69%|██████▉   | 294/427 [00:04<00:01, 114.64it/s]
+Loading weights:  72%|███████▏  | 308/427 [00:04<00:01, 116.41it/s]
+Loading weights:  75%|███████▍  | 320/427 [00:04<00:00, 109.71it/s]
+Loading weights:  78%|███████▊  | 332/427 [00:04<00:00, 109.09it/s]
+Loading weights:  81%|████████▏ | 347/427 [00:04<00:00, 116.23it/s]
+Loading weights:  85%|████████▍ | 361/427 [00:04<00:00, 114.57it/s]
+Loading weights:  87%|████████▋ | 373/427 [00:05<00:00, 108.46it/s]
+Loading weights:  90%|████████▉ | 384/427 [00:05<00:00, 100.02it/s]
+Loading weights:  94%|█████████▎| 400/427 [00:05<00:00, 110.04it/s]
+Loading weights:  97%|█████████▋| 414/427 [00:05<00:00, 110.36it/s]
+Loading weights: 100%|█████████▉| 426/427 [00:05<00:00, 107.89it/s]
+Loading weights: 100%|██████████| 427/427 [00:05<00:00, 76.97it/s] 
+/home/jacinth/nhs_omop_ncp/.venv/lib/python3.11/site-packages/sklearn/metrics/_classification.py:2939: UserWarning: y_pred contains classes not in y_true
+  warnings.warn("y_pred contains classes not in y_true")
+Label token sequences: 0=[220, 15], 1=[220, 16], 2=[220, 17]
+  50/150 evaluated...
+  100/150 evaluated...
+  150/150 evaluated...
+
+====================================================================
+BASE MODEL - EXTERNAL TEST
+====================================================================
+Accuracy            : 0.3533
+Balanced accuracy   : 0.3533
+Macro F1            : 0.2994
+NOT_ELIGIBLE recall : 0.0600
+ELIGIBLE precision  : 0.3077
+Unsafe eligible     : 20 (0.4000)
+Manual review rate  : 0.6200
+Confusion matrix    : [[3, 27, 20], [0, 34, 16], [2, 32, 16]]
+              precision    recall  f1-score   support
+
+NOT_ELIGIBLE     0.6000    0.0600    0.1091        50
+  BORDERLINE     0.3656    0.6800    0.4755        50
+    ELIGIBLE     0.3077    0.3200    0.3137        50
+
+    accuracy                         0.3533       150
+   macro avg     0.4244    0.3533    0.2994       150
+weighted avg     0.4244    0.3533    0.2994       150
+
+Metrics saved     : /home/jacinth/nhs_omop_ncp/data/evaluations/pifu_cardiology/base_external_test_metrics.json
+Predictions saved : /home/jacinth/nhs_omop_ncp/data/evaluations/pifu_cardiology/base_external_test_predictions.csv
+Label token sequences: 0=[220, 15], 1=[220, 16], 2=[220, 17]
+  24/24 evaluated...
+
+====================================================================
+BASE MODEL - CHALLENGE TEST
+====================================================================
+Accuracy            : 0.0833
+Balanced accuracy   : 0.0526
+Macro F1            : 0.0635
+NOT_ELIGIBLE recall : 0.1053
+ELIGIBLE precision  : 0.0000
+Unsafe eligible     : 7 (0.3684)
+Manual review rate  : 0.6250
+Confusion matrix    : [[2, 10, 7], [0, 0, 0], [0, 5, 0]]
+              precision    recall  f1-score   support
+
+NOT_ELIGIBLE     1.0000    0.1053    0.1905        19
+  BORDERLINE     0.0000    0.0000    0.0000         0
+    ELIGIBLE     0.0000    0.0000    0.0000         5
+
+    accuracy                         0.0833        24
+   macro avg     0.3333    0.0351    0.0635        24
+weighted avg     0.7917    0.0833    0.1508        24
+
+Metrics saved     : /home/jacinth/nhs_omop_ncp/data/evaluations/pifu_cardiology/base_challenge_metrics.json
+Predictions saved : /home/jacinth/nhs_omop_ncp/data/evaluations/pifu_cardiology/base_challenge_predictions.csv
+Base model unloaded.
+
+========================================
+Evaluating FINE-TUNED PIFU model...
+========================================
+Loading fine-tuned PIFU model from: /home/jacinth/nhs_omop_ncp/data/finetune/qwen35_9b_pifu_lora
+
+Fetching 4 files:   0%|          | 0/4 [00:00<?, ?it/s]
+Fetching 4 files: 100%|██████████| 4/4 [00:00<00:00, 36873.00it/s]
+
+Loading weights:   0%|          | 0/427 [00:00<?, ?it/s]
+Loading weights:   0%|          | 1/427 [00:00<02:16,  3.11it/s]
+Loading weights:   0%|          | 2/427 [00:00<02:31,  2.81it/s]
+Loading weights:   6%|▌         | 24/427 [00:00<00:09, 43.89it/s]
+Loading weights:   9%|▉         | 40/427 [00:00<00:05, 67.36it/s]
+Loading weights:  12%|█▏        | 52/427 [00:01<00:05, 70.03it/s]
+Loading weights:  15%|█▌        | 66/427 [00:01<00:04, 83.92it/s]
+Loading weights:  18%|█▊        | 78/427 [00:01<00:03, 91.63it/s]
+Loading weights:  21%|██        | 90/427 [00:01<00:03, 92.11it/s]
+Loading weights:  24%|██▎       | 101/427 [00:01<00:04, 71.68it/s]
+Loading weights:  28%|██▊       | 119/427 [00:01<00:03, 91.05it/s]
+Loading weights:  31%|███       | 132/427 [00:01<00:03, 94.80it/s]
+Loading weights:  34%|███▍      | 147/427 [00:02<00:02, 102.42it/s]
+Loading weights:  37%|███▋      | 159/427 [00:02<00:02, 93.90it/s] 
+Loading weights:  41%|████      | 173/427 [00:02<00:02, 101.19it/s]
+Loading weights:  44%|████▎     | 186/427 [00:02<00:02, 104.98it/s]
+Loading weights:  46%|████▌     | 197/427 [00:02<00:02, 105.89it/s]
+Loading weights:  49%|████▊     | 208/427 [00:02<00:02, 90.98it/s] 
+Loading weights:  53%|█████▎    | 226/427 [00:02<00:01, 109.16it/s]
+Loading weights:  56%|█████▌    | 240/427 [00:02<00:01, 115.66it/s]
+Loading weights:  59%|█████▉    | 254/427 [00:02<00:01, 119.74it/s]
+Loading weights:  63%|██████▎   | 267/427 [00:03<00:01, 116.22it/s]
+Loading weights:  66%|██████▌   | 282/427 [00:03<00:01, 124.88it/s]
+Loading weights:  69%|██████▉   | 295/427 [00:03<00:01, 121.47it/s]
+Loading weights:  72%|███████▏  | 308/427 [00:03<00:00, 123.71it/s]
+Loading weights:  76%|███████▌  | 325/427 [00:03<00:00, 131.79it/s]
+Loading weights:  80%|███████▉  | 341/427 [00:03<00:00, 132.93it/s]
+Loading weights:  84%|████████▍ | 358/427 [00:03<00:00, 140.36it/s]
+Loading weights:  87%|████████▋ | 373/427 [00:03<00:00, 110.67it/s]
+Loading weights:  90%|█████████ | 386/427 [00:04<00:00, 106.46it/s]
+Loading weights:  94%|█████████▎| 400/427 [00:04<00:00, 110.59it/s]
+Loading weights:  97%|█████████▋| 413/427 [00:04<00:00, 104.87it/s]
+Loading weights:  99%|█████████▉| 424/427 [00:04<00:00, 99.15it/s] 
+Loading weights: 100%|██████████| 427/427 [00:04<00:00, 94.95it/s]
+/home/jacinth/nhs_omop_ncp/.venv/lib/python3.11/site-packages/sklearn/metrics/_classification.py:2939: UserWarning: y_pred contains classes not in y_true
+  warnings.warn("y_pred contains classes not in y_true")
+Label token sequences: 0=[220, 15], 1=[220, 16], 2=[220, 17]
+  50/150 evaluated...
+  100/150 evaluated...
+  150/150 evaluated...
+
+====================================================================
+FINE-TUNED MODEL - EXTERNAL TEST
+====================================================================
+Accuracy            : 0.9667
+Balanced accuracy   : 0.9667
+Macro F1            : 0.9669
+NOT_ELIGIBLE recall : 1.0000
+ELIGIBLE precision  : 1.0000
+Unsafe eligible     : 0 (0.0000)
+Manual review rate  : 0.3067
+Confusion matrix    : [[50, 0, 0], [4, 46, 0], [1, 0, 49]]
+              precision    recall  f1-score   support
+
+NOT_ELIGIBLE     0.9091    1.0000    0.9524        50
+  BORDERLINE     1.0000    0.9200    0.9583        50
+    ELIGIBLE     1.0000    0.9800    0.9899        50
+
+    accuracy                         0.9667       150
+   macro avg     0.9697    0.9667    0.9669       150
+weighted avg     0.9697    0.9667    0.9669       150
+
+Metrics saved     : /home/jacinth/nhs_omop_ncp/data/evaluations/pifu_cardiology/finetuned_external_test_metrics.json
+Predictions saved : /home/jacinth/nhs_omop_ncp/data/evaluations/pifu_cardiology/finetuned_external_test_predictions.csv
+Label token sequences: 0=[220, 15], 1=[220, 16], 2=[220, 17]
+  24/24 evaluated...
+
+====================================================================
+FINE-TUNED MODEL - CHALLENGE TEST
+====================================================================
+Accuracy            : 0.7917
+Balanced accuracy   : 0.8684
+Macro F1            : 0.6162
+NOT_ELIGIBLE recall : 0.7368
+ELIGIBLE precision  : 1.0000
+Unsafe eligible     : 0 (0.0000)
+Manual review rate  : 0.2083
+Confusion matrix    : [[14, 5, 0], [0, 0, 0], [0, 0, 5]]
+              precision    recall  f1-score   support
+
+NOT_ELIGIBLE     1.0000    0.7368    0.8485        19
+  BORDERLINE     0.0000    0.0000    0.0000         0
+    ELIGIBLE     1.0000    1.0000    1.0000         5
+
+    accuracy                         0.7917        24
+   macro avg     0.6667    0.5789    0.6162        24
+weighted avg     1.0000    0.7917    0.8801        24
+
+Metrics saved     : /home/jacinth/nhs_omop_ncp/data/evaluations/pifu_cardiology/finetuned_challenge_metrics.json
+Predictions saved : /home/jacinth/nhs_omop_ncp/data/evaluations/pifu_cardiology/finetuned_challenge_predictions.csv
+
+====================================================================
+COMPARISON: BASE VS FINE-TUNED
+====================================================================
+Base Model vs Fine-Tuned PIFU Model - Qwen/Qwen3.5-9B
+====================================================================
+Adapter: /home/jacinth/nhs_omop_ncp/data/finetune/qwen35_9b_pifu_lora
+External test: /home/jacinth/nhs_omop_ncp/data/external/fastpifu_cardiology/processed/pifu_external_test_150.json
+Challenge set: /home/jacinth/nhs_omop_ncp/data/external/fastpifu_cardiology/processed/pifu_challenge_24.json
+
+External test
+--------------------------------------------------------------------
+Macro F1: 0.2994 -> 0.9669 (+0.6674)
+Balanced accuracy: 0.3533 -> 0.9667 (+0.6133)
+NOT_ELIGIBLE recall: 0.0600 -> 1.0000 (+0.9400)
+ELIGIBLE precision: 0.3077 -> 1.0000 (+0.6923)
+Unsafe eligible count: 20 -> 0
+
+Challenge set
+--------------------------------------------------------------------
+Macro F1: 0.0635 -> 0.6162 (+0.5527)
+NOT_ELIGIBLE recall: 0.1053 -> 0.7368 (+0.6316)
+Unsafe eligible count: 7 -> 0

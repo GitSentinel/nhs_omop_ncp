@@ -1,0 +1,812 @@
+{
+  "run_id": "20260807T104354Z",
+  "target": "pifu",
+  "mode": "train-and-evaluate",
+  "started_at": "2026-08-07T10:43:54.263237Z",
+  "finished_at": "2026-08-07T13:30:05.232123Z",
+  "train_gpus": [
+    0,
+    1,
+    2
+  ],
+  "evaluation_gpu": 0,
+  "steps": [
+    {
+      "step": "validate",
+      "dataset": "shared",
+      "status": "succeeded",
+      "command": [],
+      "started_at": "2026-08-07T10:43:54.271589Z",
+      "finished_at": "2026-08-07T10:43:54.271589Z",
+      "duration_seconds": 0.0,
+      "return_code": 0,
+      "log_path": null,
+      "stdout_tail": [
+        "{\"ok\": true, \"project_root\": \"/home/jacinth/nhs_omop_ncp\", \"required_steps\": [\"pifu_finetune\", \"pifu_evaluate\"], \"missing_scripts\": []}"
+      ],
+      "artifacts": [],
+      "gpu_ids": [],
+      "error": null
+    },
+    {
+      "step": "original_generate",
+      "dataset": "original",
+      "status": "skipped",
+      "command": [],
+      "started_at": "2026-08-07T10:43:54.273678Z",
+      "finished_at": "2026-08-07T10:43:54.273678Z",
+      "duration_seconds": 0.0,
+      "return_code": null,
+      "log_path": null,
+      "stdout_tail": [],
+      "artifacts": [],
+      "gpu_ids": [],
+      "error": "Not required for target=pifu mode=train-and-evaluate."
+    },
+    {
+      "step": "original_relabel",
+      "dataset": "original",
+      "status": "skipped",
+      "command": [],
+      "started_at": "2026-08-07T10:43:54.274616Z",
+      "finished_at": "2026-08-07T10:43:54.274616Z",
+      "duration_seconds": 0.0,
+      "return_code": null,
+      "log_path": null,
+      "stdout_tail": [],
+      "artifacts": [],
+      "gpu_ids": [],
+      "error": "Not required for target=pifu mode=train-and-evaluate."
+    },
+    {
+      "step": "original_finetune",
+      "dataset": "original",
+      "status": "skipped",
+      "command": [],
+      "started_at": "2026-08-07T10:43:54.275649Z",
+      "finished_at": "2026-08-07T10:43:54.275649Z",
+      "duration_seconds": 0.0,
+      "return_code": null,
+      "log_path": null,
+      "stdout_tail": [],
+      "artifacts": [],
+      "gpu_ids": [],
+      "error": "Not required for target=pifu mode=train-and-evaluate."
+    },
+    {
+      "step": "original_evaluate",
+      "dataset": "original",
+      "status": "skipped",
+      "command": [],
+      "started_at": "2026-08-07T10:43:54.276873Z",
+      "finished_at": "2026-08-07T10:43:54.276873Z",
+      "duration_seconds": 0.0,
+      "return_code": null,
+      "log_path": null,
+      "stdout_tail": [],
+      "artifacts": [],
+      "gpu_ids": [],
+      "error": "Not required for target=pifu mode=train-and-evaluate."
+    },
+    {
+      "step": "pifu_prepare",
+      "dataset": "pifu",
+      "status": "skipped",
+      "command": [],
+      "started_at": "2026-08-07T10:43:54.277796Z",
+      "finished_at": "2026-08-07T10:43:54.277796Z",
+      "duration_seconds": 0.0,
+      "return_code": null,
+      "log_path": null,
+      "stdout_tail": [],
+      "artifacts": [],
+      "gpu_ids": [],
+      "error": "Not required for target=pifu mode=train-and-evaluate."
+    },
+    {
+      "step": "pifu_finetune",
+      "dataset": "pifu",
+      "status": "succeeded",
+      "command": [
+        "uv",
+        "run",
+        "--extra",
+        "finetune",
+        "python",
+        "-m",
+        "torch.distributed.run",
+        "--standalone",
+        "--nproc_per_node=3",
+        "--master_port=29510",
+        "src/scripts/finetune_pifu.py"
+      ],
+      "started_at": "2026-08-07T10:43:54.281356Z",
+      "finished_at": "2026-08-07T13:27:20.883593Z",
+      "duration_seconds": 9806.602244818583,
+      "return_code": 0,
+      "log_path": "/home/jacinth/nhs_omop_ncp/data/pipeline_runs/20260807T104354Z/pifu_finetune.log",
+      "stdout_tail": [
+        "",
+        " 80%|███████▉  | 129/162 [00:46<00:12,  2.57it/s]\u001b[A",
+        "",
+        " 80%|████████  | 130/162 [00:47<00:12,  2.58it/s]\u001b[A",
+        "",
+        " 81%|████████  | 131/162 [00:47<00:12,  2.48it/s]\u001b[A",
+        "",
+        " 81%|████████▏ | 132/162 [00:47<00:12,  2.48it/s]\u001b[A",
+        "",
+        " 82%|████████▏ | 133/162 [00:48<00:11,  2.43it/s]\u001b[A",
+        "",
+        " 83%|████████▎ | 134/162 [00:48<00:11,  2.43it/s]\u001b[A",
+        "",
+        " 83%|████████▎ | 135/162 [00:49<00:11,  2.44it/s]\u001b[A",
+        "",
+        " 84%|████████▍ | 136/162 [00:49<00:10,  2.52it/s]\u001b[A",
+        "",
+        " 85%|████████▍ | 137/162 [00:49<00:10,  2.41it/s]\u001b[A",
+        "",
+        " 85%|████████▌ | 138/162 [00:50<00:09,  2.45it/s]\u001b[A",
+        "",
+        " 86%|████████▌ | 139/162 [00:50<00:09,  2.50it/s]\u001b[A",
+        "",
+        " 86%|████████▋ | 140/162 [00:51<00:08,  2.55it/s]\u001b[A",
+        "",
+        " 87%|████████▋ | 141/162 [00:51<00:08,  2.52it/s]\u001b[A",
+        "",
+        " 88%|████████▊ | 142/162 [00:51<00:07,  2.52it/s]\u001b[A",
+        "",
+        " 88%|████████▊ | 143/162 [00:52<00:07,  2.52it/s]\u001b[A",
+        "",
+        " 89%|████████▉ | 144/162 [00:52<00:07,  2.52it/s]\u001b[A",
+        "",
+        " 90%|████████▉ | 145/162 [00:53<00:06,  2.54it/s]\u001b[A",
+        "",
+        " 90%|█████████ | 146/162 [00:53<00:06,  2.53it/s]\u001b[A",
+        "",
+        " 91%|█████████ | 147/162 [00:53<00:05,  2.54it/s]\u001b[A",
+        "",
+        " 91%|█████████▏| 148/162 [00:54<00:05,  2.54it/s]\u001b[A",
+        "",
+        " 92%|█████████▏| 149/162 [00:54<00:05,  2.49it/s]\u001b[A",
+        "",
+        " 93%|█████████▎| 150/162 [00:55<00:04,  2.50it/s]\u001b[A",
+        "",
+        " 93%|█████████▎| 151/162 [00:55<00:04,  2.54it/s]\u001b[A",
+        "",
+        " 94%|█████████▍| 152/162 [00:55<00:03,  2.53it/s]\u001b[A",
+        "",
+        " 94%|█████████▍| 153/162 [00:56<00:03,  2.50it/s]\u001b[A",
+        "",
+        " 95%|█████████▌| 154/162 [00:56<00:03,  2.50it/s]\u001b[A",
+        "",
+        " 96%|█████████▌| 155/162 [00:57<00:02,  2.45it/s]\u001b[A",
+        "",
+        " 96%|█████████▋| 156/162 [00:57<00:02,  2.50it/s]\u001b[A",
+        "",
+        " 97%|█████████▋| 157/162 [00:57<00:02,  2.46it/s]\u001b[A",
+        "",
+        " 98%|█████████▊| 158/162 [00:58<00:01,  2.41it/s]\u001b[A",
+        "",
+        " 98%|█████████▊| 159/162 [00:58<00:01,  2.44it/s]\u001b[A",
+        "",
+        " 99%|█████████▉| 160/162 [00:59<00:00,  2.47it/s]\u001b[A",
+        "",
+        " 99%|█████████▉| 161/162 [00:59<00:00,  2.54it/s]\u001b[A",
+        "",
+        "100%|██████████| 162/162 [00:59<00:00,  2.38it/s]\u001b[A",
+        "",
+        "",
+        "",
+        "\u001b[A{'eval_loss': '0.08521', 'eval_runtime': '60.67', 'eval_samples_per_second': '7.994', 'eval_steps_per_second': '2.67', 'epoch': '3'}",
+        "",
+        "100%|██████████| 873/873 [2:41:48<00:00, 10.93s/it]",
+        "",
+        "100%|██████████| 162/162 [01:00<00:00,  2.38it/s]\u001b[A",
+        "",
+        "                                                 \u001b[A/home/jacinth/nhs_omop_ncp/.venv/lib/python3.11/site-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.",
+        "  return func(*args, **kwargs)",
+        "",
+        "",
+        "{'train_runtime': '9710', 'train_samples_per_second': '1.349', 'train_steps_per_second': '0.09', 'train_loss': '0.3246', 'epoch': '3'}",
+        "",
+        "100%|██████████| 873/873 [2:41:49<00:00, 10.93s/it]",
+        "100%|██████████| 873/873 [2:41:49<00:00, 11.12s/it]",
+        "Automatically evaluating external test split: 150 examples",
+        "",
+        "Running generative evaluation on 150 PIFU examples...",
+        "  25/150 evaluated...",
+        "  50/150 evaluated...",
+        "  75/150 evaluated...",
+        "  100/150 evaluated...",
+        "  125/150 evaluated...",
+        "  150/150 evaluated...",
+        "",
+        "Classification Report:",
+        "              precision    recall  f1-score   support",
+        "",
+        "NOT_ELIGIBLE     0.9057    0.9600    0.9320        50",
+        "  BORDERLINE     0.9583    0.9200    0.9388        50",
+        "    ELIGIBLE     0.9796    0.9600    0.9697        50",
+        "",
+        "    accuracy                         0.9467       150",
+        "   macro avg     0.9479    0.9467    0.9468       150",
+        "weighted avg     0.9479    0.9467    0.9468       150",
+        "",
+        "",
+        "=================================================================",
+        "PIFU FINE-TUNING COMPLETE",
+        "=================================================================",
+        "  Model            : Qwen/Qwen3.5-9B",
+        "  Macro F1         : 0.9468",
+        "  Accuracy         : 0.9467",
+        "  NOT_EL recall    : 0.9600",
+        "  EL precision     : 0.9796",
+        "  Unsafe eligible  : 0",
+        "  Adapter          : /home/jacinth/nhs_omop_ncp/data/finetune/qwen35_9b_pifu_lora",
+        "  MLflow           : http://127.0.0.1:5000",
+        "=================================================================",
+        "[rank0]:[W807 13:27:18.405783181 ProcessGroupNCCL.cpp:1575] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())"
+      ],
+      "artifacts": [
+        "/home/jacinth/nhs_omop_ncp/data/finetune/qwen35_9b_pifu_lora_3epochs_same_protocol/adapter_config.json",
+        "/home/jacinth/nhs_omop_ncp/data/finetune/qwen35_9b_pifu_lora_3epochs_same_protocol/adapter_model.safetensors"
+      ],
+      "gpu_ids": [
+        0,
+        1,
+        2
+      ],
+      "error": null
+    },
+    {
+      "step": "pifu_evaluate",
+      "dataset": "pifu",
+      "status": "succeeded",
+      "command": [
+        "uv",
+        "run",
+        "--extra",
+        "finetune",
+        "python",
+        "src/scripts/evaluate_pifu.py"
+      ],
+      "started_at": "2026-08-07T13:27:20.892562Z",
+      "finished_at": "2026-08-07T13:29:41.267742Z",
+      "duration_seconds": 140.37518893554807,
+      "return_code": 0,
+      "log_path": "/home/jacinth/nhs_omop_ncp/data/pipeline_runs/20260807T104354Z/pifu_evaluate.log",
+      "stdout_tail": [
+        "Evaluating FINE-TUNED PIFU model...",
+        "========================================",
+        "Loading fine-tuned PIFU model from: /home/jacinth/nhs_omop_ncp/data/finetune/qwen35_9b_pifu_lora",
+        "",
+        "Fetching 4 files:   0%|          | 0/4 [00:00<?, ?it/s]",
+        "Fetching 4 files: 100%|██████████| 4/4 [00:00<00:00, 41120.63it/s]",
+        "",
+        "Loading weights:   0%|          | 0/427 [00:00<?, ?it/s]",
+        "Loading weights:   0%|          | 1/427 [00:00<05:40,  1.25it/s]",
+        "Loading weights:   4%|▎         | 15/427 [00:00<00:18, 21.91it/s]",
+        "Loading weights:   7%|▋         | 28/427 [00:01<00:10, 39.65it/s]",
+        "Loading weights:  10%|█         | 43/427 [00:01<00:06, 58.59it/s]",
+        "Loading weights:  13%|█▎        | 54/427 [00:01<00:05, 65.03it/s]",
+        "Loading weights:  16%|█▌        | 67/427 [00:01<00:04, 77.17it/s]",
+        "Loading weights:  19%|█▊        | 80/427 [00:01<00:04, 85.26it/s]",
+        "Loading weights:  21%|██▏       | 91/427 [00:01<00:03, 90.50it/s]",
+        "Loading weights:  24%|██▍       | 102/427 [00:01<00:04, 76.97it/s]",
+        "Loading weights:  28%|██▊       | 119/427 [00:01<00:03, 89.51it/s]",
+        "Loading weights:  30%|███       | 130/427 [00:02<00:03, 87.79it/s]",
+        "Loading weights:  34%|███▍      | 147/427 [00:02<00:02, 96.23it/s]",
+        "Loading weights:  39%|███▉      | 167/427 [00:02<00:02, 119.12it/s]",
+        "Loading weights:  43%|████▎     | 182/427 [00:02<00:02, 122.24it/s]",
+        "Loading weights:  46%|████▌     | 197/427 [00:02<00:01, 126.31it/s]",
+        "Loading weights:  49%|████▉     | 211/427 [00:02<00:01, 108.06it/s]",
+        "Loading weights:  53%|█████▎    | 226/427 [00:02<00:01, 115.26it/s]",
+        "Loading weights:  56%|█████▌    | 240/427 [00:02<00:01, 118.07it/s]",
+        "Loading weights:  59%|█████▉    | 254/427 [00:03<00:01, 123.48it/s]",
+        "Loading weights:  63%|██████▎   | 267/427 [00:03<00:01, 116.36it/s]",
+        "Loading weights:  66%|██████▌   | 280/427 [00:03<00:01, 114.83it/s]",
+        "Loading weights:  69%|██████▉   | 294/427 [00:03<00:01, 120.58it/s]",
+        "Loading weights:  72%|███████▏  | 308/427 [00:03<00:00, 123.37it/s]",
+        "Loading weights:  75%|███████▌  | 321/427 [00:03<00:00, 119.88it/s]",
+        "Loading weights:  78%|███████▊  | 334/427 [00:03<00:00, 114.77it/s]",
+        "Loading weights:  81%|████████▏ | 347/427 [00:03<00:00, 111.90it/s]",
+        "Loading weights:  85%|████████▍ | 361/427 [00:04<00:00, 111.69it/s]",
+        "Loading weights:  87%|████████▋ | 373/427 [00:04<00:00, 107.28it/s]",
+        "Loading weights:  90%|█████████ | 385/427 [00:04<00:00, 109.61it/s]",
+        "Loading weights:  93%|█████████▎| 398/427 [00:04<00:00, 113.58it/s]",
+        "Loading weights:  96%|█████████▌| 410/427 [00:04<00:00, 96.89it/s]",
+        "Loading weights:  99%|█████████▊| 421/427 [00:04<00:00, 94.62it/s]",
+        "Loading weights: 100%|██████████| 427/427 [00:04<00:00, 91.47it/s]",
+        "/home/jacinth/nhs_omop_ncp/.venv/lib/python3.11/site-packages/sklearn/metrics/_classification.py:2939: UserWarning: y_pred contains classes not in y_true",
+        "  warnings.warn(\"y_pred contains classes not in y_true\")",
+        "Label token sequences: 0=[220, 15], 1=[220, 16], 2=[220, 17]",
+        "  50/150 evaluated...",
+        "  100/150 evaluated...",
+        "  150/150 evaluated...",
+        "",
+        "====================================================================",
+        "FINE-TUNED MODEL - EXTERNAL TEST",
+        "====================================================================",
+        "Accuracy            : 0.9467",
+        "Balanced accuracy   : 0.9467",
+        "Macro F1            : 0.9468",
+        "NOT_ELIGIBLE recall : 0.9600",
+        "ELIGIBLE precision  : 0.9796",
+        "Unsafe eligible     : 0 (0.0000)",
+        "Manual review rate  : 0.3200",
+        "Confusion matrix    : [[48, 2, 0], [3, 46, 1], [2, 0, 48]]",
+        "              precision    recall  f1-score   support",
+        "",
+        "NOT_ELIGIBLE     0.9057    0.9600    0.9320        50",
+        "  BORDERLINE     0.9583    0.9200    0.9388        50",
+        "    ELIGIBLE     0.9796    0.9600    0.9697        50",
+        "",
+        "    accuracy                         0.9467       150",
+        "   macro avg     0.9479    0.9467    0.9468       150",
+        "weighted avg     0.9479    0.9467    0.9468       150",
+        "",
+        "Metrics saved     : /home/jacinth/nhs_omop_ncp/data/evaluations/pifu_cardiology/finetuned_external_test_metrics.json",
+        "Predictions saved : /home/jacinth/nhs_omop_ncp/data/evaluations/pifu_cardiology/finetuned_external_test_predictions.csv",
+        "Label token sequences: 0=[220, 15], 1=[220, 16], 2=[220, 17]",
+        "  24/24 evaluated...",
+        "",
+        "====================================================================",
+        "FINE-TUNED MODEL - CHALLENGE TEST",
+        "====================================================================",
+        "Accuracy            : 0.7917",
+        "Balanced accuracy   : 0.8684",
+        "Macro F1            : 0.6162",
+        "NOT_ELIGIBLE recall : 0.7368",
+        "ELIGIBLE precision  : 1.0000",
+        "Unsafe eligible     : 0 (0.0000)",
+        "Manual review rate  : 0.2083",
+        "Confusion matrix    : [[14, 5, 0], [0, 0, 0], [0, 0, 5]]",
+        "              precision    recall  f1-score   support",
+        "",
+        "NOT_ELIGIBLE     1.0000    0.7368    0.8485        19",
+        "  BORDERLINE     0.0000    0.0000    0.0000         0",
+        "    ELIGIBLE     1.0000    1.0000    1.0000         5",
+        "",
+        "    accuracy                         0.7917        24",
+        "   macro avg     0.6667    0.5789    0.6162        24",
+        "weighted avg     1.0000    0.7917    0.8801        24",
+        "",
+        "Metrics saved     : /home/jacinth/nhs_omop_ncp/data/evaluations/pifu_cardiology/finetuned_challenge_metrics.json",
+        "Predictions saved : /home/jacinth/nhs_omop_ncp/data/evaluations/pifu_cardiology/finetuned_challenge_predictions.csv",
+        "",
+        "====================================================================",
+        "COMPARISON: BASE VS FINE-TUNED",
+        "====================================================================",
+        "Base Model vs Fine-Tuned PIFU Model - Qwen/Qwen3.5-9B",
+        "====================================================================",
+        "Adapter: /home/jacinth/nhs_omop_ncp/data/finetune/qwen35_9b_pifu_lora",
+        "External test: /home/jacinth/nhs_omop_ncp/data/external/fastpifu_cardiology/processed/pifu_external_test_150.json",
+        "Challenge set: /home/jacinth/nhs_omop_ncp/data/external/fastpifu_cardiology/processed/pifu_challenge_24.json",
+        "",
+        "External test",
+        "--------------------------------------------------------------------",
+        "Macro F1: 0.2994 -> 0.9468 (+0.6474)",
+        "Balanced accuracy: 0.3533 -> 0.9467 (+0.5933)",
+        "NOT_ELIGIBLE recall: 0.0600 -> 0.9600 (+0.9000)",
+        "ELIGIBLE precision: 0.3077 -> 0.9796 (+0.6719)",
+        "Unsafe eligible count: 20 -> 0",
+        "",
+        "Challenge set",
+        "--------------------------------------------------------------------",
+        "Macro F1: 0.0635 -> 0.6162 (+0.5527)",
+        "NOT_ELIGIBLE recall: 0.1053 -> 0.7368 (+0.6316)",
+        "Unsafe eligible count: 7 -> 0"
+      ],
+      "artifacts": [],
+      "gpu_ids": [
+        0
+      ],
+      "error": null
+    }
+  ],
+  "metrics": [
+    {
+      "dataset": "pifu",
+      "model": "fine_tuned",
+      "split": "external_test",
+      "metrics": {
+        "accuracy": 0.9466666666666667,
+        "balanced_accuracy": 0.9466666666666667,
+        "macro_f1": 0.946837104950836,
+        "weighted_f1": 0.9468371049508357,
+        "not_eligible_precision": 0.9056603773584906,
+        "not_eligible_recall": 0.96,
+        "borderline_precision": 0.9583333333333334,
+        "borderline_recall": 0.92,
+        "eligible_precision": 0.9795918367346939,
+        "eligible_recall": 0.96,
+        "unsafe_eligible_count": 0,
+        "unsafe_eligible_rate": 0.0,
+        "manual_review_rate": 0.32,
+        "prediction_counts": {
+          "2": 49,
+          "0": 53,
+          "1": 48
+        },
+        "confusion_matrix": [
+          [
+            48,
+            2,
+            0
+          ],
+          [
+            3,
+            46,
+            1
+          ],
+          [
+            2,
+            0,
+            48
+          ]
+        ],
+        "report": {
+          "NOT_ELIGIBLE": {
+            "precision": 0.9056603773584906,
+            "recall": 0.96,
+            "f1-score": 0.9320388349514563,
+            "support": 50.0
+          },
+          "BORDERLINE": {
+            "precision": 0.9583333333333334,
+            "recall": 0.92,
+            "f1-score": 0.9387755102040817,
+            "support": 50.0
+          },
+          "ELIGIBLE": {
+            "precision": 0.9795918367346939,
+            "recall": 0.96,
+            "f1-score": 0.9696969696969697,
+            "support": 50.0
+          },
+          "accuracy": 0.9466666666666667,
+          "macro avg": {
+            "precision": 0.9478618491421725,
+            "recall": 0.9466666666666667,
+            "f1-score": 0.946837104950836,
+            "support": 150.0
+          },
+          "weighted avg": {
+            "precision": 0.9478618491421726,
+            "recall": 0.9466666666666667,
+            "f1-score": 0.9468371049508357,
+            "support": 150.0
+          }
+        }
+      },
+      "source": "/home/jacinth/nhs_omop_ncp/data/evaluations/pifu_cardiology/finetuned_external_test_metrics.json"
+    },
+    {
+      "dataset": "pifu",
+      "model": "fine_tuned",
+      "split": "challenge",
+      "metrics": {
+        "accuracy": 0.7916666666666666,
+        "balanced_accuracy": 0.868421052631579,
+        "macro_f1": 0.6161616161616162,
+        "weighted_f1": 0.8800505050505051,
+        "not_eligible_precision": 1.0,
+        "not_eligible_recall": 0.7368421052631579,
+        "borderline_precision": 0.0,
+        "borderline_recall": 0.0,
+        "eligible_precision": 1.0,
+        "eligible_recall": 1.0,
+        "unsafe_eligible_count": 0,
+        "unsafe_eligible_rate": 0.0,
+        "manual_review_rate": 0.20833333333333334,
+        "prediction_counts": {
+          "2": 5,
+          "0": 14,
+          "1": 5
+        },
+        "confusion_matrix": [
+          [
+            14,
+            5,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            5
+          ]
+        ],
+        "report": {
+          "NOT_ELIGIBLE": {
+            "precision": 1.0,
+            "recall": 0.7368421052631579,
+            "f1-score": 0.8484848484848485,
+            "support": 19.0
+          },
+          "BORDERLINE": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1-score": 0.0,
+            "support": 0.0
+          },
+          "ELIGIBLE": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1-score": 1.0,
+            "support": 5.0
+          },
+          "accuracy": 0.7916666666666666,
+          "macro avg": {
+            "precision": 0.6666666666666666,
+            "recall": 0.5789473684210527,
+            "f1-score": 0.6161616161616162,
+            "support": 24.0
+          },
+          "weighted avg": {
+            "precision": 1.0,
+            "recall": 0.7916666666666666,
+            "f1-score": 0.8800505050505051,
+            "support": 24.0
+          }
+        }
+      },
+      "source": "/home/jacinth/nhs_omop_ncp/data/evaluations/pifu_cardiology/finetuned_challenge_metrics.json"
+    },
+    {
+      "dataset": "pifu",
+      "model": "base",
+      "split": "challenge",
+      "metrics": {
+        "accuracy": 0.08333333333333333,
+        "balanced_accuracy": 0.05263157894736842,
+        "macro_f1": 0.06349206349206349,
+        "weighted_f1": 0.15079365079365079,
+        "not_eligible_precision": 1.0,
+        "not_eligible_recall": 0.10526315789473684,
+        "borderline_precision": 0.0,
+        "borderline_recall": 0.0,
+        "eligible_precision": 0.0,
+        "eligible_recall": 0.0,
+        "unsafe_eligible_count": 7,
+        "unsafe_eligible_rate": 0.3684210526315789,
+        "manual_review_rate": 0.625,
+        "prediction_counts": {
+          "1": 15,
+          "0": 2,
+          "2": 7
+        },
+        "confusion_matrix": [
+          [
+            2,
+            10,
+            7
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            5,
+            0
+          ]
+        ],
+        "report": {
+          "NOT_ELIGIBLE": {
+            "precision": 1.0,
+            "recall": 0.10526315789473684,
+            "f1-score": 0.19047619047619047,
+            "support": 19.0
+          },
+          "BORDERLINE": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1-score": 0.0,
+            "support": 0.0
+          },
+          "ELIGIBLE": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1-score": 0.0,
+            "support": 5.0
+          },
+          "accuracy": 0.08333333333333333,
+          "macro avg": {
+            "precision": 0.3333333333333333,
+            "recall": 0.03508771929824561,
+            "f1-score": 0.06349206349206349,
+            "support": 24.0
+          },
+          "weighted avg": {
+            "precision": 0.7916666666666666,
+            "recall": 0.08333333333333333,
+            "f1-score": 0.15079365079365079,
+            "support": 24.0
+          }
+        }
+      },
+      "source": "/home/jacinth/nhs_omop_ncp/data/evaluations/pifu_cardiology/base_challenge_metrics.json"
+    },
+    {
+      "dataset": "pifu",
+      "model": "base",
+      "split": "external_test",
+      "metrics": {
+        "accuracy": 0.35333333333333333,
+        "balanced_accuracy": 0.35333333333333333,
+        "macro_f1": 0.2994469582704877,
+        "weighted_f1": 0.2994469582704877,
+        "not_eligible_precision": 0.6,
+        "not_eligible_recall": 0.06,
+        "borderline_precision": 0.3655913978494624,
+        "borderline_recall": 0.68,
+        "eligible_precision": 0.3076923076923077,
+        "eligible_recall": 0.32,
+        "unsafe_eligible_count": 20,
+        "unsafe_eligible_rate": 0.4,
+        "manual_review_rate": 0.62,
+        "prediction_counts": {
+          "1": 93,
+          "2": 52,
+          "0": 5
+        },
+        "confusion_matrix": [
+          [
+            3,
+            27,
+            20
+          ],
+          [
+            0,
+            34,
+            16
+          ],
+          [
+            2,
+            32,
+            16
+          ]
+        ],
+        "report": {
+          "NOT_ELIGIBLE": {
+            "precision": 0.6,
+            "recall": 0.06,
+            "f1-score": 0.10909090909090909,
+            "support": 50.0
+          },
+          "BORDERLINE": {
+            "precision": 0.3655913978494624,
+            "recall": 0.68,
+            "f1-score": 0.4755244755244755,
+            "support": 50.0
+          },
+          "ELIGIBLE": {
+            "precision": 0.3076923076923077,
+            "recall": 0.32,
+            "f1-score": 0.3137254901960784,
+            "support": 50.0
+          },
+          "accuracy": 0.35333333333333333,
+          "macro avg": {
+            "precision": 0.4244279018472567,
+            "recall": 0.35333333333333333,
+            "f1-score": 0.2994469582704877,
+            "support": 150.0
+          },
+          "weighted avg": {
+            "precision": 0.4244279018472567,
+            "recall": 0.35333333333333333,
+            "f1-score": 0.2994469582704877,
+            "support": 150.0
+          }
+        }
+      },
+      "source": "/home/jacinth/nhs_omop_ncp/data/evaluations/pifu_cardiology/base_external_test_metrics.json"
+    },
+    {
+      "dataset": "pifu",
+      "model": "fine_tuned",
+      "split": "test",
+      "metrics": {
+        "accuracy": 0.9466666666666667,
+        "balanced_accuracy": 0.9466666666666667,
+        "macro_f1": 0.946837104950836,
+        "weighted_f1": 0.9468371049508357,
+        "not_eligible_recall": 0.96,
+        "borderline_recall": 0.92,
+        "eligible_precision": 0.9795918367346939,
+        "eligible_recall": 0.96,
+        "unsafe_eligible_count": 0,
+        "unsafe_eligible_rate": 0.0,
+        "manual_review_rate": 0.32,
+        "invalid_output_count": 0,
+        "n_evaluated": 150,
+        "confusion_matrix": [
+          [
+            48,
+            2,
+            0
+          ],
+          [
+            3,
+            46,
+            1
+          ],
+          [
+            2,
+            0,
+            48
+          ]
+        ]
+      },
+      "source": "/home/jacinth/nhs_omop_ncp/data/finetune/qwen35_9b_pifu_lora/evaluation/test_metrics.json"
+    },
+    {
+      "dataset": "pifu",
+      "model": "fine_tuned",
+      "split": "test",
+      "metrics": {
+        "accuracy": 0.96,
+        "balanced_accuracy": 0.96,
+        "macro_f1": 0.9601171760596315,
+        "weighted_f1": 0.9601171760596313,
+        "not_eligible_recall": 0.96,
+        "borderline_recall": 0.98,
+        "eligible_precision": 1.0,
+        "eligible_recall": 0.94,
+        "unsafe_eligible_count": 0,
+        "unsafe_eligible_rate": 0.0,
+        "manual_review_rate": 0.3466666666666667,
+        "invalid_output_count": 0,
+        "n_evaluated": 150,
+        "confusion_matrix": [
+          [
+            48,
+            2,
+            0
+          ],
+          [
+            1,
+            49,
+            0
+          ],
+          [
+            2,
+            1,
+            47
+          ]
+        ]
+      },
+      "source": "/home/jacinth/nhs_omop_ncp/data/finetune/qwen35_9b_pifu_lora_3epochs_same_protocol/evaluation/test_metrics.json"
+    }
+  ],
+  "assessment": {
+    "overall_status": "success",
+    "executive_summary": "Pipeline assessment for synthetic PIFU (three-class eligibility) in target mode: train-and-evaluate.\n- Validation step: succeeded on dataset 'shared' (stdout indicates project ready with required steps).\n- Original data steps (generate, relabel, finetune, evaluate) were skipped as Not required for target=pifu mode=train-and-evaluate.\n- PIFU finetuning: succeeded on dataset 'pifu'. Duration: 9806.602244818583 seconds. Key artifacts produced: adapter files at the finetune path. This step completed with return_code 0.\n- PIFU evaluation: succeeded on dataset 'pifu'. Evaluated model using finetuned adapter. Runtime: 140.37518893554807 seconds. External evidence includes external/test and challenge/test metrics.\n\nKey results for PIFU three-class eligibility (NOT_ELIGIBLE, BORDERLINE, ELIGIBLE):\n- External test (fine-tuned model):\n  • Accuracy: 0.9466666666666667; Balanced accuracy: 0.9466666666666667; Macro F1: 0.946837104950836; Weighted F1: 0.9468371049508357\n  • NOT_ELIGIBLE: precision 0.9056603773584906; recall 0.96; F1 0.9320388349514563; support 50\n  • BORDERLINE: precision 0.9583333333333334; recall 0.92; F1 0.9387755102040817; support 50\n  • ELIGIBLE: precision 0.9795918367346939; recall 0.96; F1 0.9696969696969697; support 50\n  • NOT_ELIGIBLE recall emphasized at 0.96; ELIGIBLE precision emphasized at 0.9796; Unsafe eligible count: 0; Unsafe eligible rate: 0.0; Manual review rate: 0.32\n- Challenge set (finetuned model):\n  • Accuracy: 0.7916666666666666; Balanced accuracy: 0.868421052631579; Macro F1: 0.6161616161616162; Weighted F1: 0.8800505050505051\n  • NOT_ELIGIBLE: precision 1.0; recall 0.7368421052631579; F1 0.8484848484848485; support 19\n  • BORDERLINE: precision 0.0; recall 0.0; F1 0.0; support 0\n  • ELIGIBLE: precision 1.0; recall 1.0; F1 1.0; support 5\n  • Unsafe eligible count: 0; Manual review rate: 0.20833333333333334\n- Test split (finetuned model):\n  • Accuracy: 0.9466666666666667; Balanced accuracy: 0.9466666666666667; Macro F1: 0.946837104950836; Weights identical to external test; NOT_ELIGIBLE recall: 0.96; Borderline recall: 0.92; ELIGIBLE precision: 0.9795918367346939; ELIGIBLE recall: 0.96; Unsafe eligible count: 0; Manual review rate: 0.32; Confusion matrix: [[48,2,0],[3,46,1],[2,0,48]]\n\nNotable comparisons (BASE vs FINE-TUNED PIFU model, Qwen/Qwen3.5-9B):\n- External test macro F1: 0.2994 -> 0.9468 (+0.6474)\n- External test balanced accuracy: 0.3533 -> 0.9467 (+0.5933)\n- External test NOT_ELIGIBLE recall: 0.0600 -> 0.9600 (+0.9000)\n- External test ELIGIBLE precision: 0.3077 -> 0.9796 (+0.6719)\n- External test unsafe eligible count: 20 -> 0\n- Challenge set macro F1: 0.0635 -> 0.6162 (+0.5527)\n- Challenge set NOT_ELIGIBLE recall: 0.1053 -> 0.7368 (+0.6316)\n- Challenge set unsafe eligible count: 7 -> 0\n\nOverall interpretation: The finetuned PIFU model shows strong external/test performance in macro F1 and recall for NOT_ELIGIBLE, with high ELIGIBLE precision. However, challenge-set results are more variable, with some classes failing to meet performance in BORDERLINE. The manual review rate remains a consideration for deployment. These results are derived from synthetic evidence and must be reviewed by humans before any real-world conclusions.\n\nNote: outputs are for synthetic research and require human review.",
+    "key_findings": [
+      "PIFU finetuning completed; validation and pifu_evaluate steps succeeded.",
+      "External_test: Macro F1 ~0.9468; NOT_ELIGIBLE recall 0.96; ELIGIBLE precision 0.9796; Manual review rate 0.32; Unsafe eligible 0.",
+      "Challenge set: Macro F1 ~0.6162; NOT_ELIGIBLE recall ~0.7368; ELIGIBLE precision/recall = 1.0; Manual review rate ~0.2083; Unsafe eligible 0.",
+      "Test split: Macro F1 ~0.9468; NOT_ELIGIBLE recall 0.96; ELIGIBLE precision 0.9796; Manual review rate 0.32; Unsafe eligible 0."
+    ],
+    "safety_flags": [
+      "Synthetic data; results require human review; performance varies across challenge set; potential class imbalance across three classes."
+    ],
+    "recommended_actions": [
+      "Flag results for expert review due to synthetic-data provenance.",
+      "Inspect BORDERLINE class performance on challenge set; consider targeted data augmentation if deployed.",
+      "Monitor manual_review_rate implications in real deployments; confirm not_elible recall and eligible precision thresholds meet domain requirements."
+    ],
+    "comparison_statement": "BASE vs FINE-TUNED PIFU: External test Macro F1 improved from 0.2994 to 0.9468; Balanced accuracy from 0.3533 to 0.9467; NOT_ELIGIBLE recall from 0.0600 to 0.9600; ELIGIBLE precision from 0.3077 to 0.9796; Unsafe eligible count from 20 to 0. Challenge set Macro F1 improved from 0.0635 to 0.6162; NOT_ELIGIBLE recall from 0.1053 to 0.7368; Unsafe eligible count from 7 to 0."
+  },
+  "report_json": "/home/jacinth/nhs_omop_ncp/data/pipeline_runs/20260807T104354Z/pipeline_report.json",
+  "report_markdown": "/home/jacinth/nhs_omop_ncp/data/pipeline_runs/20260807T104354Z/pipeline_report.md",
+  "synthetic_data_only": true,
+  "human_review_required": true
+}

@@ -1,0 +1,166 @@
+COMMAND: uv run --extra finetune python src/scripts/evaluate_model.py
+
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+`torch_dtype` is deprecated! Use `dtype` instead!
+=================================================================
+NHS OMOP MCP Model Evaluation
+=================================================================
+Base model          : Qwen/Qwen3.5-9B
+Adapter             : /home/jacinth/nhs_omop_ncp/data/finetune/qwen35_9b_qlora_adapter_3epochs_recall_v2
+Dataset             : /home/jacinth/nhs_omop_ncp/data/finetune/clinic_letters_azure_labelled.json
+Validation samples  : 301
+Test samples        : 599
+Minimum recall      : 0.95
+Evaluation batch    : 4
+Text input          : full stored letter
+
+Test set distribution:
+  routine_followup : 214
+  treatment_event  : 385
+
+========================================
+Evaluating BASE model without adapter...
+========================================
+Loading base model: Qwen/Qwen3.5-9B
+
+Fetching 4 files:   0%|          | 0/4 [00:00<?, ?it/s]
+Fetching 4 files: 100%|██████████| 4/4 [00:00<00:00, 2373.69it/s]
+The fast path is not available because one of the required library is not installed. Falling back to torch implementation. To install follow https://github.com/fla-org/flash-linear-attention#installation and https://github.com/Dao-AILab/causal-conv1d
+
+Loading weights:   0%|          | 0/427 [00:00<?, ?it/s]
+Loading weights:   0%|          | 1/427 [00:00<02:02,  3.49it/s]
+Loading weights:   0%|          | 2/427 [00:00<02:55,  2.42it/s]/home/jacinth/nhs_omop_ncp/.venv/lib/python3.11/site-packages/bitsandbytes/backends/cuda/ops.py:213: FutureWarning: _check_is_size will be removed in a future PyTorch release along with guard_size_oblivious.     Use _check(i >= 0) instead.
+  torch._check_is_size(blocksize)
+
+Loading weights:   2%|▏         | 7/427 [00:01<00:52,  7.98it/s]
+Loading weights:   2%|▏         | 9/427 [00:01<01:09,  5.99it/s]
+Loading weights:   2%|▏         | 10/427 [00:02<01:31,  4.54it/s]
+Loading weights:   3%|▎         | 12/427 [00:02<01:16,  5.44it/s]
+Loading weights:   3%|▎         | 13/427 [00:02<01:30,  4.56it/s]
+Loading weights:   3%|▎         | 14/427 [00:02<01:37,  4.22it/s]
+Loading weights:   4%|▎         | 15/427 [00:03<01:47,  3.82it/s]
+Loading weights:   5%|▍         | 21/427 [00:03<00:51,  7.83it/s]
+Loading weights:   5%|▌         | 22/427 [00:03<01:01,  6.61it/s]
+Loading weights:   5%|▌         | 23/427 [00:04<01:13,  5.46it/s]
+Loading weights:   6%|▌         | 24/427 [00:04<01:31,  4.39it/s]
+Loading weights:   6%|▌         | 26/427 [00:04<01:17,  5.15it/s]
+Loading weights:   6%|▋         | 27/427 [00:05<01:24,  4.76it/s]
+Loading weights:  49%|████▊     | 208/427 [00:05<00:00, 221.92it/s]
+Loading weights:  98%|█████████▊| 419/427 [00:05<00:00, 498.69it/s]
+Loading weights: 100%|██████████| 427/427 [00:05<00:00, 78.31it/s] 
+Label token sequences: 0=[220, 15], 1=[220, 16]
+  100/301 evaluated...
+  200/301 evaluated...
+  300/301 evaluated...
+  301/301 evaluated...
+Base validation operating point: threshold=0.222700, precision=0.6777, recall=0.9536
+Label token sequences: 0=[220, 15], 1=[220, 16]
+  100/599 evaluated...
+  200/599 evaluated...
+  300/599 evaluated...
+  400/599 evaluated...
+  500/599 evaluated...
+  599/599 evaluated...
+
+BASE MODEL Results:
+  F1                : 0.7831
+  Macro F1          : 0.4864
+  Accuracy          : 0.6578
+  Balanced accuracy : 0.5366
+  Precision         : 0.6607
+  Recall            : 0.9610
+  ROC AUC           : 0.6214
+  PR AUC            : 0.7948
+  Predictions       : {1: 560, 0: 39}
+  Probability range : min=0.1192, median=0.4073, max=0.8808
+  Confusion matrix  : TN=24, FP=190, FN=15, TP=370
+                  precision    recall  f1-score   support
+
+routine_followup     0.6154    0.1121    0.1897       214
+ treatment_event     0.6607    0.9610    0.7831       385
+
+        accuracy                         0.6578       599
+       macro avg     0.6380    0.5366    0.4864       599
+    weighted avg     0.6445    0.6578    0.5711       599
+
+Base model unloaded.
+
+========================================
+Evaluating FINE-TUNED model with adapter...
+========================================
+Loading fine-tuned model from: /home/jacinth/nhs_omop_ncp/data/finetune/qwen35_9b_qlora_adapter_3epochs_recall_v2
+
+Fetching 4 files:   0%|          | 0/4 [00:00<?, ?it/s]
+Fetching 4 files: 100%|██████████| 4/4 [00:00<00:00, 3567.34it/s]
+
+Loading weights:   0%|          | 0/427 [00:00<?, ?it/s]
+Loading weights:   0%|          | 1/427 [00:00<02:13,  3.18it/s]
+Loading weights:   0%|          | 2/427 [00:00<02:33,  2.77it/s]/home/jacinth/nhs_omop_ncp/.venv/lib/python3.11/site-packages/bitsandbytes/backends/cuda/ops.py:213: FutureWarning: _check_is_size will be removed in a future PyTorch release along with guard_size_oblivious.     Use _check(i >= 0) instead.
+  torch._check_is_size(blocksize)
+
+Loading weights:   2%|▏         | 7/427 [00:00<00:47,  8.75it/s]
+Loading weights:   2%|▏         | 8/427 [00:01<01:08,  6.09it/s]
+Loading weights:   2%|▏         | 9/427 [00:01<01:22,  5.06it/s]
+Loading weights:   2%|▏         | 10/427 [00:02<01:34,  4.41it/s]
+Loading weights:   3%|▎         | 12/427 [00:02<01:28,  4.69it/s]
+Loading weights:   3%|▎         | 13/427 [00:02<01:33,  4.44it/s]
+Loading weights:   3%|▎         | 14/427 [00:02<01:32,  4.45it/s]
+Loading weights:   4%|▎         | 15/427 [00:03<01:35,  4.32it/s]
+Loading weights:   5%|▍         | 21/427 [00:03<00:42,  9.50it/s]
+Loading weights:   5%|▌         | 22/427 [00:03<01:02,  6.50it/s]
+Loading weights:   5%|▌         | 23/427 [00:04<01:08,  5.93it/s]
+Loading weights:   6%|▌         | 24/427 [00:04<01:21,  4.96it/s]
+Loading weights:   6%|▌         | 26/427 [00:04<01:11,  5.57it/s]
+Loading weights:   6%|▋         | 27/427 [00:04<01:15,  5.26it/s]
+Loading weights:  55%|█████▌    | 236/427 [00:05<00:00, 280.28it/s]
+Loading weights: 100%|██████████| 427/427 [00:05<00:00, 82.75it/s] 
+Label token sequences: 0=[220, 15], 1=[220, 16]
+  100/301 evaluated...
+  200/301 evaluated...
+  300/301 evaluated...
+  301/301 evaluated...
+Fine-tuned validation operating point: threshold=0.531209, precision=0.8636, recall=0.9794
+Label token sequences: 0=[220, 15], 1=[220, 16]
+  100/599 evaluated...
+  200/599 evaluated...
+  300/599 evaluated...
+  400/599 evaluated...
+  500/599 evaluated...
+  599/599 evaluated...
+
+FINE-TUNED MODEL Results:
+  F1                : 0.9010
+  Macro F1          : 0.8397
+  Accuracy          : 0.8631
+  Balanced accuracy : 0.8209
+  Precision         : 0.8420
+  Recall            : 0.9688
+  ROC AUC           : 0.9564
+  PR AUC            : 0.9727
+  Predictions       : {1: 443, 0: 156}
+  Probability range : min=0.0052, median=0.6514, max=0.9996
+  Confusion matrix  : TN=144, FP=70, FN=12, TP=373
+                  precision    recall  f1-score   support
+
+routine_followup     0.9231    0.6729    0.7784       214
+ treatment_event     0.8420    0.9688    0.9010       385
+
+        accuracy                         0.8631       599
+       macro avg     0.8825    0.8209    0.8397       599
+    weighted avg     0.8710    0.8631    0.8572       599
+
+Fine-tuned model unloaded.
+
+=================================================================
+COMPARISON: Base vs Fine-Tuned
+=================================================================
+Metric                     Base   Fine-Tuned      Delta
+--------------------------------------------------------
+f1                       0.7831       0.9010    +0.1179
+macro_f1                 0.4864       0.8397    +0.3533
+accuracy                 0.6578       0.8631    +0.2053
+balanced_accuracy        0.5366       0.8209    +0.2843
+precision                0.6607       0.8420    +0.1813
+recall                   0.9610       0.9688    +0.0078
+roc_auc                  0.6214       0.9564    +0.3350
+pr_auc                   0.7948       0.9727    +0.1779

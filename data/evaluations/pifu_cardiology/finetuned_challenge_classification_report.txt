@@ -1,9 +1,9 @@
               precision    recall  f1-score   support
 
-NOT_ELIGIBLE     1.0000    0.7895    0.8824        19
+NOT_ELIGIBLE     1.0000    0.7368    0.8485        19
   BORDERLINE     0.0000    0.0000    0.0000         0
-    ELIGIBLE     0.8333    1.0000    0.9091         5
+    ELIGIBLE     1.0000    1.0000    1.0000         5
 
-    accuracy                         0.8333        24
-   macro avg     0.6111    0.5965    0.5971        24
-weighted avg     0.9653    0.8333    0.8879        24
+    accuracy                         0.7917        24
+   macro avg     0.6667    0.5789    0.6162        24
+weighted avg     1.0000    0.7917    0.8801        24
