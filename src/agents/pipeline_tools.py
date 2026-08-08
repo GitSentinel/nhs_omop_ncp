@@ -1,5 +1,5 @@
 """
-Pipeline execution tools.
+Pipeline Execution Tools
 
 Defines LangChain tools for validating the project, running approved pipeline scripts, selecting GPUs, collecting logs/artifacts, and extracting structured metrics for the final pipeline report.
 """

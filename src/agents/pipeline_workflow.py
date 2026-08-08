@@ -1,5 +1,5 @@
 """
-Agentic pipeline workflow graph.
+Agentic Pipeline Workflow Graphs
 
 Builds the LangGraph workflow used to validate, run, evaluate, collect metrics, assess results, save reports, and log pipeline artifacts.
 """

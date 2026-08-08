@@ -1,5 +1,13 @@
 """
+<<<<<<< HEAD
 Agentic model pipeline runner.
+=======
+<<<<<<< HEAD
+Agentic model pipeline runner.
+=======
+Agentic Model Pipeline Runner
+>>>>>>> d2ab366 ([ADD]: Sequential script execution timeline added!)
+>>>>>>> 4250a8f ([ADD]: Sequential script execution timeline added!)
 
 Runs the original and/or FastPIFU workflow in a fixed validated order and produces a structured pipeline report.
 

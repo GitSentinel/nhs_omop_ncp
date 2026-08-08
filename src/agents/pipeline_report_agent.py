@@ -1,5 +1,5 @@
 """
-Pipeline assessment agent.
+Pipeline Assessment Agent
 
 Creates the final structured assessment for an agentic model pipeline run. Uses a Pydantic AI reporting agent when enabled, and falls back to a deterministic assessment if LLM reporting is disabled or unavailable.
 """
