@@ -1,7 +1,8 @@
 """
 Agentic Pipeline Workflow Graphs
 
-Builds the LangGraph workflow used to validate, run, evaluate, collect metrics, assess results, save reports, and log pipeline artifacts.
+Builds the LangGraph workflow used to validate, run, evaluate,
+collect metrics, assess results, save reports, and log pipeline artifacts.
 """
 
 from __future__ import annotations
@@ -80,8 +81,7 @@ def has_failed_step(
 
     # Failure Detection
     return any(
-        step.get("status") == StepStatus.FAILED.value
-        for step in state.get("steps", [])
+        step.get("status") == StepStatus.FAILED.value for step in state.get("steps", [])
     )
 
 
@@ -157,10 +157,12 @@ def validate_node(
     config = state["config"]
 
     # Project Validation
-    result = validate_pipeline_project.invoke({
-        "target": config["target"],
-        "mode": config["mode"],
-    })
+    result = validate_pipeline_project.invoke(
+        {
+            "target": config["target"],
+            "mode": config["mode"],
+        }
+    )
 
     now = datetime.now(UTC)
 
@@ -168,20 +170,12 @@ def validate_node(
     step = ScriptStepResult(
         step="validate",
         dataset="shared",
-        status=(
-            StepStatus.SUCCEEDED
-            if result["ok"]
-            else StepStatus.FAILED
-        ),
+        status=(StepStatus.SUCCEEDED if result["ok"] else StepStatus.FAILED),
         command=[],
         started_at=now,
         finished_at=now,
         duration_seconds=0,
-        return_code=(
-            0
-            if result["ok"]
-            else 1
-        ),
+        return_code=(0 if result["ok"] else 1),
         log_path=None,
         stdout_tail=[
             json.dumps(
@@ -194,10 +188,7 @@ def validate_node(
         error=(
             None
             if result["ok"]
-            else (
-                "Missing required scripts: "
-                + ", ".join(result["missing_scripts"])
-            )
+            else ("Missing required scripts: " + ", ".join(result["missing_scripts"]))
         ),
     )
 
@@ -254,13 +245,15 @@ def make_script_node(
             }
 
         # Approved Step Execution
-        result = run_project_pipeline_step.invoke({
-            "step": step,
-            "run_dir": config["run_dir"],
-            "train_gpu_ids": config["train_gpus"],
-            "evaluation_gpu_id": config["evaluation_gpu"],
-            "force_prepare": config["force_prepare"],
-        })
+        result = run_project_pipeline_step.invoke(
+            {
+                "step": step,
+                "run_dir": config["run_dir"],
+                "train_gpu_ids": config["train_gpus"],
+                "evaluation_gpu_id": config["evaluation_gpu"],
+                "force_prepare": config["force_prepare"],
+            }
+        )
 
         return {
             "steps": [
@@ -277,9 +270,11 @@ def collect_node(
     """Collect structured metric bundles after script execution."""
 
     # Metric Collection
-    metrics = collect_pipeline_metrics.invoke({
-        "run_dir": state["config"]["run_dir"],
-    })
+    metrics = collect_pipeline_metrics.invoke(
+        {
+            "run_dir": state["config"]["run_dir"],
+        }
+    )
 
     return {
         "metrics": metrics,
@@ -310,104 +305,467 @@ async def assessment_node(
     }
 
 
+def format_metric(
+    value: object,
+) -> str:
+    """Format a metric for the Markdown report."""
+
+    if isinstance(value, float):
+        return f"{value:.4f}"
+
+    if value is None:
+        return "-"
+
+    return str(value)
+
+
+def find_metric_bundle(
+    report: PipelineReport,
+    *,
+    dataset: str,
+    model: str,
+    split: str | None = None,
+) -> MetricBundle | None:
+    """Find one matching metric bundle."""
+
+    # Candidate Selection
+    candidates = [
+        bundle
+        for bundle in report.metrics
+        if (
+            bundle.dataset == dataset
+            and bundle.model == model
+            and (
+                split is None
+                or bundle.split == split
+            )
+        )
+    ]
+
+    if not candidates:
+        return None
+
+    return candidates[-1]
+
+
+def metric_value(
+    bundle: MetricBundle | None,
+    key: str,
+) -> str:
+    """Return one formatted metric value."""
+
+    if bundle is None:
+        return "-"
+
+    return format_metric(
+        bundle.metrics.get(key)
+    )
+
+
+def comparison_row(
+    label: str,
+    base_bundle: MetricBundle | None,
+    fine_tuned_bundle: MetricBundle | None,
+    metric_key: str,
+) -> str:
+    """Create one Base vs Fine-tuned Markdown table row."""
+
+    # Base Model Metric Value
+    base_value = metric_value(
+        base_bundle,
+        metric_key,
+    )
+
+    # Fine-tuned Model Metric Value
+    fine_tuned_value = metric_value(
+        fine_tuned_bundle,
+        metric_key,
+    )
+
+    return (
+        f"| {label} | "
+        f"{base_value} | "
+        f"{fine_tuned_value} |"
+    )
+
+
 def markdown_report(
     report: PipelineReport,
 ) -> str:
-    """Create the Markdown version of the final pipeline report."""
+    """Create a compact human-readable pipeline report."""
 
-    # Report Header
+    status_icon = {
+        "success": "✅",
+        "partial_success": "⚠️",
+        "failed": "❌",
+    }.get(
+        report.assessment.overall_status,
+        "",
+    )
+
+    # Report Lines
     lines = [
-        f"# Agentic Pipeline Report - {report.run_id}",
+        "# Agentic Model Pipeline Report",
         "",
-        f"- Target: `{report.target.value}`",
-        f"- Mode: `{report.mode.value}`",
-        f"- Started: `{report.started_at.isoformat()}`",
-        f"- Finished: `{report.finished_at.isoformat()}`",
-        f"- Training GPUs: `{report.train_gpus}`",
-        f"- Evaluation GPU: `{report.evaluation_gpu}`",
-        f"- Overall status: `{report.assessment.overall_status}`",
+        "## Run Summary",
         "",
-        "## Executive summary",
+        "| Item | Value |",
+        "|---|---|",
+        (
+            f"| Status | {status_icon} "
+            f"{report.assessment.overall_status.upper()} |"
+        ),
+        f"| Target | `{report.target.value}` |",
+        f"| Mode | `{report.mode.value}` |",
+        f"| Run ID | `{report.run_id}` |",
+        f"| Evaluation GPU | `{report.evaluation_gpu}` |",
         "",
-        report.assessment.executive_summary,
-        "",
-        "## Pipeline steps",
-        "",
-        "| Step | Dataset | Status | Duration (s) | Return code |",
-        "|---|---|---:|---:|---:|",
     ]
 
-    # Step Table
+    # Original Base Model Clinic-Letter Evaluation
+    original_base = find_metric_bundle(
+        report,
+        dataset="original",
+        model="base",
+        split="test",
+    )
+
+    # Original Fine-tuned Model Clinic-Letter Evaluation
+    original_ft = find_metric_bundle(
+        report,
+        dataset="original",
+        model="fine_tuned",
+        split="test",
+    )
+
+    # Base vs Fine-tuned Comparison Table
+    if original_base or original_ft:
+        lines.extend(
+            [
+                "## Original Clinic-Letter Model",
+                "",
+                "| Metric | Base | Fine-tuned |",
+                "|---|---:|---:|",
+                comparison_row(
+                    "F1",
+                    original_base,
+                    original_ft,
+                    "f1",
+                ),
+                comparison_row(
+                    "Macro F1",
+                    original_base,
+                    original_ft,
+                    "macro_f1",
+                ),
+                comparison_row(
+                    "Accuracy",
+                    original_base,
+                    original_ft,
+                    "accuracy",
+                ),
+                comparison_row(
+                    "Balanced accuracy",
+                    original_base,
+                    original_ft,
+                    "balanced_accuracy",
+                ),
+                comparison_row(
+                    "Precision",
+                    original_base,
+                    original_ft,
+                    "precision",
+                ),
+                comparison_row(
+                    "Recall",
+                    original_base,
+                    original_ft,
+                    "recall",
+                ),
+                comparison_row(
+                    "ROC AUC",
+                    original_base,
+                    original_ft,
+                    "roc_auc",
+                ),
+                comparison_row(
+                    "PR AUC",
+                    original_base,
+                    original_ft,
+                    "pr_auc",
+                ),
+                "",
+            ]
+        )
+
+    
+    # PIFU External Base Model Evaluation
+    pifu_external_base = find_metric_bundle(
+        report,
+        dataset="pifu",
+        model="base",
+        split="external_test",
+    )
+
+    # PIFU External Fine-tuned Model Evaluation
+    pifu_external_ft = find_metric_bundle(
+        report,
+        dataset="pifu",
+        model="fine_tuned",
+        split="external_test",
+    )
+
+    # Base vs Fine-tuned Comparison Table
+    if pifu_external_base or pifu_external_ft:
+        lines.extend(
+            [
+                "## PIFU — External Test",
+                "",
+                "| Metric | Base | Fine-tuned |",
+                "|---|---:|---:|",
+                comparison_row(
+                    "Macro F1",
+                    pifu_external_base,
+                    pifu_external_ft,
+                    "macro_f1",
+                ),
+                comparison_row(
+                    "Accuracy",
+                    pifu_external_base,
+                    pifu_external_ft,
+                    "accuracy",
+                ),
+                comparison_row(
+                    "Balanced accuracy",
+                    pifu_external_base,
+                    pifu_external_ft,
+                    "balanced_accuracy",
+                ),
+                comparison_row(
+                    "NOT_ELIGIBLE recall",
+                    pifu_external_base,
+                    pifu_external_ft,
+                    "not_eligible_recall",
+                ),
+                comparison_row(
+                    "BORDERLINE recall",
+                    pifu_external_base,
+                    pifu_external_ft,
+                    "borderline_recall",
+                ),
+                comparison_row(
+                    "ELIGIBLE precision",
+                    pifu_external_base,
+                    pifu_external_ft,
+                    "eligible_precision",
+                ),
+                comparison_row(
+                    "ELIGIBLE recall",
+                    pifu_external_base,
+                    pifu_external_ft,
+                    "eligible_recall",
+                ),
+                comparison_row(
+                    "Unsafe eligible errors",
+                    pifu_external_base,
+                    pifu_external_ft,
+                    "unsafe_eligible_count",
+                ),
+                comparison_row(
+                    "Manual review rate",
+                    pifu_external_base,
+                    pifu_external_ft,
+                    "manual_review_rate",
+                ),
+                "",
+            ]
+        )
+
+    # PIFU Challenge Set Base Model Evaluation
+    pifu_challenge_base = find_metric_bundle(
+        report,
+        dataset="pifu",
+        model="base",
+        split="challenge",
+    )
+
+    # PIFU Challenge Set Fine-tuned Model Evaluation
+    pifu_challenge_ft = find_metric_bundle(
+        report,
+        dataset="pifu",
+        model="fine_tuned",
+        split="challenge",
+    )
+
+    # Base vs Fine-tuned Comparison Table
+    if pifu_challenge_base or pifu_challenge_ft:
+        lines.extend(
+            [
+                "## PIFU — Challenge Set",
+                "",
+                "| Metric | Base | Fine-tuned |",
+                "|---|---:|---:|",
+                comparison_row(
+                    "Macro F1",
+                    pifu_challenge_base,
+                    pifu_challenge_ft,
+                    "macro_f1",
+                ),
+                comparison_row(
+                    "Accuracy",
+                    pifu_challenge_base,
+                    pifu_challenge_ft,
+                    "accuracy",
+                ),
+                comparison_row(
+                    "Balanced accuracy",
+                    pifu_challenge_base,
+                    pifu_challenge_ft,
+                    "balanced_accuracy",
+                ),
+                comparison_row(
+                    "NOT_ELIGIBLE recall",
+                    pifu_challenge_base,
+                    pifu_challenge_ft,
+                    "not_eligible_recall",
+                ),
+                comparison_row(
+                    "BORDERLINE recall",
+                    pifu_challenge_base,
+                    pifu_challenge_ft,
+                    "borderline_recall",
+                ),
+                comparison_row(
+                    "ELIGIBLE precision",
+                    pifu_challenge_base,
+                    pifu_challenge_ft,
+                    "eligible_precision",
+                ),
+                comparison_row(
+                    "ELIGIBLE recall",
+                    pifu_challenge_base,
+                    pifu_challenge_ft,
+                    "eligible_recall",
+                ),
+                comparison_row(
+                    "Unsafe eligible errors",
+                    pifu_challenge_base,
+                    pifu_challenge_ft,
+                    "unsafe_eligible_count",
+                ),
+                comparison_row(
+                    "Manual review rate",
+                    pifu_challenge_base,
+                    pifu_challenge_ft,
+                    "manual_review_rate",
+                ),
+                "",
+            ]
+        )
+
+    lines.extend(
+        [
+            "## Assessment",
+            "",
+            report.assessment.executive_summary,
+            "",
+        ]
+    )
+
+    # Key Findings, Safety Flags, Recommended Actions
+    if report.assessment.key_findings:
+        lines.extend(
+            [
+                "### Key Findings",
+                "",
+            ]
+        )
+
+        for finding in report.assessment.key_findings[:3]:
+            lines.append(
+                f"- {finding}"
+            )
+
+        lines.append("")
+
+    if report.assessment.safety_flags:
+        lines.extend(
+            [
+                "### Safety",
+                "",
+            ]
+        )
+
+        for flag in report.assessment.safety_flags[:3]:
+            lines.append(
+                f"- {flag}"
+            )
+
+        lines.append("")
+
+    if report.assessment.recommended_actions:
+        lines.extend(
+            [
+                "### Recommended Actions",
+                "",
+            ]
+        )
+
+        for action in report.assessment.recommended_actions[:3]:
+            lines.append(
+                f"- {action}"
+            )
+
+        lines.append("")
+
+    # Comparison Statement
+    lines.extend(
+        [
+            "## Pipeline Execution",
+            "",
+            "| Step | Dataset | Status | Time (s) |",
+            "|---|---|---|---:|",
+        ]
+    )
+
+    # Step Execution Summary
     for step in report.steps:
+        if step.status == StepStatus.SKIPPED:
+            continue
+
+        step_icon = {
+            StepStatus.SUCCEEDED: "✅",
+            StepStatus.FAILED: "❌",
+        }.get(
+            step.status,
+            "⚠️",
+        )
+
         lines.append(
             "| "
             f"{step.step} | "
             f"{step.dataset} | "
-            f"{step.status.value} | "
-            f"{step.duration_seconds:.1f} | "
-            f"{step.return_code} |"
+            f"{step_icon} {step.status.value} | "
+            f"{step.duration_seconds:.1f} |"
         )
-
-    # Key Findings
-    lines.extend([
-        "",
-        "## Key findings",
-        "",
-    ])
-
-    for finding in report.assessment.key_findings:
-        lines.append(f"- {finding}")
-
-    # Safety Flags
-    lines.extend([
-        "",
-        "## Safety flags",
-        "",
-    ])
-
-    for flag in report.assessment.safety_flags:
-        lines.append(f"- {flag}")
-
-    # Recommended Actions
-    lines.extend([
-        "",
-        "## Recommended actions",
-        "",
-    ])
-
-    for action in report.assessment.recommended_actions:
-        lines.append(f"- {action}")
-
-    # Optional Comparison
-    if report.assessment.comparison_statement:
-        lines.extend([
+    
+    lines.extend(
+        [
             "",
-            "## Comparison",
+            "---",
             "",
-            report.assessment.comparison_statement,
-        ])
-
-    # Structured Metrics
-    lines.extend([
-        "",
-        "## Structured metric bundles",
-        "",
-        "```json",
-        json.dumps(
-            [
-                metric.model_dump(mode="json")
-                for metric in report.metrics
-            ],
-            indent=2,
-            ensure_ascii=False,
-        ),
-        "```",
-        "",
-        (
-            "> Synthetic research data only. Human clinical and "
-            "methodological review is required."
-        ),
-    ])
+            (
+                "*Synthetic research data only. "
+                "Human clinical review is required.*"
+            ),
+            "",
+            (
+                "Full metrics, confusion matrices, classification "
+                "reports and provenance are available in "
+                "`pipeline_report.json` and the evaluation artifacts."
+            ),
+        ]
+    )
 
     return "\n".join(lines)
 
@@ -431,16 +789,10 @@ def infer_used_gpus(
         if step.step.endswith("_evaluate") and step.gpu_ids
     ]
 
-    train_gpus = (
-        train_gpu_candidates[-1]
-        if train_gpu_candidates
-        else []
-    )
+    train_gpus = train_gpu_candidates[-1] if train_gpu_candidates else []
 
     evaluation_gpu = (
-        evaluation_gpu_candidates[-1]
-        if evaluation_gpu_candidates
-        else None
+        evaluation_gpu_candidates[-1] if evaluation_gpu_candidates else None
     )
 
     return train_gpus, evaluation_gpu
@@ -465,22 +817,16 @@ def save_node(
 
     # Pydantic Validation
     validated_steps = [
-        ScriptStepResult.model_validate(step)
-        for step in state.get("steps", [])
+        ScriptStepResult.model_validate(step) for step in state.get("steps", [])
     ]
 
     validated_metrics = [
-        MetricBundle.model_validate(metric)
-        for metric in state.get("metrics", [])
+        MetricBundle.model_validate(metric) for metric in state.get("metrics", [])
     ]
 
-    assessment = AgentAssessment.model_validate(
-        state["assessment"]
-    )
+    assessment = AgentAssessment.model_validate(state["assessment"])
 
-    train_gpus, evaluation_gpu = infer_used_gpus(
-        validated_steps
-    )
+    train_gpus, evaluation_gpu = infer_used_gpus(validated_steps)
 
     # Report Construction
     report = PipelineReport(
@@ -522,16 +868,18 @@ def save_node(
             "human_review_required": "true",
         },
     ):
-        mlflow.log_params({
-            "run_id": report.run_id,
-            "target": report.target.value,
-            "mode": report.mode.value,
-            "train_gpus": str(report.train_gpus),
-            "evaluation_gpu": report.evaluation_gpu,
-            "step_count": len(report.steps),
-            "metric_bundle_count": len(report.metrics),
-            "overall_status": report.assessment.overall_status,
-        })
+        mlflow.log_params(
+            {
+                "run_id": report.run_id,
+                "target": report.target.value,
+                "mode": report.mode.value,
+                "train_gpus": str(report.train_gpus),
+                "evaluation_gpu": report.evaluation_gpu,
+                "step_count": len(report.steps),
+                "metric_bundle_count": len(report.metrics),
+                "overall_status": report.assessment.overall_status,
+            }
+        )
 
         mlflow.log_artifact(
             str(report_json),

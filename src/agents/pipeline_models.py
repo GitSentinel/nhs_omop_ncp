@@ -1,7 +1,8 @@
 """
 Pipeline Data Models
 
-Defines the structured Pydantic schemas used by the agentic pipeline srunner, execution tools, reporting agent, and saved pipeline reports.
+Defines the structured Pydantic schemas used by the agentic pipeline runner,
+execution tools, reporting agent, and saved pipeline reports.
 """
 
 from __future__ import annotations
@@ -71,11 +72,7 @@ class MetricBundle(BaseModel):
 
     metrics: dict[
         str,
-        float
-        | int
-        | str
-        | list[Any]
-        | dict[str, Any],
+        float | int | str | list[Any] | dict[str, Any],
     ]
 
     source: Path | str

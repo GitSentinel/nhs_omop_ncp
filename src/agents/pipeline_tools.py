@@ -1,7 +1,9 @@
 """
 Pipeline Execution Tools
 
-Defines LangChain tools for validating the project, running approved pipeline scripts, selecting GPUs, collecting logs/artifacts, and extracting structured metrics for the final pipeline report.
+Defines LangChain tools for validating the project, running approved pipeline scripts,
+selecting GPUs, collecting logs/artifacts, and extracting structured metrics for the
+final pipeline report.
 """
 
 from __future__ import annotations
@@ -97,19 +99,13 @@ def parse_gpu_csv(value: str) -> list[int]:
     """Parse a comma-separated list of physical GPU IDs."""
 
     # CSV Parsing
-    values = [
-        item.strip()
-        for item in str(value).split(",")
-        if item.strip()
-    ]
+    values = [item.strip() for item in str(value).split(",") if item.strip()]
 
     gpu_ids = []
 
     for item in values:
         if not item.isdigit():
-            raise ValueError(
-                f"GPU identifier must be an integer, received {item!r}."
-            )
+            raise ValueError(f"GPU identifier must be an integer, received {item!r}.")
 
         gpu_ids.append(int(item))
 
@@ -142,11 +138,7 @@ def active_compute_gpu_uuids() -> set[str]:
     if completed.returncode != 0:
         return set()
 
-    return {
-        line.strip()
-        for line in completed.stdout.splitlines()
-        if line.strip()
-    }
+    return {line.strip() for line in completed.stdout.splitlines() if line.strip()}
 
 
 def select_idle_gpus(
@@ -184,10 +176,7 @@ def select_idle_gpus(
 
     # Idle GPU Selection
     for line in completed.stdout.splitlines():
-        values = [
-            value.strip()
-            for value in line.split(",")
-        ]
+        values = [value.strip() for value in line.split(",")]
 
         if len(values) != 4:
             continue
@@ -265,10 +254,12 @@ def required_steps_for_target(
 
     if target in {"original", "both"}:
         if mode == "full":
-            steps.extend([
-                "original_generate",
-                "original_relabel",
-            ])
+            steps.extend(
+                [
+                    "original_generate",
+                    "original_relabel",
+                ]
+            )
 
         if mode in {
             "full",
@@ -306,9 +297,7 @@ def build_command(
     script_path = PROJECT_ROOT / script
 
     if not script_path.exists():
-        raise FileNotFoundError(
-            f"Required script does not exist: {script_path}"
-        )
+        raise FileNotFoundError(f"Required script does not exist: {script_path}")
 
     # Environment Setup
     environment = os.environ.copy()
@@ -329,15 +318,10 @@ def build_command(
             raise ValueError(f"{step} requires at least one training GPU.")
 
         environment["CUDA_VISIBLE_DEVICES"] = ",".join(
-            str(gpu_id)
-            for gpu_id in train_gpus
+            str(gpu_id) for gpu_id in train_gpus
         )
 
-        master_port = (
-            "29500"
-            if step == "original_finetune"
-            else "29510"
-        )
+        master_port = "29500" if step == "original_finetune" else "29510"
 
         command = [
             "uv",
@@ -424,12 +408,14 @@ def find_expected_artifacts(step: StepName) -> list[Path]:
             "data/external/fastpifu_cardiology/processed/pifu_external_test_150.json",
         ],
         "pifu_finetune": [
-            "data/finetune/qwen35_9b_pifu_lora_3epochs_same_protocol/adapter_config.json",
-            "data/finetune/qwen35_9b_pifu_lora_3epochs_same_protocol/adapter_model.safetensors",
+            "data/finetune/qwen35_9b_pifu_lora/adapter_config.json",
+            "data/finetune/qwen35_9b_pifu_lora/adapter_model.safetensors",
         ],
         "pifu_evaluate": [
-            "data/evaluations/pifu_cardiology_same_protocol/*_metrics.json",
-            "data/evaluations/pifu_cardiology_same_protocol/*_predictions.csv",
+            "data/evaluations/pifu_cardiology/*_metrics.json",
+            "data/evaluations/pifu_cardiology/*_predictions.csv",
+            "data/evaluations/pifu_cardiology/*_confusion_matrix.csv",
+            "data/evaluations/pifu_cardiology/*_classification_report.txt",
         ],
     }
 
@@ -438,9 +424,7 @@ def find_expected_artifacts(step: StepName) -> list[Path]:
     # Artifact Discovery
     for pattern in candidate_patterns[step]:
         artifacts.extend(
-            path.resolve()
-            for path in PROJECT_ROOT.glob(pattern)
-            if path.is_file()
+            path.resolve() for path in PROJECT_ROOT.glob(pattern) if path.is_file()
         )
 
     return sorted(set(artifacts))
@@ -482,11 +466,7 @@ def run_approved_step(
             "w",
             encoding="utf-8",
         ) as log_file:
-            log_file.write(
-                "COMMAND: "
-                + " ".join(command)
-                + "\n\n"
-            )
+            log_file.write("COMMAND: " + " ".join(command) + "\n\n")
 
             log_file.flush()
 
@@ -513,11 +493,7 @@ def run_approved_step(
         finished_at = utc_now()
         duration = time.monotonic() - started_clock
 
-        status = (
-            StepStatus.SUCCEEDED
-            if return_code == 0
-            else StepStatus.FAILED
-        )
+        status = StepStatus.SUCCEEDED if return_code == 0 else StepStatus.FAILED
 
         return ScriptStepResult(
             step=step,
@@ -556,11 +532,7 @@ def run_approved_step(
             finished_at=finished_at,
             duration_seconds=time.monotonic() - started_clock,
             return_code=None,
-            log_path=(
-                log_path.resolve()
-                if log_path.exists()
-                else None
-            ),
+            log_path=(log_path.resolve() if log_path.exists() else None),
             stdout_tail=list(stdout_tail),
             artifacts=[],
             gpu_ids=gpu_ids_for_step(
@@ -630,16 +602,10 @@ def run_project_pipeline_step(
         "pifu_evaluate",
     }
 
-    train_gpus = (
-        resolve_train_gpus(train_gpu_ids)
-        if needs_training_gpu
-        else []
-    )
+    train_gpus = resolve_train_gpus(train_gpu_ids) if needs_training_gpu else []
 
     evaluation_gpu = (
-        resolve_evaluation_gpu(evaluation_gpu_id)
-        if needs_evaluation_gpu
-        else 0
+        resolve_evaluation_gpu(evaluation_gpu_id) if needs_evaluation_gpu else 0
     )
 
     # Approved Step Execution
@@ -703,17 +669,19 @@ def parse_original_metrics_from_log(
                 metrics[key] = float(metric_match.group(1))
 
         if metrics:
-            bundles.append({
-                "dataset": "original",
-                "model": (
-                    "base"
-                    if match.group("section") == "BASE MODEL"
-                    else "fine_tuned"
-                ),
-                "split": "test",
-                "metrics": metrics,
-                "source": str(log_path.resolve()),
-            })
+            bundles.append(
+                {
+                    "dataset": "original",
+                    "model": (
+                        "base"
+                        if match.group("section") == "BASE MODEL"
+                        else "fine_tuned"
+                    ),
+                    "split": "test",
+                    "metrics": metrics,
+                    "source": str(log_path.resolve()),
+                }
+            )
 
     return bundles
 
@@ -736,9 +704,7 @@ def collect_json_metric_files() -> list[dict]:
                 continue
 
             try:
-                payload = json.loads(
-                    path.read_text(encoding="utf-8")
-                )
+                payload = json.loads(path.read_text(encoding="utf-8"))
 
             except (
                 OSError,
@@ -749,17 +715,9 @@ def collect_json_metric_files() -> list[dict]:
             path_text = str(path).lower()
             name_text = path.name.lower()
 
-            dataset = (
-                "pifu"
-                if "pifu" in path_text
-                else "original"
-            )
+            dataset = "pifu" if "pifu" in path_text else "original"
 
-            model = (
-                "base"
-                if "base" in name_text
-                else "fine_tuned"
-            )
+            model = "base" if "base" in name_text else "fine_tuned"
 
             if "challenge" in name_text:
                 split = "challenge"
@@ -770,13 +728,15 @@ def collect_json_metric_files() -> list[dict]:
             else:
                 split = "test"
 
-            bundles.append({
-                "dataset": dataset,
-                "model": model,
-                "split": split,
-                "metrics": payload,
-                "source": str(path.resolve()),
-            })
+            bundles.append(
+                {
+                    "dataset": dataset,
+                    "model": model,
+                    "split": split,
+                    "metrics": payload,
+                    "source": str(path.resolve()),
+                }
+            )
 
     return bundles
 
@@ -794,9 +754,7 @@ def collect_pipeline_metrics(
 
     original_log = run_path / "original_evaluate.log"
 
-    bundles.extend(
-        parse_original_metrics_from_log(original_log)
-    )
+    bundles.extend(parse_original_metrics_from_log(original_log))
 
     # Deduplication
     unique: dict[

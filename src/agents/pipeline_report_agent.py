@@ -1,7 +1,9 @@
 """
 Pipeline Assessment Agent
 
-Creates the final structured assessment for an agentic model pipeline run. Uses a Pydantic AI reporting agent when enabled, and falls back to a deterministic assessment if LLM reporting is disabled or unavailable.
+Creates the final structured assessment for an agentic model pipeline run.
+Uses a Pydantic AI reporting agent when enabled, and
+falls back to a deterministic assessment if LLM reporting is disabled or unavailable.
 """
 
 from __future__ import annotations
@@ -39,24 +41,12 @@ def _fallback_assessment(
     )
 
     # Step Status Summary
-    failures = [
-        step
-        for step in steps
-        if step.get("status") == "failed"
-    ]
+    failures = [step for step in steps if step.get("status") == "failed"]
 
-    succeeded = [
-        step
-        for step in steps
-        if step.get("status") == "succeeded"
-    ]
+    succeeded = [step for step in steps if step.get("status") == "succeeded"]
 
     if failures:
-        overall_status = (
-            "partial_success"
-            if succeeded
-            else "failed"
-        )
+        overall_status = "partial_success" if succeeded else "failed"
     else:
         overall_status = "success"
 
@@ -123,17 +113,29 @@ def make_report_agent() -> Agent[None, AgentAssessment]:
         model,
         output_type=AgentAssessment,
         instructions=(
-            "You are an ML evaluation auditor for a synthetic NHS research project. "
+            "You are an ML evaluation auditor for a synthetic NHS "
+            "research project. "
             "Use only the JSON evidence supplied by the workflow. "
-            "Never invent metrics, files, successful stages, or clinical conclusions. "
+            "Never invent metrics, files, successful stages, or "
+            "clinical conclusions. "
             "Preserve numeric values exactly. "
-            "Distinguish the original binary treatment-event task from the "
-            "three-class PIFU eligibility task. "
-            "For PIFU, prioritise NOT_ELIGIBLE recall, ELIGIBLE precision, "
-            "unsafe eligible count/rate, BORDERLINE recall, and manual-review rate. "
-            "For the original task, prioritise treatment-event recall, precision, "
-            "macro F1, balanced accuracy, PR AUC, and false negatives when available. "
-            "State that outputs are for synthetic research and require human review."
+            "Distinguish the original binary treatment-event task "
+            "from the three-class PIFU eligibility task. "
+            "For PIFU, prioritise NOT_ELIGIBLE recall, ELIGIBLE "
+            "precision, unsafe eligible count/rate, BORDERLINE "
+            "recall, and manual-review rate. "
+            "For the original task, prioritise treatment-event "
+            "recall, precision, macro F1, balanced accuracy, "
+            "ROC AUC and PR AUC. "
+            "Keep the assessment concise. "
+            "The executive summary must contain no more than "
+            "3 sentences. "
+            "Return no more than 3 key findings, 3 safety flags, "
+            "and 3 recommended actions. "
+            "Do not reproduce full classification reports, "
+            "confusion matrices, or every available metric in prose. "
+            "State that outputs are for synthetic research and "
+            "require human review."
         ),
     )
 
