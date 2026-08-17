@@ -44,10 +44,7 @@ def parse_args() -> argparse.Namespace:
     # Pipeline Target
     parser.add_argument(
         "--target",
-        choices=[
-            target.value
-            for target in PipelineTarget
-        ],
+        choices=[target.value for target in PipelineTarget],
         default=PipelineTarget.PIFU.value,
         help="Pipeline target to run.",
     )
@@ -55,10 +52,7 @@ def parse_args() -> argparse.Namespace:
     # Pipeline Mode
     parser.add_argument(
         "--mode",
-        choices=[
-            mode.value
-            for mode in PipelineMode
-        ],
+        choices=[mode.value for mode in PipelineMode],
         default=PipelineMode.POST_FINETUNE.value,
         help=(
             "full: prepare data, train, evaluate; "
@@ -176,12 +170,7 @@ async def main() -> None:
     # Run Directory Setup
     run_id = args.run_id or datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
 
-    run_dir = (
-        PROJECT_ROOT
-        / "data"
-        / "pipeline_runs"
-        / run_id
-    )
+    run_dir = PROJECT_ROOT / "data" / "pipeline_runs" / run_id
 
     run_dir.mkdir(
         parents=True,
@@ -200,12 +189,14 @@ async def main() -> None:
     # Pipeline Graph Execution
     graph = build_pipeline_graph()
 
-    result = await graph.ainvoke({
-        "config": config,
-        "started_at": datetime.now(UTC).isoformat(),
-        "steps": [],
-        "metrics": [],
-    })
+    result = await graph.ainvoke(
+        {
+            "config": config,
+            "started_at": datetime.now(UTC).isoformat(),
+            "steps": [],
+            "metrics": [],
+        }
+    )
 
     # Final Report Output
     report = result["final_report"]

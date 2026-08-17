@@ -27,22 +27,18 @@ log = logging.getLogger(__name__)
 
 
 def normalise_specialty_name(specialty: str) -> str:
-    return (
-        specialty
-        .lower()
-        .strip()
-        .replace(" ", "_")
-        .replace("-", "_")
-    )
+    return specialty.lower().strip().replace(" ", "_").replace("-", "_")
 
 
 def get_available_skills() -> list[str]:
     # Available Skill Detection
-    return sorted([
-        specialty
-        for specialty, filename in SPECIALTY_MAP.items()
-        if (SKILLS_DIR / filename).exists()
-    ])
+    return sorted(
+        [
+            specialty
+            for specialty, filename in SPECIALTY_MAP.items()
+            if (SKILLS_DIR / filename).exists()
+        ]
+    )
 
 
 @asynccontextmanager

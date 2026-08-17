@@ -7,24 +7,17 @@ OUTPUT_DIR = Path("data/cohort_run_outputs")
 
 def get_latest_output() -> Path:
     # Find all timestamped cohort-run output files
-    output_files = sorted(
-        OUTPUT_DIR.glob("cohort_run_*.json")
-    )
+    output_files = sorted(OUTPUT_DIR.glob("cohort_run_*.json"))
 
     if not output_files:
-        raise FileNotFoundError(
-            f"No cohort-run files found in: {OUTPUT_DIR}"
-        )
+        raise FileNotFoundError(f"No cohort-run files found in: {OUTPUT_DIR}")
 
     return output_files[-1]
 
 
 def load_results(output_file: Path) -> list[dict]:
     # Read the stored cohort results using UTF-8 encoding
-    with output_file.open(
-        "r",
-        encoding="utf-8"
-    ) as file:
+    with output_file.open("r", encoding="utf-8") as file:
         return json.load(file)
 
 
@@ -53,53 +46,27 @@ def print_patient_summary(result: dict) -> None:
 
 
 def print_cohort_statistics(results: list[dict]) -> None:
-    successful = [
-        result
-        for result in results
-        if result.get("status") == "success"
-    ]
+    successful = [result for result in results if result.get("status") == "success"]
 
-    failed = [
-        result
-        for result in results
-        if result.get("status") == "failed"
-    ]
+    failed = [result for result in results if result.get("status") == "failed"]
 
     total = len(results)
 
     print("\n" + "=" * 65)
-    print(
-        f"Success: {len(successful)}/{total}  |  "
-        f"Failed: {len(failed)}/{total}"
-    )
+    print(f"Success: {len(successful)}/{total}  |  Failed: {len(failed)}/{total}")
 
     if not successful:
         print("No successful responses available.")
         return
 
     # Calculate response lengths for successful runs
-    response_lengths = [
-        len(result.get("response", ""))
-        for result in successful
-    ]
+    response_lengths = [len(result.get("response", "")) for result in successful]
 
-    average_length = (
-        sum(response_lengths)
-        / len(response_lengths)
-    )
+    average_length = sum(response_lengths) / len(response_lengths)
 
-    print(
-        f"Average response length: "
-        f"{average_length:.0f} characters"
-    )
-    print(
-        f"Minimum response length: "
-        f"{min(response_lengths)} characters"
-    )
-    print(
-        f"Maximum response length: "
-        f"{max(response_lengths)} characters"
-    )
+    print(f"Average response length: {average_length:.0f} characters")
+    print(f"Minimum response length: {min(response_lengths)} characters")
+    print(f"Maximum response length: {max(response_lengths)} characters")
 
 
 def main() -> None:

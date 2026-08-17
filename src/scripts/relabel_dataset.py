@@ -142,8 +142,7 @@ async def label_with_azure(
 
             wait_time = min(
                 60.0,
-                BASE_RETRY_SECONDS * (2**attempt)
-                + random.uniform(0.0, 1.0),
+                BASE_RETRY_SECONDS * (2**attempt) + random.uniform(0.0, 1.0),
             )
 
             await asyncio.sleep(wait_time)
@@ -167,7 +166,7 @@ def load_source_samples(n_samples: int) -> list[dict]:
     # Sample Selection
     all_samples = data["train"] + data["test"]
 
-    return all_samples[:min(n_samples, len(all_samples))]
+    return all_samples[: min(n_samples, len(all_samples))]
 
 
 def build_relabelled_example(
@@ -179,10 +178,7 @@ def build_relabelled_example(
     # Original Label Metadata
     original_label = parse_original_label(example.get("label"))
 
-    label_changed = (
-        original_label is not None
-        and new_label != original_label
-    )
+    label_changed = original_label is not None and new_label != original_label
 
     return {
         "note_id": example["note_id"],
@@ -190,11 +186,7 @@ def build_relabelled_example(
         "note_date": example.get("note_date"),
         "text": example["text"],
         "label": new_label,
-        "label_name": (
-            "treatment_event"
-            if new_label == 1
-            else "routine_followup"
-        ),
+        "label_name": ("treatment_event" if new_label == 1 else "routine_followup"),
         "original_label": original_label,
         "label_changed": label_changed,
         "label_failed": False,
@@ -219,9 +211,7 @@ def validate_group_split_input(frame: pd.DataFrame) -> None:
         )
 
     if frame["label"].nunique() < 2:
-        raise ValueError(
-            "Both labels 0 and 1 are required for stratified splitting."
-        )
+        raise ValueError("Both labels 0 and 1 are required for stratified splitting.")
 
 
 def split_by_person(
@@ -249,9 +239,7 @@ def split_by_person(
         )
     )
 
-    train_validation = frame.iloc[
-        train_validation_indices
-    ].reset_index(drop=True)
+    train_validation = frame.iloc[train_validation_indices].reset_index(drop=True)
 
     test = frame.iloc[test_indices].reset_index(drop=True)
 
@@ -271,9 +259,7 @@ def split_by_person(
     )
 
     train = train_validation.iloc[train_indices].reset_index(drop=True)
-    validation = train_validation.iloc[
-        validation_indices
-    ].reset_index(drop=True)
+    validation = train_validation.iloc[validation_indices].reset_index(drop=True)
 
     # Leakage Check
     train_people = set(train["person_id"])
@@ -356,9 +342,7 @@ async def label_example(
             "label_failed": label_failed,
             "error_type": error_type,
             "unresolved_reason": (
-                "api_failure"
-                if label_failed
-                else "labeller_uncertain"
+                "api_failure" if label_failed else "labeller_uncertain"
             ),
         }
 
@@ -382,9 +366,7 @@ async def relabel_async(
         "clinic_letters_azure_labelled.json",
     )
 
-    checkpoint_path = azure_dataset_path.with_suffix(
-        ".progress.jsonl"
-    )
+    checkpoint_path = azure_dataset_path.with_suffix(".progress.jsonl")
 
     azure_dataset_path.parent.mkdir(
         parents=True,
@@ -409,9 +391,7 @@ async def relabel_async(
     completed = load_checkpoint(checkpoint_path)
 
     pending_samples = [
-        example
-        for example in samples
-        if str(example["note_id"]) not in completed
+        example for example in samples if str(example["note_id"]) not in completed
     ]
 
     print(f"  Already completed   : {len(completed):,}")
@@ -443,13 +423,9 @@ async def relabel_async(
         newly_completed += 1
         total_completed = len(completed)
 
-        if (
-            newly_completed % CHECKPOINT_EVERY == 0
-            or total_completed == len(samples)
-        ):
+        if newly_completed % CHECKPOINT_EVERY == 0 or total_completed == len(samples):
             n_resolved = sum(
-                item["status"] == "resolved"
-                for item in completed.values()
+                item["status"] == "resolved" for item in completed.values()
             )
 
             n_unresolved = total_completed - n_resolved
@@ -468,22 +444,21 @@ async def relabel_async(
     n_failed = 0
     n_uncertain = 0
 
-    sample_lookup = {
-        str(example["note_id"]): example
-        for example in samples
-    }
+    sample_lookup = {str(example["note_id"]): example for example in samples}
 
     for example in samples:
         note_id = str(example["note_id"])
         result = completed[note_id]
 
         if result["status"] == "unresolved":
-            unresolved.append({
-                **example,
-                "label_failed": result["label_failed"],
-                "error_type": result.get("error_type"),
-                "unresolved_reason": result["unresolved_reason"],
-            })
+            unresolved.append(
+                {
+                    **example,
+                    "label_failed": result["label_failed"],
+                    "error_type": result.get("error_type"),
+                    "unresolved_reason": result["unresolved_reason"],
+                }
+            )
 
             n_failed += int(result["label_failed"])
             n_uncertain += int(not result["label_failed"])

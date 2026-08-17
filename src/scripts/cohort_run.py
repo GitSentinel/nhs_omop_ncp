@@ -22,18 +22,9 @@ def get_cohort(n: int = 10) -> list[int]:
     person = get_table("person")
 
     # Select a consistent cohort by ordering patient identifiers.
-    patient_ids = (
-        person
-        .select("person_id")
-        .order_by("person_id")
-        .limit(n)
-        .execute()
-    )
+    patient_ids = person.select("person_id").order_by("person_id").limit(n).execute()
 
-    return [
-        int(person_id)
-        for person_id in patient_ids["person_id"].tolist()
-    ]
+    return [int(person_id) for person_id in patient_ids["person_id"].tolist()]
 
 
 def run_cohort(n_patients: int = 10) -> None:
@@ -52,10 +43,7 @@ def run_cohort(n_patients: int = 10) -> None:
     for index, person_id in enumerate(cohort):
         query = QUERIES[index % len(QUERIES)]
 
-        print(
-            f"\nPatient {person_id} | "
-            f"Query: {query[:60]}..."
-        )
+        print(f"\nPatient {person_id} | Query: {query[:60]}...")
 
         # Create one MLflow run for each patient
         with mlflow.start_run(
@@ -80,21 +68,18 @@ def run_cohort(n_patients: int = 10) -> None:
                     "agent_response.txt",
                 )
 
-                results.append({
-                    "person_id": person_id,
-                    "query": query,
-                    "response": response,
-                    "status": "success",
-                    "error": None,
-                })
+                results.append(
+                    {
+                        "person_id": person_id,
+                        "query": query,
+                        "response": response,
+                        "status": "success",
+                        "error": None,
+                    }
+                )
 
-                print(
-                    f"  ✓ Success — {len(response)} characters"
-                )
-                print(
-                    f"  Response preview: "
-                    f"{response[:150]}..."
-                )
+                print(f"  ✓ Success — {len(response)} characters")
+                print(f"  Response preview: {response[:150]}...")
 
             except Exception as error:
                 error_message = str(error)
@@ -105,26 +90,22 @@ def run_cohort(n_patients: int = 10) -> None:
                     "error.txt",
                 )
 
-                results.append({
-                    "person_id": person_id,
-                    "query": query,
-                    "response": None,
-                    "status": "failed",
-                    "error": error_message,
-                })
-
-                print(
-                    f"  ✗ Failed — "
-                    f"{error_message[:100]}"
+                results.append(
+                    {
+                        "person_id": person_id,
+                        "query": query,
+                        "response": None,
+                        "status": "failed",
+                        "error": error_message,
+                    }
                 )
+
+                print(f"  ✗ Failed — {error_message[:100]}")
 
     # Create a timestamped output filename
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-    output_file = (
-        OUTPUT_DIR
-        / f"cohort_run_{timestamp}.json"
-    )
+    output_file = OUTPUT_DIR / f"cohort_run_{timestamp}.json"
 
     # Save all cohort responses and failures
     with output_file.open(
@@ -138,14 +119,8 @@ def run_cohort(n_patients: int = 10) -> None:
             ensure_ascii=False,
         )
 
-    successful = sum(
-        result["status"] == "success"
-        for result in results
-    )
-    failed = sum(
-        result["status"] == "failed"
-        for result in results
-    )
+    successful = sum(result["status"] == "success" for result in results)
+    failed = sum(result["status"] == "failed" for result in results)
 
     print("\n" + "=" * 60)
     print("COHORT RUN COMPLETE")

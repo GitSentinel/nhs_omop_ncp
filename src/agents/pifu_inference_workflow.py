@@ -90,9 +90,7 @@ def text_sha256(text: str) -> str:
     """Return the SHA-256 hash of the clinic-letter text."""
 
     # Text Hashing
-    return hashlib.sha256(
-        text.encode("utf-8")
-    ).hexdigest()
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
 def markdown_report(
@@ -134,10 +132,12 @@ def markdown_report(
 
     # Evidence Section
     if report.explanation.evidence_summary:
-        lines.extend([
-            "### Evidence",
-            "",
-        ])
+        lines.extend(
+            [
+                "### Evidence",
+                "",
+            ]
+        )
 
         for item in report.explanation.evidence_summary:
             lines.append(f"- {item}")
@@ -146,10 +146,12 @@ def markdown_report(
 
     # Review Flags Section
     if report.safety.flags:
-        lines.extend([
-            "### Review Flags",
-            "",
-        ])
+        lines.extend(
+            [
+                "### Review Flags",
+                "",
+            ]
+        )
 
         for flag in report.safety.flags:
             lines.append(f"- {flag}")
@@ -158,10 +160,12 @@ def markdown_report(
 
     # Limitations Section
     if report.explanation.limitations:
-        lines.extend([
-            "### Limitations",
-            "",
-        ])
+        lines.extend(
+            [
+                "### Limitations",
+                "",
+            ]
+        )
 
         for limitation in report.explanation.limitations:
             lines.append(f"- {limitation}")
@@ -169,11 +173,13 @@ def markdown_report(
         lines.append("")
 
     # Safety Footer
-    lines.extend([
-        "---",
-        "",
-        "*Synthetic research system. Human clinical review is required.*",
-    ])
+    lines.extend(
+        [
+            "---",
+            "",
+            "*Synthetic research system. Human clinical review is required.*",
+        ]
+    )
 
     return "\n".join(lines)
 
@@ -188,17 +194,10 @@ def validate_config(config: dict[str, Any]) -> None:
         "use_llm_explanation",
     }
 
-    missing = [
-        key
-        for key in required_keys
-        if key not in config
-    ]
+    missing = [key for key in required_keys if key not in config]
 
     if missing:
-        raise KeyError(
-            "Missing PIFU inference config key(s): "
-            + ", ".join(missing)
-        )
+        raise KeyError("Missing PIFU inference config key(s): " + ", ".join(missing))
 
 
 def save_report_files(
@@ -238,24 +237,28 @@ def log_inference_to_mlflow(
         },
     ):
         # Parameter Logging
-        mlflow.log_params({
-            "run_id": report.run_id,
-            "model": report.model_name,
-            "adapter": str(report.adapter_path),
-            "predicted_class": report.prediction.predicted_class.value,
-            "predicted_label": report.prediction.predicted_label,
-            "human_review": "true",
-            "text_sha256": report.text_sha256,
-        })
+        mlflow.log_params(
+            {
+                "run_id": report.run_id,
+                "model": report.model_name,
+                "adapter": str(report.adapter_path),
+                "predicted_class": report.prediction.predicted_class.value,
+                "predicted_label": report.prediction.predicted_label,
+                "human_review": "true",
+                "text_sha256": report.text_sha256,
+            }
+        )
 
         # Metric Logging
-        mlflow.log_metrics({
-            "confidence": report.prediction.confidence,
-            "prob_not_eligible": report.prediction.probabilities.not_eligible,
-            "prob_borderline": report.prediction.probabilities.borderline,
-            "prob_eligible": report.prediction.probabilities.eligible,
-            "top_two_margin": report.safety.top_two_margin,
-        })
+        mlflow.log_metrics(
+            {
+                "confidence": report.prediction.confidence,
+                "prob_not_eligible": report.prediction.probabilities.not_eligible,
+                "prob_borderline": report.prediction.probabilities.borderline,
+                "prob_eligible": report.prediction.probabilities.eligible,
+                "top_two_margin": report.safety.top_two_margin,
+            }
+        )
 
         # Report Artifact Logging
         mlflow.log_artifact(
@@ -299,9 +302,7 @@ def build_pifu_inference_graph():
         """Apply deterministic review rules."""
 
         # Prediction Validation
-        prediction = PIFUModelPrediction.model_validate(
-            state["prediction"]
-        )
+        prediction = PIFUModelPrediction.model_validate(state["prediction"])
 
         # Safety Assessment
         safety = assess_pifu_safety(prediction)
@@ -316,13 +317,9 @@ def build_pifu_inference_graph():
         """Create the narrative explanation."""
 
         # Evidence Validation
-        prediction = PIFUModelPrediction.model_validate(
-            state["prediction"]
-        )
+        prediction = PIFUModelPrediction.model_validate(state["prediction"])
 
-        safety = PIFUSafetyAssessment.model_validate(
-            state["safety"]
-        )
+        safety = PIFUSafetyAssessment.model_validate(state["safety"])
 
         # Explanation Generation
         explanation = await create_pifu_explanation(
@@ -357,17 +354,11 @@ def build_pifu_inference_graph():
         report_markdown = run_dir / "prediction.md"
 
         # Component Validation
-        prediction = PIFUModelPrediction.model_validate(
-            state["prediction"]
-        )
+        prediction = PIFUModelPrediction.model_validate(state["prediction"])
 
-        safety = PIFUSafetyAssessment.model_validate(
-            state["safety"]
-        )
+        safety = PIFUSafetyAssessment.model_validate(state["safety"])
 
-        explanation = PIFUExplanation.model_validate(
-            state["explanation"]
-        )
+        explanation = PIFUExplanation.model_validate(state["explanation"])
 
         # Report Construction
         report = PIFUInferenceReport(

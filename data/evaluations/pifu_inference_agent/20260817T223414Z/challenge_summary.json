@@ -1,0 +1,47 @@
+{
+  "n": 24,
+  "accuracy": 0.7916666666666666,
+  "balanced_accuracy": 0.868421052631579,
+  "macro_f1": 0.6161616161616162,
+  "not_eligible_precision": 1.0,
+  "not_eligible_recall": 0.7368421052631579,
+  "not_eligible_f1": 0.8484848484848485,
+  "not_eligible_support": 19,
+  "borderline_precision": 0.0,
+  "borderline_recall": 0.0,
+  "borderline_f1": 0.0,
+  "borderline_support": 0,
+  "eligible_precision": 1.0,
+  "eligible_recall": 1.0,
+  "eligible_f1": 1.0,
+  "eligible_support": 5,
+  "unsafe_eligible_count": 0,
+  "unsafe_eligible_rate": 0.0,
+  "borderline_prediction_rate": 0.20833333333333334,
+  "mean_confidence": 0.9113829533259074,
+  "mean_confidence_correct": 0.9453842545810499,
+  "mean_confidence_incorrect": 0.782178008556366,
+  "mean_top_two_margin": 0.8261994576534258,
+  "low_confidence_rate": 0.16666666666666666,
+  "close_margin_rate": 0.0,
+  "safety_flag_rate": 0.25,
+  "human_review_required_rate": 1.0,
+  "misclassified_count": 5,
+  "confusion_matrix": [
+    [
+      14,
+      5,
+      0
+    ],
+    [
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      5
+    ]
+  ]
+}

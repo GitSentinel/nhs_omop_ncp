@@ -437,10 +437,7 @@ def comparison_summary(
     ]
 
     # Fine-Tuned Only Evaluation Case
-    if (
-        base_external is None
-        or base_challenge is None
-    ):
+    if base_external is None or base_challenge is None:
         lines.extend(
             [
                 "Base-model evaluation was skipped.",

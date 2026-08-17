@@ -24,9 +24,7 @@ SOURCE_DATASET_PATH = FINETUNE_DIR / "clinic_letters_labelled.json"
 AZURE_DATASET_PATH = FINETUNE_DIR / "clinic_letters_azure_labelled.json"
 DATASET_PATH = AZURE_DATASET_PATH
 
-FINETUNE_OUTPUT_DIR = (
-    FINETUNE_DIR / "qwen35_9b_qlora_adapter_3epochs_recall_v2"
-)
+FINETUNE_OUTPUT_DIR = FINETUNE_DIR / "qwen35_9b_qlora_adapter_3epochs_recall_v2"
 
 # MCP Server Paths
 OMOP_SERVER_PATH = PROJECT_ROOT / "src" / "mcp_server" / "server.py"
@@ -113,17 +111,13 @@ def build_training_config(n_train: int) -> dict:
     )
 
     global_batch_size = (
-        per_device_train_batch_size
-        * gradient_accumulation_steps
-        * world_size
+        per_device_train_batch_size * gradient_accumulation_steps * world_size
     )
 
     # Step Calculation
     samples_per_rank = math.ceil(n_train / world_size)
 
-    micro_batches_per_epoch = math.ceil(
-        samples_per_rank / per_device_train_batch_size
-    )
+    micro_batches_per_epoch = math.ceil(samples_per_rank / per_device_train_batch_size)
 
     optimiser_steps_per_epoch = math.ceil(
         micro_batches_per_epoch / gradient_accumulation_steps
@@ -169,9 +163,7 @@ def build_training_config(n_train: int) -> dict:
 
 
 # Training Configuration Preview
-TRAINING_CONFIG = build_training_config(
-    n_train=int(N_DATASET_SAMPLES * 0.8)
-)
+TRAINING_CONFIG = build_training_config(n_train=int(N_DATASET_SAMPLES * 0.8))
 
 # BitsAndBytes Configuration
 BNB_CONFIG_PARAMS = {

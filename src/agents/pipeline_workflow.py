@@ -335,10 +335,7 @@ def find_metric_bundle(
         if (
             bundle.dataset == dataset
             and bundle.model == model
-            and (
-                split is None
-                or bundle.split == split
-            )
+            and (split is None or bundle.split == split)
         )
     ]
 
@@ -357,9 +354,7 @@ def metric_value(
     if bundle is None:
         return "-"
 
-    return format_metric(
-        bundle.metrics.get(key)
-    )
+    return format_metric(bundle.metrics.get(key))
 
 
 def comparison_row(
@@ -382,11 +377,7 @@ def comparison_row(
         metric_key,
     )
 
-    return (
-        f"| {label} | "
-        f"{base_value} | "
-        f"{fine_tuned_value} |"
-    )
+    return f"| {label} | {base_value} | {fine_tuned_value} |"
 
 
 def markdown_report(
@@ -411,10 +402,7 @@ def markdown_report(
         "",
         "| Item | Value |",
         "|---|---|",
-        (
-            f"| Status | {status_icon} "
-            f"{report.assessment.overall_status.upper()} |"
-        ),
+        (f"| Status | {status_icon} {report.assessment.overall_status.upper()} |"),
         f"| Target | `{report.target.value}` |",
         f"| Mode | `{report.mode.value}` |",
         f"| Run ID | `{report.run_id}` |",
@@ -498,7 +486,6 @@ def markdown_report(
             ]
         )
 
-    
     # PIFU External Base Model Evaluation
     pifu_external_base = find_metric_bundle(
         report,
@@ -682,9 +669,7 @@ def markdown_report(
         )
 
         for finding in report.assessment.key_findings[:3]:
-            lines.append(
-                f"- {finding}"
-            )
+            lines.append(f"- {finding}")
 
         lines.append("")
 
@@ -697,9 +682,7 @@ def markdown_report(
         )
 
         for flag in report.assessment.safety_flags[:3]:
-            lines.append(
-                f"- {flag}"
-            )
+            lines.append(f"- {flag}")
 
         lines.append("")
 
@@ -712,9 +695,7 @@ def markdown_report(
         )
 
         for action in report.assessment.recommended_actions[:3]:
-            lines.append(
-                f"- {action}"
-            )
+            lines.append(f"- {action}")
 
         lines.append("")
 
@@ -748,16 +729,13 @@ def markdown_report(
             f"{step_icon} {step.status.value} | "
             f"{step.duration_seconds:.1f} |"
         )
-    
+
     lines.extend(
         [
             "",
             "---",
             "",
-            (
-                "*Synthetic research data only. "
-                "Human clinical review is required.*"
-            ),
+            ("*Synthetic research data only. Human clinical review is required.*"),
             "",
             (
                 "Full metrics, confusion matrices, classification "

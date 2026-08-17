@@ -44,15 +44,17 @@ def normalised_hash(text: str) -> str:
     """Return a stable hash after whitespace and case normalisation."""
 
     # Text Normalisation
-    normalised = re.sub(
-        r"\s+",
-        " ",
-        str(text),
-    ).strip().lower()
+    normalised = (
+        re.sub(
+            r"\s+",
+            " ",
+            str(text),
+        )
+        .strip()
+        .lower()
+    )
 
-    return hashlib.sha256(
-        normalised.encode("utf-8")
-    ).hexdigest()
+    return hashlib.sha256(normalised.encode("utf-8")).hexdigest()
 
 
 def read_jsonl(path: Path) -> list[dict]:
@@ -73,8 +75,7 @@ def read_jsonl(path: Path) -> list[dict]:
 
             except json.JSONDecodeError as error:
                 raise ValueError(
-                    f"Invalid JSONL in {path} at line "
-                    f"{line_number}: {error}"
+                    f"Invalid JSONL in {path} at line {line_number}: {error}"
                 ) from error
 
     if not rows:
@@ -103,12 +104,7 @@ def class_counts(samples: list[dict]) -> dict:
     """Return class counts by label name."""
 
     # Class Count Calculation
-    return dict(
-        Counter(
-            sample["label_name"]
-            for sample in samples
-        )
-    )
+    return dict(Counter(sample["label_name"] for sample in samples))
 
 
 def write_dataset(
@@ -188,9 +184,7 @@ def extract_zip(
 
     # ZIP Existence Check
     if not source_zip.exists():
-        raise FileNotFoundError(
-            f"FastPIFU ZIP not found: {source_zip}"
-        )
+        raise FileNotFoundError(f"FastPIFU ZIP not found: {source_zip}")
 
     # Forced Re-Extraction
     if force and PIFU_EXTRACTED_DIR.exists():
@@ -250,17 +244,14 @@ def convert_training_row(row: dict) -> dict:
     label_name = str(assessment["eligibility"]).upper()
 
     if label_name not in PIFU_LABEL_TO_ID:
-        raise ValueError(
-            f"Unexpected training label: {label_name}"
-        )
+        raise ValueError(f"Unexpected training label: {label_name}")
 
     # Metadata Extraction
     metadata = dict(row.get("metadata") or {})
 
     return {
         "sample_id": str(
-            metadata.get("document_id")
-            or normalised_hash(row["input"])[:16]
+            metadata.get("document_id") or normalised_hash(row["input"])[:16]
         ),
         "text": str(row["input"]),
         "label": PIFU_LABEL_TO_ID[label_name],
@@ -277,9 +268,7 @@ def convert_external_test_row(row: dict) -> dict:
     label_name = str(row["_class"]).upper()
 
     if label_name not in PIFU_LABEL_TO_ID:
-        raise ValueError(
-            f"Unexpected external test label: {label_name}"
-        )
+        raise ValueError(f"Unexpected external test label: {label_name}")
 
     return {
         "sample_id": f"eval_{row['_idx']}",
@@ -343,15 +332,9 @@ def assert_no_text_overlap(
     """Raise an error if two splits contain duplicate letter text."""
 
     # Hash-Based Leakage Check
-    first_hashes = {
-        normalised_hash(sample["text"])
-        for sample in first_samples
-    }
+    first_hashes = {normalised_hash(sample["text"]) for sample in first_samples}
 
-    second_hashes = {
-        normalised_hash(sample["text"])
-        for sample in second_samples
-    }
+    second_hashes = {normalised_hash(sample["text"]) for sample in second_samples}
 
     overlap = first_hashes & second_hashes
 
@@ -369,10 +352,7 @@ def remove_external_test_overlap(
     """Remove external-test letters from the training pool."""
 
     # External Hash Set
-    external_hashes = {
-        normalised_hash(sample["text"])
-        for sample in external_test
-    }
+    external_hashes = {normalised_hash(sample["text"]) for sample in external_test}
 
     # Leakage Removal
     training_pool = [
@@ -393,19 +373,12 @@ def split_training_pool(
 
     # Split Validation
     if len(training_pool) < 10:
-        raise ValueError(
-            "At least 10 training samples are required for splitting."
-        )
+        raise ValueError("At least 10 training samples are required for splitting.")
 
-    labels = [
-        sample["label"]
-        for sample in training_pool
-    ]
+    labels = [sample["label"] for sample in training_pool]
 
     if len(set(labels)) < 2:
-        raise ValueError(
-            "At least two classes are required for stratified splitting."
-        )
+        raise ValueError("At least two classes are required for stratified splitting.")
 
     # Stratified Split
     train_samples, validation_samples = train_test_split(
@@ -478,15 +451,9 @@ def prepare(source_zip: Path, force: bool) -> None:
     raw_hard_negatives = read_jsonl(files["hard_negatives"])
 
     # Source Conversion
-    training_all = [
-        convert_training_row(row)
-        for row in raw_training
-    ]
+    training_all = [convert_training_row(row) for row in raw_training]
 
-    external_test = [
-        convert_external_test_row(row)
-        for row in raw_external_test
-    ]
+    external_test = [convert_external_test_row(row) for row in raw_external_test]
 
     challenge_samples = [
         *[
@@ -512,9 +479,7 @@ def prepare(source_zip: Path, force: bool) -> None:
     )
 
     # Train-Validation Split
-    train_samples, validation_samples = split_training_pool(
-        training_pool
-    )
+    train_samples, validation_samples = split_training_pool(training_pool)
 
     # Leakage Checks
     assert_no_text_overlap(
@@ -585,10 +550,7 @@ def prepare(source_zip: Path, force: bool) -> None:
     print("=" * 68)
     print("FASTPIFU DATA PREPARATION COMPLETE")
     print("=" * 68)
-    print(
-        "Evaluation letters removed from training: "
-        f"{removed_overlap}"
-    )
+    print(f"Evaluation letters removed from training: {removed_overlap}")
     print(f"Train        : {len(train_samples):,}")
     print(f"Validation   : {len(validation_samples):,}")
     print(f"External test: {len(external_test):,}")

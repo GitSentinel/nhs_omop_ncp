@@ -44,15 +44,10 @@ def detect_gpu_indices() -> list[int]:
 
     except FileNotFoundError as error:
         raise RuntimeError(
-            "nvidia-smi was not found. CUDA GPUs are required for "
-            "PIFU fine-tuning."
+            "nvidia-smi was not found. CUDA GPUs are required for PIFU fine-tuning."
         ) from error
 
-    return [
-        int(line.strip())
-        for line in result.stdout.splitlines()
-        if line.strip()
-    ]
+    return [int(line.strip()) for line in result.stdout.splitlines() if line.strip()]
 
 
 def configured_or_visible_gpu_ids() -> list[int]:
@@ -62,27 +57,18 @@ def configured_or_visible_gpu_ids() -> list[int]:
     configured = PIFU_GPU_CONFIG.get("gpu_ids")
 
     if configured:
-        return [
-            int(value)
-            for value in configured
-        ]
+        return [int(value) for value in configured]
 
     # Existing CUDA Visibility
     visible = os.environ.get("CUDA_VISIBLE_DEVICES")
 
     if visible:
-        return [
-            int(value.strip())
-            for value in visible.split(",")
-            if value.strip()
-        ]
+        return [int(value.strip()) for value in visible.split(",") if value.strip()]
 
     # Automatic GPU Selection
     available_gpu_ids = detect_gpu_indices()
 
-    return available_gpu_ids[
-        :PIFU_GPU_CONFIG["default_gpu_count"]
-    ]
+    return available_gpu_ids[: PIFU_GPU_CONFIG["default_gpu_count"]]
 
 
 def validate_gpu_ids(gpu_ids: list[int]) -> None:
@@ -90,18 +76,12 @@ def validate_gpu_ids(gpu_ids: list[int]) -> None:
 
     # GPU Selection Check
     if not gpu_ids:
-        raise RuntimeError(
-            "No GPUs were selected for PIFU fine-tuning."
-        )
+        raise RuntimeError("No GPUs were selected for PIFU fine-tuning.")
 
     # Physical GPU Availability Check
     available_gpu_ids = detect_gpu_indices()
 
-    missing_gpu_ids = [
-        gpu_id
-        for gpu_id in gpu_ids
-        if gpu_id not in available_gpu_ids
-    ]
+    missing_gpu_ids = [gpu_id for gpu_id in gpu_ids if gpu_id not in available_gpu_ids]
 
     if missing_gpu_ids:
         raise RuntimeError(
@@ -127,10 +107,7 @@ def launch_distributed_if_needed() -> None:
     # Distributed Environment Setup
     environment = os.environ.copy()
 
-    environment["CUDA_VISIBLE_DEVICES"] = ",".join(
-        str(gpu_id)
-        for gpu_id in gpu_ids
-    )
+    environment["CUDA_VISIBLE_DEVICES"] = ",".join(str(gpu_id) for gpu_id in gpu_ids)
 
     environment.setdefault(
         "PYTORCH_CUDA_ALLOC_CONF",
@@ -152,10 +129,7 @@ def launch_distributed_if_needed() -> None:
         str(Path(__file__).resolve()),
     ]
 
-    print(
-        f"Launching PIFU fine-tuning on "
-        f"{len(gpu_ids)} GPU(s): {gpu_ids}"
-    )
+    print(f"Launching PIFU fine-tuning on {len(gpu_ids)} GPU(s): {gpu_ids}")
 
     completed = subprocess.run(
         command,
@@ -247,9 +221,7 @@ if not IS_MAIN_PROCESS:
 
 # Device Setup
 if not torch.cuda.is_available():
-    raise RuntimeError(
-        "CUDA GPU is required for BF16 LoRA fine-tuning."
-    )
+    raise RuntimeError("CUDA GPU is required for BF16 LoRA fine-tuning.")
 
 torch.cuda.set_device(LOCAL_RANK)
 
@@ -284,9 +256,7 @@ def load_samples(path: Path) -> list[dict]:
     samples = payload.get("samples")
 
     if not isinstance(samples, list):
-        raise ValueError(
-            f"{path} does not contain a valid 'samples' list."
-        )
+        raise ValueError(f"{path} does not contain a valid 'samples' list.")
 
     if not samples:
         raise ValueError(f"{path} contains no samples.")
@@ -294,16 +264,12 @@ def load_samples(path: Path) -> list[dict]:
     # Sample Validation
     for index, sample in enumerate(samples):
         if "text" not in sample or "label" not in sample:
-            raise ValueError(
-                f"Sample {index} in {path} must contain text and label."
-            )
+            raise ValueError(f"Sample {index} in {path} must contain text and label.")
 
         label = int(sample["label"])
 
         if label not in PIFU_LABEL_IDS:
-            raise ValueError(
-                f"Unexpected label {label} in sample {index} from {path}."
-            )
+            raise ValueError(f"Unexpected label {label} in sample {index} from {path}.")
 
     return samples
 
@@ -363,14 +329,16 @@ def build_dataset(
     """Convert prepared samples into a HuggingFace Dataset."""
 
     # Dataset Formatting
-    return Dataset.from_list([
-        format_example(
-            sample["text"],
-            sample["label"],
-            tokenizer,
-        )
-        for sample in samples
-    ])
+    return Dataset.from_list(
+        [
+            format_example(
+                sample["text"],
+                sample["label"],
+                tokenizer,
+            )
+            for sample in samples
+        ]
+    )
 
 
 def load_splits(
@@ -446,8 +414,7 @@ def evaluate_generative(
     prediction_rows = []
 
     rank_zero_print(
-        f"\nRunning generative evaluation on "
-        f"{len(samples):,} PIFU examples..."
+        f"\nRunning generative evaluation on {len(samples):,} PIFU examples..."
     )
 
     # Prediction Loop
@@ -472,7 +439,7 @@ def evaluate_generative(
             )
 
         generated = tokenizer.decode(
-            output[0][inputs["input_ids"].shape[1]:],
+            output[0][inputs["input_ids"].shape[1] :],
             skip_special_tokens=True,
         )
 
@@ -483,21 +450,21 @@ def evaluate_generative(
         predictions.append(prediction)
         labels.append(label)
 
-        prediction_rows.append({
-            "sample_id": sample.get("sample_id"),
-            "source": sample.get("source"),
-            "true_label": label,
-            "true_label_name": PIFU_ID_TO_LABEL[label],
-            "predicted_label": prediction,
-            "predicted_label_name": PIFU_ID_TO_LABEL[prediction],
-            "generated_text": generated,
-            "invalid_output": invalid,
-        })
+        prediction_rows.append(
+            {
+                "sample_id": sample.get("sample_id"),
+                "source": sample.get("source"),
+                "true_label": label,
+                "true_label_name": PIFU_ID_TO_LABEL[label],
+                "predicted_label": prediction,
+                "predicted_label_name": PIFU_ID_TO_LABEL[prediction],
+                "generated_text": generated,
+                "invalid_output": invalid,
+            }
+        )
 
         if (index + 1) % 25 == 0:
-            rank_zero_print(
-                f"  {index + 1:,}/{len(samples):,} evaluated..."
-            )
+            rank_zero_print(f"  {index + 1:,}/{len(samples):,} evaluated...")
 
     # Metric Arrays
     labels_arr = np.asarray(
@@ -511,10 +478,7 @@ def evaluate_generative(
     )
 
     # Classification Report
-    target_names = [
-        PIFU_ID_TO_LABEL[label]
-        for label in PIFU_LABEL_IDS
-    ]
+    target_names = [PIFU_ID_TO_LABEL[label] for label in PIFU_LABEL_IDS]
 
     report_text = classification_report(
         labels_arr,
@@ -601,12 +565,20 @@ def print_run_header(
     rank_zero_print(f"Train dataset          : {PIFU_TRAIN_PATH}")
     rank_zero_print(f"Visible CUDA devices   : {torch.cuda.device_count()}")
     rank_zero_print(f"Distributed world size : {WORLD_SIZE}")
-    rank_zero_print(f"Per-device batch       : {training_config['per_device_train_batch_size']}")
-    rank_zero_print(f"Gradient accumulation  : {training_config['gradient_accumulation_steps']}")
+    rank_zero_print(
+        f"Per-device batch       : {training_config['per_device_train_batch_size']}"
+    )
+    rank_zero_print(
+        f"Gradient accumulation  : {training_config['gradient_accumulation_steps']}"
+    )
     rank_zero_print(f"Global batch size      : {training_config['global_batch_size']}")
     rank_zero_print(f"Epochs                 : {training_config['num_train_epochs']}")
-    rank_zero_print(f"Steps per epoch        : {training_config['optimiser_steps_per_epoch']}")
-    rank_zero_print(f"Total optimiser steps  : {training_config['total_optimiser_steps']}")
+    rank_zero_print(
+        f"Steps per epoch        : {training_config['optimiser_steps_per_epoch']}"
+    )
+    rank_zero_print(
+        f"Total optimiser steps  : {training_config['total_optimiser_steps']}"
+    )
 
     # GPU Summary
     for gpu_index in range(torch.cuda.device_count()):
@@ -634,9 +606,7 @@ def trainer_argument_config(
     }
 
     return {
-        key: value
-        for key, value in training_config.items()
-        if key not in excluded_keys
+        key: value for key, value in training_config.items() if key not in excluded_keys
     }
 
 
@@ -668,7 +638,8 @@ def write_evaluation_artifacts(
     serialisable = {
         key: value
         for key, value in metrics.items()
-        if key not in {
+        if key
+        not in {
             "report",
             "predictions",
         }
@@ -718,23 +689,24 @@ def write_evaluation_artifacts(
     ) as file:
         writer = csv.writer(file)
 
-        writer.writerow([
-            "true/predicted",
-            *[
-                PIFU_ID_TO_LABEL[label]
-                for label in PIFU_LABEL_IDS
-            ],
-        ])
+        writer.writerow(
+            [
+                "true/predicted",
+                *[PIFU_ID_TO_LABEL[label] for label in PIFU_LABEL_IDS],
+            ]
+        )
 
         for label, row in zip(
             PIFU_LABEL_IDS,
             metrics["confusion_matrix"],
             strict=True,
         ):
-            writer.writerow([
-                PIFU_ID_TO_LABEL[label],
-                *row,
-            ])
+            writer.writerow(
+                [
+                    PIFU_ID_TO_LABEL[label],
+                    *row,
+                ]
+            )
 
     return {
         "report": report_path,
@@ -810,9 +782,7 @@ def run_finetune() -> None:
 
     train_ds, validation_ds, test_ds, raw_data = load_splits(tokenizer)
 
-    training_config = build_pifu_training_config(
-        len(train_ds)
-    )
+    training_config = build_pifu_training_config(len(train_ds))
 
     print_run_header(training_config)
 
@@ -824,9 +794,7 @@ def run_finetune() -> None:
     )
 
     # Model Loading
-    rank_zero_print(
-        f"\nLoading model in BF16: {PIFU_BASE_MODEL}"
-    )
+    rank_zero_print(f"\nLoading model in BF16: {PIFU_BASE_MODEL}")
 
     model = AutoModelForCausalLM.from_pretrained(
         PIFU_BASE_MODEL,
@@ -853,8 +821,7 @@ def run_finetune() -> None:
         model.print_trainable_parameters()
 
         rank_zero_print(
-            f"Model memory footprint: "
-            f"{model.get_memory_footprint() / 1024**3:.2f} GiB"
+            f"Model memory footprint: {model.get_memory_footprint() / 1024**3:.2f} GiB"
         )
 
     # Trainer Setup
@@ -900,36 +867,36 @@ def run_finetune() -> None:
     with run_context:
         # MLflow Parameter Logging
         if IS_MAIN_PROCESS:
-            mlflow.log_params({
-                "base_model": PIFU_BASE_MODEL,
-                "approach": "generative_classification",
-                "task": "pifu_eligibility_3class",
-                "dataset": "fastpifu_cardiology",
-                "lora_r": PIFU_LORA_CONFIG["r"],
-                "lora_alpha": PIFU_LORA_CONFIG["lora_alpha"],
-                "target_modules": str(PIFU_LORA_CONFIG["target_modules"]),
-                "epochs": training_config["num_train_epochs"],
-                "per_device_batch_size": (
-                    training_config["per_device_train_batch_size"]
-                ),
-                "gradient_accumulation_steps": (
-                    training_config["gradient_accumulation_steps"]
-                ),
-                "global_batch_size": training_config["global_batch_size"],
-                "world_size": WORLD_SIZE,
-                "learning_rate": training_config["learning_rate"],
-                "precision": "bf16",
-                "max_length": PIFU_MAX_LENGTH,
-                "n_train": len(train_ds),
-                "n_validation": len(validation_ds),
-                "n_test": len(test_ds),
-                "n_challenge": len(raw_data["challenge"]),
-            })
+            mlflow.log_params(
+                {
+                    "base_model": PIFU_BASE_MODEL,
+                    "approach": "generative_classification",
+                    "task": "pifu_eligibility_3class",
+                    "dataset": "fastpifu_cardiology",
+                    "lora_r": PIFU_LORA_CONFIG["r"],
+                    "lora_alpha": PIFU_LORA_CONFIG["lora_alpha"],
+                    "target_modules": str(PIFU_LORA_CONFIG["target_modules"]),
+                    "epochs": training_config["num_train_epochs"],
+                    "per_device_batch_size": (
+                        training_config["per_device_train_batch_size"]
+                    ),
+                    "gradient_accumulation_steps": (
+                        training_config["gradient_accumulation_steps"]
+                    ),
+                    "global_batch_size": training_config["global_batch_size"],
+                    "world_size": WORLD_SIZE,
+                    "learning_rate": training_config["learning_rate"],
+                    "precision": "bf16",
+                    "max_length": PIFU_MAX_LENGTH,
+                    "n_train": len(train_ds),
+                    "n_validation": len(validation_ds),
+                    "n_test": len(test_ds),
+                    "n_challenge": len(raw_data["challenge"]),
+                }
+            )
 
         # Model Training
-        rank_zero_print(
-            "\nStarting BF16 LoRA PIFU fine-tuning..."
-        )
+        rank_zero_print("\nStarting BF16 LoRA PIFU fine-tuning...")
 
         trainer.train()
         trainer.accelerator.wait_for_everyone()
@@ -940,19 +907,13 @@ def run_finetune() -> None:
         # Model and State Saving
         trainer.save_state()
 
-        inference_model = trainer.accelerator.unwrap_model(
-            trainer.model_wrapped
-        )
+        inference_model = trainer.accelerator.unwrap_model(trainer.model_wrapped)
 
         inference_model.eval()
 
-        inference_model.save_pretrained(
-            str(PIFU_OUTPUT_DIR)
-        )
+        inference_model.save_pretrained(str(PIFU_OUTPUT_DIR))
 
-        tokenizer.save_pretrained(
-            str(PIFU_OUTPUT_DIR)
-        )
+        tokenizer.save_pretrained(str(PIFU_OUTPUT_DIR))
 
         # Full External-Test Evaluation
         rank_zero_print(
@@ -966,18 +927,18 @@ def run_finetune() -> None:
             raw_data["test"],
         )
 
-        mlflow.log_metrics({
-            f"test_{key}": value
-            for key, value in finite_metrics(test_metrics).items()
-        })
+        mlflow.log_metrics(
+            {
+                f"test_{key}": value
+                for key, value in finite_metrics(test_metrics).items()
+            }
+        )
 
         rank_zero_print("\nClassification Report:")
         rank_zero_print(test_metrics["report"])
 
         # Artifact Writing
-        artifact_paths = write_evaluation_artifacts(
-            test_metrics
-        )
+        artifact_paths = write_evaluation_artifacts(test_metrics)
 
         # MLflow Artifact Logging
         mlflow.log_text(
@@ -1022,17 +983,12 @@ def run_finetune() -> None:
         rank_zero_print(f"  Macro F1         : {test_metrics['macro_f1']:.4f}")
         rank_zero_print(f"  Accuracy         : {test_metrics['accuracy']:.4f}")
         rank_zero_print(
-            f"  NOT_EL recall    : "
-            f"{test_metrics['not_eligible_recall']:.4f}"
+            f"  NOT_EL recall    : {test_metrics['not_eligible_recall']:.4f}"
         )
         rank_zero_print(
-            f"  EL precision     : "
-            f"{test_metrics['eligible_precision']:.4f}"
+            f"  EL precision     : {test_metrics['eligible_precision']:.4f}"
         )
-        rank_zero_print(
-            f"  Unsafe eligible  : "
-            f"{test_metrics['unsafe_eligible_count']}"
-        )
+        rank_zero_print(f"  Unsafe eligible  : {test_metrics['unsafe_eligible_count']}")
         rank_zero_print(f"  Adapter          : {PIFU_OUTPUT_DIR}")
         rank_zero_print("  MLflow           : http://127.0.0.1:5000")
         rank_zero_print("=" * 65)

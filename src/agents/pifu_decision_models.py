@@ -35,10 +35,7 @@ PIFU_LABEL_TO_ID = {
     PIFULabel.ELIGIBLE: 2,
 }
 
-PIFU_ID_TO_LABEL = {
-    label_id: label
-    for label, label_id in PIFU_LABEL_TO_ID.items()
-}
+PIFU_ID_TO_LABEL = {label_id: label for label, label_id in PIFU_LABEL_TO_ID.items()}
 
 
 class PIFUProbabilities(BaseModel):
@@ -64,16 +61,10 @@ class PIFUProbabilities(BaseModel):
         """Check probabilities approximately sum to one."""
 
         # Probability Sum Check
-        total = (
-            self.not_eligible
-            + self.borderline
-            + self.eligible
-        )
+        total = self.not_eligible + self.borderline + self.eligible
 
         if abs(total - 1.0) > 1e-3:
-            raise ValueError(
-                "PIFU probabilities must sum approximately to 1."
-            )
+            raise ValueError("PIFU probabilities must sum approximately to 1.")
 
         return self
 
@@ -109,27 +100,19 @@ class PIFUModelPrediction(BaseModel):
         expected_class = PIFU_ID_TO_LABEL[self.predicted_label]
 
         if self.predicted_class != expected_class:
-            raise ValueError(
-                "Predicted label and class are inconsistent."
-            )
+            raise ValueError("Predicted label and class are inconsistent.")
 
         # Probability Consistency Check
         probability_by_label = self.probabilities.as_label_dict()
         predicted_probability = probability_by_label[self.predicted_class]
 
-        largest_probability = max(
-            probability_by_label.values()
-        )
+        largest_probability = max(probability_by_label.values())
 
         if abs(self.confidence - predicted_probability) > 1e-4:
-            raise ValueError(
-                "Confidence must equal the predicted class probability."
-            )
+            raise ValueError("Confidence must equal the predicted class probability.")
 
         if abs(predicted_probability - largest_probability) > 1e-4:
-            raise ValueError(
-                "Predicted class must have the largest class probability."
-            )
+            raise ValueError("Predicted class must have the largest class probability.")
 
         return self
 

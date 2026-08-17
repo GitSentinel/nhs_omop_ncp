@@ -121,8 +121,7 @@ def get_label_token_ids(tokenizer) -> dict[int, list[int]]:
 
     if label_token_ids[0] == label_token_ids[1]:
         raise ValueError(
-            "Labels 0 and 1 produced identical token sequences: "
-            f"{label_token_ids[0]}"
+            f"Labels 0 and 1 produced identical token sequences: {label_token_ids[0]}"
         )
 
     return label_token_ids
@@ -147,9 +146,7 @@ def build_prompt_ids(
     max_prompt_length = MAX_LENGTH - max_label_length
 
     if max_prompt_length < 1:
-        raise ValueError(
-            f"MAX_LENGTH={MAX_LENGTH} is too small for the label tokens."
-        )
+        raise ValueError(f"MAX_LENGTH={MAX_LENGTH} is too small for the label tokens.")
 
     prompt_ids = prompt_ids[:max_prompt_length]
 
@@ -172,21 +169,15 @@ def score_label_candidates(
 
     device = get_model_device(model)
     label_token_ids = get_label_token_ids(tokenizer)
-    max_label_length = max(
-        len(token_ids)
-        for token_ids in label_token_ids.values()
-    )
+    max_label_length = max(len(token_ids) for token_ids in label_token_ids.values())
 
     probabilities = []
 
-    print(
-        "Label token sequences: "
-        f"0={label_token_ids[0]}, 1={label_token_ids[1]}"
-    )
+    print(f"Label token sequences: 0={label_token_ids[0]}, 1={label_token_ids[1]}")
 
     # Batch Scoring Loop
     for batch_start in range(0, len(texts), batch_size):
-        batch_texts = texts[batch_start:batch_start + batch_size]
+        batch_texts = texts[batch_start : batch_start + batch_size]
 
         sequences = []
         metadata = []
@@ -205,10 +196,7 @@ def score_label_candidates(
                 metadata.append((len(prompt_ids), candidate_ids))
 
         # Tensor Construction
-        max_sequence_length = max(
-            len(sequence)
-            for sequence in sequences
-        )
+        max_sequence_length = max(len(sequence) for sequence in sequences)
 
         input_ids = torch.full(
             (len(sequences), max_sequence_length),
@@ -257,10 +245,13 @@ def score_label_candidates(
                     :,
                 ].float()
 
-                score = score + torch.log_softmax(
-                    token_logits,
-                    dim=-1,
-                )[token_id]
+                score = (
+                    score
+                    + torch.log_softmax(
+                        token_logits,
+                        dim=-1,
+                    )[token_id]
+                )
 
             candidate_scores.append(score)
 
@@ -381,9 +372,7 @@ def unpack_split(
     samples = data.get(split_name)
 
     if not isinstance(samples, list):
-        raise ValueError(
-            f"The dataset must contain a list named {split_name!r}."
-        )
+        raise ValueError(f"The dataset must contain a list named {split_name!r}.")
 
     if not samples:
         raise ValueError(f"The split {split_name!r} is empty.")
@@ -396,14 +385,10 @@ def unpack_split(
     invalid_labels = sorted(set(labels) - {0, 1})
 
     if invalid_labels:
-        raise ValueError(
-            f"Unexpected labels in {split_name}: {invalid_labels}"
-        )
+        raise ValueError(f"Unexpected labels in {split_name}: {invalid_labels}")
 
     if len(set(labels)) < 2:
-        raise ValueError(
-            f"The split {split_name!r} must contain both labels 0 and 1."
-        )
+        raise ValueError(f"The split {split_name!r} must contain both labels 0 and 1.")
 
     return texts, labels, samples
 
@@ -420,9 +405,7 @@ def load_evaluation_splits() -> tuple[
 
     # Dataset Existence Check
     if not DATASET_PATH.exists():
-        raise FileNotFoundError(
-            f"Dataset not found: {DATASET_PATH.resolve()}"
-        )
+        raise FileNotFoundError(f"Dataset not found: {DATASET_PATH.resolve()}")
 
     # Dataset Loading
     with open(DATASET_PATH, "r", encoding="utf-8") as file:
@@ -463,31 +446,20 @@ def select_threshold(
     #     precision_values >= minimum_precision
     # )
 
-    valid_indices = np.flatnonzero(
-        recall_values >= minimum_recall
-    )
+    valid_indices = np.flatnonzero(recall_values >= minimum_recall)
 
     if len(valid_indices) > 0:
         # best_index = valid_indices[
         #     np.argmax(recall_values[valid_indices])
         # ]
 
-        best_index = valid_indices[
-            np.argmax(precision_values[valid_indices])
-        ]
+        best_index = valid_indices[np.argmax(precision_values[valid_indices])]
 
     else:
         # F2 Fallback
-        denominator = (
-            4 * precision_values
-            + recall_values
-            + 1e-12
-        )
+        denominator = 4 * precision_values + recall_values + 1e-12
 
-        f2_values = (
-            5 * precision_values * recall_values
-            / denominator
-        )
+        f2_values = 5 * precision_values * recall_values / denominator
 
         best_index = int(np.nanargmax(f2_values))
 
@@ -505,10 +477,7 @@ def apply_threshold(
     """Convert probabilities into binary predictions."""
 
     # Threshold Application
-    return [
-        int(probability >= threshold)
-        for probability in probabilities
-    ]
+    return [int(probability >= threshold) for probability in probabilities]
 
 
 def load_base_model():
@@ -542,8 +511,7 @@ def load_finetuned_model():
 
     if not adapter_config_path.exists():
         raise FileNotFoundError(
-            f"Adapter config not found: {adapter_config_path}. "
-            "Run finetune.py first."
+            f"Adapter config not found: {adapter_config_path}. Run finetune.py first."
         )
 
     # Adapter Base Model Validation
@@ -666,16 +634,18 @@ def build_comparison_summary(
             f"({finetuned_value - base_value:+.4f})"
         )
 
-    lines.extend([
-        "",
-        f"Dataset: {DATASET_PATH}",
-        f"Adapter: {FINETUNE_OUTPUT_DIR}",
-        f"Minimum validation recall: {PIFU_MIN_RECALL}"
-        f"Base threshold: {base_threshold:.6f}",
-        f"Fine-tuned threshold: {finetuned_threshold:.6f}",
-        f"Evaluation batch size: {EVAL_BATCH_SIZE}",
-        "Text input: full stored clinic letter with token truncation",
-    ])
+    lines.extend(
+        [
+            "",
+            f"Dataset: {DATASET_PATH}",
+            f"Adapter: {FINETUNE_OUTPUT_DIR}",
+            f"Minimum validation recall: {PIFU_MIN_RECALL}"
+            f"Base threshold: {base_threshold:.6f}",
+            f"Fine-tuned threshold: {finetuned_threshold:.6f}",
+            f"Evaluation batch size: {EVAL_BATCH_SIZE}",
+            "Text input: full stored clinic letter with token truncation",
+        ]
+    )
 
     return "\n".join(lines)
 
@@ -696,11 +666,13 @@ def log_metrics(prefix: str, metrics: dict) -> None:
     ]
 
     # MLflow Metric Logging
-    mlflow.log_metrics({
-        f"{prefix}_{metric_name}": metrics[metric_name]
-        for metric_name in metric_names
-        if np.isfinite(metrics[metric_name])
-    })
+    mlflow.log_metrics(
+        {
+            f"{prefix}_{metric_name}": metrics[metric_name]
+            for metric_name in metric_names
+            if np.isfinite(metrics[metric_name])
+        }
+    )
 
 
 def run_evaluation() -> None:
@@ -856,12 +828,7 @@ def run_evaluation() -> None:
     print("=" * 65)
     print("COMPARISON: Base vs Fine-Tuned")
     print("=" * 65)
-    print(
-        f"{'Metric':<20} "
-        f"{'Base':>10} "
-        f"{'Fine-Tuned':>12} "
-        f"{'Delta':>10}"
-    )
+    print(f"{'Metric':<20} {'Base':>10} {'Fine-Tuned':>12} {'Delta':>10}")
     print("-" * 56)
 
     comparison_metrics = [
@@ -888,31 +855,31 @@ def run_evaluation() -> None:
 
     # MLflow Logging
     with mlflow.start_run(run_name="evaluation_base_vs_finetuned"):
-        mlflow.log_params({
-            "base_model": BASE_MODEL,
-            "adapter_path": str(FINETUNE_OUTPUT_DIR),
-            "n_validation_samples": len(validation_samples),
-            "n_test_samples": len(test_samples),
-            "dataset": str(DATASET_PATH),
-            "minimum_validation_recall": PIFU_MIN_RECALL,
-            "base_threshold": base_threshold,
-            "finetuned_threshold": finetuned_threshold,
-            "eval_batch_size": EVAL_BATCH_SIZE,
-            "scoring_method": "exact_label_sequence_log_probability",
-            # "threshold_selection": "max_recall_at_minimum_precision",
-            "threshold_selection": "max_precision_at_minimum_recall",
-        })
+        mlflow.log_params(
+            {
+                "base_model": BASE_MODEL,
+                "adapter_path": str(FINETUNE_OUTPUT_DIR),
+                "n_validation_samples": len(validation_samples),
+                "n_test_samples": len(test_samples),
+                "dataset": str(DATASET_PATH),
+                "minimum_validation_recall": PIFU_MIN_RECALL,
+                "base_threshold": base_threshold,
+                "finetuned_threshold": finetuned_threshold,
+                "eval_batch_size": EVAL_BATCH_SIZE,
+                "scoring_method": "exact_label_sequence_log_probability",
+                # "threshold_selection": "max_recall_at_minimum_precision",
+                "threshold_selection": "max_precision_at_minimum_recall",
+            }
+        )
 
-        mlflow.log_metrics({
-            "base_validation_precision": base_validation_precision,
-            "base_validation_recall": base_validation_recall,
-            "finetuned_validation_precision": (
-                finetuned_validation_precision
-            ),
-            "finetuned_validation_recall": (
-                finetuned_validation_recall
-            ),
-        })
+        mlflow.log_metrics(
+            {
+                "base_validation_precision": base_validation_precision,
+                "base_validation_recall": base_validation_recall,
+                "finetuned_validation_precision": (finetuned_validation_precision),
+                "finetuned_validation_recall": (finetuned_validation_recall),
+            }
+        )
 
         log_metrics("base", base_metrics)
         log_metrics("ft", finetuned_metrics)

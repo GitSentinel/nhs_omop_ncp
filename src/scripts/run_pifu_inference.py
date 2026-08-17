@@ -133,12 +133,7 @@ def build_run_directory(
     """Return the output directory for one inference run."""
 
     # Run Directory Path
-    return (
-        PROJECT_ROOT
-        / "data"
-        / "inference_runs"
-        / run_id
-    )
+    return PROJECT_ROOT / "data" / "inference_runs" / run_id
 
 
 def print_final_summary(
@@ -183,14 +178,16 @@ async def main() -> None:
     # Graph Execution
     graph = build_pifu_inference_graph()
 
-    result = await graph.ainvoke({
-        "config": {
-            "run_id": run_id,
-            "run_dir": str(run_dir.resolve()),
-            "use_llm_explanation": not args.no_llm_explanation,
-        },
-        "text": text,
-    })
+    result = await graph.ainvoke(
+        {
+            "config": {
+                "run_id": run_id,
+                "run_dir": str(run_dir.resolve()),
+                "use_llm_explanation": not args.no_llm_explanation,
+            },
+            "text": text,
+        }
+    )
 
     # Final Summary
     print_final_summary(result["final_report"])

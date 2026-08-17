@@ -124,15 +124,11 @@ async def create_pifu_explanation(
 
     # Deterministic Reporting Mode
     if not use_llm:
-        return fallback_explanation(
-            "LLM explanation was disabled."
-        )
+        return fallback_explanation("LLM explanation was disabled.")
 
     # Azure OpenAI Availability Check
     if not azure_settings_available():
-        return fallback_explanation(
-            "Azure OpenAI settings were incomplete."
-        )
+        return fallback_explanation("Azure OpenAI settings were incomplete.")
 
     # Prompt Construction
     prompt = build_explanation_prompt(
@@ -148,13 +144,9 @@ async def create_pifu_explanation(
         result = await agent.run(prompt)
 
         if not isinstance(result.output, PIFUExplanation):
-            return fallback_explanation(
-                "Unexpected Pydantic AI output type."
-            )
+            return fallback_explanation("Unexpected Pydantic AI output type.")
 
         return result.output
 
     except Exception as error:
-        return fallback_explanation(
-            f"{type(error).__name__}: {error}"
-        )
+        return fallback_explanation(f"{type(error).__name__}: {error}")

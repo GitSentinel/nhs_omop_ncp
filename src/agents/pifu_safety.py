@@ -44,10 +44,7 @@ def top_two_probability_margin(
         reverse=True,
     )
 
-    return float(
-        ranked_probabilities[0]
-        - ranked_probabilities[1]
-    )
+    return float(ranked_probabilities[0] - ranked_probabilities[1])
 
 
 def safety_flags_for_prediction(
@@ -63,14 +60,10 @@ def safety_flags_for_prediction(
         flags.append("Classifier returned BORDERLINE.")
 
     if prediction.confidence < CONFIDENCE_THRESHOLD:
-        flags.append(
-            f"Classifier confidence is below {CONFIDENCE_THRESHOLD:.2f}."
-        )
+        flags.append(f"Classifier confidence is below {CONFIDENCE_THRESHOLD:.2f}.")
 
     if margin < MARGIN_THRESHOLD:
-        flags.append(
-            "The two highest class probabilities are close."
-        )
+        flags.append("The two highest class probabilities are close.")
 
     return flags
 
@@ -81,16 +74,11 @@ def build_review_reason(
     """Build the human-review reason text."""
 
     # Base Review Reason
-    reason = (
-        "Research-only PIFU classification requires human clinical review."
-    )
+    reason = "Research-only PIFU classification requires human clinical review."
 
     # Additional Review Triggers
     if flags:
-        reason += (
-            " Additional review triggers: "
-            + " ".join(flags)
-        )
+        reason += " Additional review triggers: " + " ".join(flags)
 
     return reason
 

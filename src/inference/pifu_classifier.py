@@ -176,15 +176,10 @@ def label_token_sequences(
         if not token_ids:
             raise ValueError(f"Label {label} produced no token IDs.")
 
-    unique_sequences = {
-        tuple(value)
-        for value in sequences.values()
-    }
+    unique_sequences = {tuple(value) for value in sequences.values()}
 
     if len(unique_sequences) != len(PIFU_LABEL_IDS):
-        raise ValueError(
-            f"PIFU label token sequences are not unique: {sequences}"
-        )
+        raise ValueError(f"PIFU label token sequences are not unique: {sequences}")
 
     return sequences
 
@@ -210,9 +205,7 @@ def build_prompt_ids(
     max_prompt_length = PIFU_MAX_LENGTH - max_label_length
 
     if max_prompt_length < 1:
-        raise ValueError(
-            "PIFU_MAX_LENGTH is too small for the label token sequences."
-        )
+        raise ValueError("PIFU_MAX_LENGTH is too small for the label token sequences.")
 
     prompt_ids = prompt_ids[:max_prompt_length]
 
@@ -250,20 +243,14 @@ def score_probabilities(
     device = get_model_device(model)
     token_map = label_token_sequences(tokenizer)
 
-    max_label_length = max(
-        len(tokens)
-        for tokens in token_map.values()
-    )
+    max_label_length = max(len(tokens) for tokens in token_map.values())
 
     all_probabilities: list[list[float]] = []
 
     if verbose:
         print(
             "PIFU label token sequences: "
-            + ", ".join(
-                f"{label}={token_map[label]}"
-                for label in PIFU_LABEL_IDS
-            )
+            + ", ".join(f"{label}={token_map[label]}" for label in PIFU_LABEL_IDS)
         )
 
     # Batch Scoring Loop
@@ -272,7 +259,7 @@ def score_probabilities(
         len(texts),
         batch_size,
     ):
-        batch_texts = texts[start:start + batch_size]
+        batch_texts = texts[start : start + batch_size]
 
         sequences: list[list[int]] = []
         metadata: list[tuple[int, list[int]]] = []
@@ -288,10 +275,7 @@ def score_probabilities(
             for label in PIFU_LABEL_IDS:
                 candidate_ids = token_map[label]
 
-                sequences.append(
-                    prompt_ids
-                    + candidate_ids
-                )
+                sequences.append(prompt_ids + candidate_ids)
 
                 metadata.append(
                     (
@@ -301,10 +285,7 @@ def score_probabilities(
                 )
 
         # Tensor Construction
-        max_sequence_length = max(
-            len(sequence)
-            for sequence in sequences
-        )
+        max_sequence_length = max(len(sequence) for sequence in sequences)
 
         input_ids = torch.full(
             (
@@ -382,9 +363,7 @@ def score_probabilities(
             dim=-1,
         )
 
-        all_probabilities.extend(
-            probabilities.detach().cpu().numpy().tolist()
-        )
+        all_probabilities.extend(probabilities.detach().cpu().numpy().tolist())
 
         if verbose:
             completed = min(

@@ -76,15 +76,9 @@ def label_note(note_text: str) -> int | None:
     text_lower = str(note_text).lower()
 
     # Keyword Scoring
-    treatment_score = sum(
-        keyword in text_lower
-        for keyword in TREATMENT_KEYWORDS
-    )
+    treatment_score = sum(keyword in text_lower for keyword in TREATMENT_KEYWORDS)
 
-    routine_score = sum(
-        keyword in text_lower
-        for keyword in ROUTINE_KEYWORDS
-    )
+    routine_score = sum(keyword in text_lower for keyword in ROUTINE_KEYWORDS)
 
     # Provisional Label Assignment
     if treatment_score > routine_score:
@@ -133,8 +127,7 @@ def generate_dataset(n_samples: int = N_DATASET_SAMPLES) -> None:
     note = get_table("note")
 
     notes_df = (
-        note
-        .select(
+        note.select(
             "note_id",
             "person_id",
             "note_date",
@@ -179,9 +172,13 @@ def generate_dataset(n_samples: int = N_DATASET_SAMPLES) -> None:
     ).reset_index(drop=True)
 
     # Label Distribution Summary
-    label_counts = samples["label"].value_counts(
-        dropna=True,
-    ).sort_index()
+    label_counts = (
+        samples["label"]
+        .value_counts(
+            dropna=True,
+        )
+        .sort_index()
+    )
 
     uncertain_count = int(samples["label"].isna().sum())
 
@@ -210,14 +207,8 @@ def generate_dataset(n_samples: int = N_DATASET_SAMPLES) -> None:
         "n_train": len(train),
         "n_test": len(test),
         "n_uncertain": uncertain_count,
-        "train": [
-            format_sample(row)
-            for _, row in train.iterrows()
-        ],
-        "test": [
-            format_sample(row)
-            for _, row in test.iterrows()
-        ],
+        "train": [format_sample(row) for _, row in train.iterrows()],
+        "test": [format_sample(row) for _, row in test.iterrows()],
     }
 
     # Dataset Saving
