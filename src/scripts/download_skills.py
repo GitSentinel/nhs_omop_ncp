@@ -7,10 +7,7 @@ from urllib.request import Request, urlopen
 SKILLS_DIR = Path("src/mcp_server/resources/skills")
 
 # Define the raw GitHub location containing the specialty skills
-RAW_BASE_URL = (
-    "https://raw.githubusercontent.com/"
-    "lsc-sde/fastpifu-skills/main/skills"
-)
+RAW_BASE_URL = "https://raw.githubusercontent.com/lsc-sde/fastpifu-skills/main/skills"
 
 # Define the specialties available in the FastPIFU repository
 SPECIALTIES = (
@@ -35,26 +32,17 @@ def build_skill_url(specialty: str) -> str:
     # Convert Python-style names into repository folder names
     specialty_slug = specialty.replace("_", "-")
 
-    return (
-        f"{RAW_BASE_URL}/"
-        f"fastpifu-{specialty_slug}/SKILL.md"
-    )
+    return f"{RAW_BASE_URL}/fastpifu-{specialty_slug}/SKILL.md"
 
 
 def download_skill(specialty: str) -> Path:
     url = build_skill_url(specialty)
 
     # Add a user agent to identify the download request
-    request = Request(
-        url,
-        headers={"User-Agent": USER_AGENT}
-    )
+    request = Request(url, headers={"User-Agent": USER_AGENT})
 
     # Download the raw Markdown content
-    with urlopen(
-        request,
-        timeout=REQUEST_TIMEOUT
-    ) as response:
+    with urlopen(request, timeout=REQUEST_TIMEOUT) as response:
         content = response.read().decode("utf-8")
 
     # Reject empty or unexpectedly rendered HTML responses
@@ -62,27 +50,19 @@ def download_skill(specialty: str) -> Path:
         raise ValueError("Downloaded file is empty.")
 
     if "<html" in content.lower():
-        raise ValueError(
-            "Received HTML instead of raw Markdown."
-        )
+        raise ValueError("Received HTML instead of raw Markdown.")
 
     output_path = SKILLS_DIR / f"{specialty}.md"
 
     # Save the original Markdown content without modification
-    output_path.write_text(
-        content,
-        encoding="utf-8"
-    )
+    output_path.write_text(content, encoding="utf-8")
 
     return output_path
 
 
 def main() -> None:
     # Create the destination directory when it does not exist
-    SKILLS_DIR.mkdir(
-        parents=True,
-        exist_ok=True
-    )
+    SKILLS_DIR.mkdir(parents=True, exist_ok=True)
 
     successful = []
     failed = []
@@ -105,10 +85,12 @@ def main() -> None:
             ValueError,
             OSError,
         ) as error:
-            failed.append({
-                "specialty": specialty,
-                "error": str(error),
-            })
+            failed.append(
+                {
+                    "specialty": specialty,
+                    "error": str(error),
+                }
+            )
 
             print(f"  ✗ Failed: {error}")
 
@@ -124,10 +106,7 @@ def main() -> None:
         print("\nFailed specialties:")
 
         for failure in failed:
-            print(
-                f"  - {failure['specialty']}: "
-                f"{failure['error']}"
-            )
+            print(f"  - {failure['specialty']}: {failure['error']}")
 
         raise SystemExit(1)
 

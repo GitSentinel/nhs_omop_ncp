@@ -42,58 +42,27 @@ def test_get_patient_summary_returns_demographics():
 
 
 def test_get_patient_summary_rejects_invalid_id():
-    with pytest.raises(
-        ValueError,
-        match=r"No (person|patient) found"
-    ):
+    with pytest.raises(ValueError, match=r"No (person|patient) found"):
         get_patient_summary(INVALID_PID)
 
 
 @pytest.mark.parametrize(
     ("tool", "kwargs", "required_fields"),
     [
-        (
-            get_patient_conditions,
-            {},
-            ["condition_name", "condition_start_date"]
-        ),
-        (
-            get_patient_medications,
-            {},
-            ["drug_name", "drug_exposure_start_date"]
-        ),
-        (
-            get_patient_visits,
-            {},
-            ["visit_type", "visit_start_date"]
-        ),
+        (get_patient_conditions, {}, ["condition_name", "condition_start_date"]),
+        (get_patient_medications, {}, ["drug_name", "drug_exposure_start_date"]),
+        (get_patient_visits, {}, ["visit_type", "visit_start_date"]),
         (
             get_patient_measurements,
             {"limit": 10},
-            ["measurement_name", "measurement_date"]
+            ["measurement_name", "measurement_date"],
         ),
-        (
-            get_patient_observations,
-            {},
-            ["observation_name", "observation_date"]
-        ),
-        (
-            get_patient_notes,
-            {},
-            ["note_text", "note_date"]
-        ),
-        (
-            get_patient_procedures,
-            {},
-            ["procedure_name", "procedure_date"]
-        ),
-    ]
+        (get_patient_observations, {}, ["observation_name", "observation_date"]),
+        (get_patient_notes, {}, ["note_text", "note_date"]),
+        (get_patient_procedures, {}, ["procedure_name", "procedure_date"]),
+    ],
 )
-def test_patient_domain_tools_return_records(
-    tool,
-    kwargs,
-    required_fields
-):
+def test_patient_domain_tools_return_records(tool, kwargs, required_fields):
     result = tool(TEST_PID, **kwargs)
 
     assert isinstance(result, list)
@@ -125,10 +94,7 @@ def test_get_patient_measurements_respects_limit(limit):
 def test_get_patient_notes_text_not_empty():
     result = get_patient_notes(TEST_PID)
 
-    assert all(
-        record.get("note_text")
-        for record in result[:5]
-    )
+    assert all(record.get("note_text") for record in result[:5])
 
 
 @pytest.mark.parametrize(
@@ -142,7 +108,7 @@ def test_get_patient_notes_text_not_empty():
         (get_patient_observations, (TEST_PID,)),
         (get_patient_notes, (TEST_PID,)),
         (get_patient_procedures, (TEST_PID,)),
-    ]
+    ],
 )
 def test_tool_outputs_are_json_serialisable(tool, args):
     result = tool(*args)

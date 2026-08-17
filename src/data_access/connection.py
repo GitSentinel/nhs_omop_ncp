@@ -21,10 +21,7 @@ def get_connection(read_only: bool = True) -> BaseBackend:
         )
 
     # Open the database using the requested access mode
-    return ibis.duckdb.connect(
-        database=str(db_path),
-        read_only=read_only
-    )
+    return ibis.duckdb.connect(database=str(db_path), read_only=read_only)
 
 
 def list_omop_tables() -> list[str]:

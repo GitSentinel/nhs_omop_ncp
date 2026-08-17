@@ -169,9 +169,7 @@ def get_label_token_ids(tokenizer) -> dict[int, list[int]]:
             raise ValueError(f"Label {label} produced no token IDs.")
 
     if len({tuple(value) for value in label_token_ids.values()}) != len(LABEL_IDS):
-        raise ValueError(
-            f"Non-unique label token sequences: {label_token_ids}"
-        )
+        raise ValueError(f"Non-unique label token sequences: {label_token_ids}")
 
     return label_token_ids
 
@@ -196,8 +194,7 @@ def build_prompt_ids(
 
     if max_prompt_length < 1:
         raise ValueError(
-            f"PIFU_MAX_LENGTH={PIFU_MAX_LENGTH} is too small "
-            "for the label tokens."
+            f"PIFU_MAX_LENGTH={PIFU_MAX_LENGTH} is too small for the label tokens."
         )
 
     prompt_ids = prompt_ids[:max_prompt_length]
@@ -219,10 +216,7 @@ def score_label_probabilities(
     device = get_model_device(model)
     label_token_ids = get_label_token_ids(tokenizer)
 
-    max_label_length = max(
-        len(token_ids)
-        for token_ids in label_token_ids.values()
-    )
+    max_label_length = max(len(token_ids) for token_ids in label_token_ids.values())
 
     prompt_ids = build_prompt_ids(
         tokenizer,
@@ -241,10 +235,7 @@ def score_label_probabilities(
         metadata.append((len(prompt_ids), candidate_ids))
 
     # Tensor Construction
-    max_sequence_length = max(
-        len(sequence)
-        for sequence in sequences
-    )
+    max_sequence_length = max(len(sequence) for sequence in sequences)
 
     input_ids = torch.full(
         (len(sequences), max_sequence_length),
@@ -287,14 +278,17 @@ def score_label_probabilities(
         for offset, token_id in enumerate(candidate_ids):
             position = prompt_length + offset - 1
 
-            score = score + torch.log_softmax(
-                outputs.logits[
-                    row_index,
-                    position,
-                    :,
-                ].float(),
-                dim=-1,
-            )[token_id]
+            score = (
+                score
+                + torch.log_softmax(
+                    outputs.logits[
+                        row_index,
+                        position,
+                        :,
+                    ].float(),
+                    dim=-1,
+                )[token_id]
+            )
 
         scores.append(score)
 
@@ -325,10 +319,7 @@ def print_prediction(probabilities: list[float]) -> None:
     print()
 
     for label in LABEL_IDS:
-        print(
-            f"{PIFU_ID_TO_LABEL[label]:<14}: "
-            f"{probabilities[label]:.4f}"
-        )
+        print(f"{PIFU_ID_TO_LABEL[label]:<14}: {probabilities[label]:.4f}")
 
 
 def main() -> None:

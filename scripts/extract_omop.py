@@ -7,16 +7,24 @@ import zipfile
 import duckdb
 from pathlib import Path
 
-ZIP_PATH = Path(r"C:\Users\mahan\AppData\Local\R\cache\CDMConnector\delphi-100k_5.4.zip")
+ZIP_PATH = Path(
+    r"C:\Users\mahan\AppData\Local\R\cache\CDMConnector\delphi-100k_5.4.zip"
+)
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-EXTRACT_DIR  = PROJECT_ROOT / "data" / "raw" / "delphi-100k"
-OUTPUT_PATH  = PROJECT_ROOT / "data" / "processed" / "omop_v54.duckdb"
+EXTRACT_DIR = PROJECT_ROOT / "data" / "raw" / "delphi-100k"
+OUTPUT_PATH = PROJECT_ROOT / "data" / "processed" / "omop_v54.duckdb"
 
 REQUIRED_TABLES = [
-    "person", "condition_occurrence", "drug_exposure",
-    "visit_occurrence", "measurement", "observation",
-    "procedure_occurrence", "concept", "vocabulary",
+    "person",
+    "condition_occurrence",
+    "drug_exposure",
+    "visit_occurrence",
+    "measurement",
+    "observation",
+    "procedure_occurrence",
+    "concept",
+    "vocabulary",
 ]
 
 
@@ -54,7 +62,7 @@ def build_duckdb(extract_dir: Path, output_path: Path) -> None:
 
     print(f"\n[3/3] Verifying required OMOP tables...")
     existing = [t[0] for t in con.execute("SHOW TABLES").fetchall()]
-    missing  = [t for t in REQUIRED_TABLES if t not in existing]
+    missing = [t for t in REQUIRED_TABLES if t not in existing]
 
     if missing:
         raise ValueError(f"Missing required OMOP tables: {missing}")

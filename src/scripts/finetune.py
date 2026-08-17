@@ -39,11 +39,7 @@ def detect_gpu_indices() -> list[int]:
         text=True,
     )
 
-    return [
-        int(line.strip())
-        for line in result.stdout.splitlines()
-        if line.strip()
-    ]
+    return [int(line.strip()) for line in result.stdout.splitlines() if line.strip()]
 
 
 def launch_distributed_if_needed() -> None:
@@ -58,15 +54,11 @@ def launch_distributed_if_needed() -> None:
         return
 
     available_gpu_ids = detect_gpu_indices()
-    configured_gpu_ids = list(
-        GPU_CONFIG.get("gpu_ids") or available_gpu_ids
-    )
+    configured_gpu_ids = list(GPU_CONFIG.get("gpu_ids") or available_gpu_ids)
 
     # GPU Availability Validation
     missing_gpu_ids = [
-        gpu_id
-        for gpu_id in configured_gpu_ids
-        if gpu_id not in available_gpu_ids
+        gpu_id for gpu_id in configured_gpu_ids if gpu_id not in available_gpu_ids
     ]
 
     if missing_gpu_ids:
@@ -82,8 +74,7 @@ def launch_distributed_if_needed() -> None:
     environment = os.environ.copy()
 
     environment["CUDA_VISIBLE_DEVICES"] = ",".join(
-        str(gpu_id)
-        for gpu_id in configured_gpu_ids
+        str(gpu_id) for gpu_id in configured_gpu_ids
     )
 
     environment.setdefault(
@@ -105,10 +96,7 @@ def launch_distributed_if_needed() -> None:
         str(Path(__file__).resolve()),
     ]
 
-    print(
-        f"Launching fine-tuning on {process_count} GPU(s): "
-        f"{configured_gpu_ids}"
-    )
+    print(f"Launching fine-tuning on {process_count} GPU(s): {configured_gpu_ids}")
 
     completed = subprocess.run(
         command,
@@ -259,22 +247,28 @@ def load_splits(
         )
 
     # Training Split Formatting
-    train_ds = Dataset.from_list([
-        format_example(example["text"], example["label"], tokenizer)
-        for example in data["train"]
-    ])
+    train_ds = Dataset.from_list(
+        [
+            format_example(example["text"], example["label"], tokenizer)
+            for example in data["train"]
+        ]
+    )
 
     # Validation Split Formatting
-    validation_ds = Dataset.from_list([
-        format_example(example["text"], example["label"], tokenizer)
-        for example in data["validation"]
-    ])
+    validation_ds = Dataset.from_list(
+        [
+            format_example(example["text"], example["label"], tokenizer)
+            for example in data["validation"]
+        ]
+    )
 
     # Test Split Formatting
-    test_ds = Dataset.from_list([
-        format_example(example["text"], example["label"], tokenizer)
-        for example in data["test"]
-    ])
+    test_ds = Dataset.from_list(
+        [
+            format_example(example["text"], example["label"], tokenizer)
+            for example in data["test"]
+        ]
+    )
 
     return train_ds, validation_ds, test_ds, data
 
@@ -302,8 +296,7 @@ def evaluate_generative(
     labels = []
 
     rank_zero_print(
-        f"\nRunning generative evaluation on "
-        f"{len(test_raw):,} test examples..."
+        f"\nRunning generative evaluation on {len(test_raw):,} test examples..."
     )
 
     # Prediction Loop
@@ -328,7 +321,7 @@ def evaluate_generative(
             )
 
         generated = tokenizer.decode(
-            output[0][inputs["input_ids"].shape[1]:],
+            output[0][inputs["input_ids"].shape[1] :],
             skip_special_tokens=True,
         )
 
@@ -336,9 +329,7 @@ def evaluate_generative(
         labels.append(int(example["label"]))
 
         if (index + 1) % 50 == 0:
-            rank_zero_print(
-                f"  {index + 1:,}/{len(test_raw):,} evaluated..."
-            )
+            rank_zero_print(f"  {index + 1:,}/{len(test_raw):,} evaluated...")
 
     # Metric Calculation
     labels_arr = np.asarray(labels)
@@ -392,12 +383,20 @@ def print_run_header(training_config: dict) -> None:
     rank_zero_print(f"Dataset                : {DATASET_PATH}")
     rank_zero_print(f"Visible CUDA devices   : {torch.cuda.device_count()}")
     rank_zero_print(f"Distributed world size : {WORLD_SIZE}")
-    rank_zero_print(f"Per-device batch       : {training_config['per_device_train_batch_size']}")
-    rank_zero_print(f"Gradient accumulation  : {training_config['gradient_accumulation_steps']}")
+    rank_zero_print(
+        f"Per-device batch       : {training_config['per_device_train_batch_size']}"
+    )
+    rank_zero_print(
+        f"Gradient accumulation  : {training_config['gradient_accumulation_steps']}"
+    )
     rank_zero_print(f"Global batch size      : {training_config['global_batch_size']}")
     rank_zero_print(f"Epochs                 : {training_config['num_train_epochs']}")
-    rank_zero_print(f"Steps per epoch        : {training_config['optimiser_steps_per_epoch']}")
-    rank_zero_print(f"Total optimiser steps  : {training_config['total_optimiser_steps']}")
+    rank_zero_print(
+        f"Steps per epoch        : {training_config['optimiser_steps_per_epoch']}"
+    )
+    rank_zero_print(
+        f"Total optimiser steps  : {training_config['total_optimiser_steps']}"
+    )
 
     # GPU Summary
     for gpu_index in range(torch.cuda.device_count()):
@@ -423,9 +422,7 @@ def trainer_argument_config(training_config: dict) -> dict:
     }
 
     return {
-        key: value
-        for key, value in training_config.items()
-        if key not in excluded_keys
+        key: value for key, value in training_config.items() if key not in excluded_keys
     }
 
 
@@ -485,8 +482,7 @@ def run_finetune() -> None:
         model.print_trainable_parameters()
 
         rank_zero_print(
-            f"Model memory footprint: "
-            f"{model.get_memory_footprint() / 1024**3:.2f} GiB"
+            f"Model memory footprint: {model.get_memory_footprint() / 1024**3:.2f} GiB"
         )
 
     # Training Argument Setup
@@ -530,34 +526,30 @@ def run_finetune() -> None:
     with run_context:
         # MLflow Parameter Logging
         if IS_MAIN_PROCESS:
-            mlflow.log_params({
-                "base_model": BASE_MODEL,
-                "approach": "generative_classification",
-                "lora_r": QLORA_CONFIG["r"],
-                "lora_alpha": QLORA_CONFIG["lora_alpha"],
-                "target_modules": str(
-                    QLORA_CONFIG["target_modules"]
-                ),
-                "epochs": training_config["num_train_epochs"],
-                "per_device_batch_size": (
-                    training_config[
-                        "per_device_train_batch_size"
-                    ]
-                ),
-                "gradient_accumulation_steps": (
-                    training_config[
-                        "gradient_accumulation_steps"
-                    ]
-                ),
-                "global_batch_size": training_config["global_batch_size"],
-                "world_size": WORLD_SIZE,
-                "learning_rate": training_config["learning_rate"],
-                "precision": "bf16",
-                "max_length": MAX_LENGTH,
-                "n_train": len(train_ds),
-                "n_validation": len(validation_ds),
-                "n_test": len(test_ds),
-            })
+            mlflow.log_params(
+                {
+                    "base_model": BASE_MODEL,
+                    "approach": "generative_classification",
+                    "lora_r": QLORA_CONFIG["r"],
+                    "lora_alpha": QLORA_CONFIG["lora_alpha"],
+                    "target_modules": str(QLORA_CONFIG["target_modules"]),
+                    "epochs": training_config["num_train_epochs"],
+                    "per_device_batch_size": (
+                        training_config["per_device_train_batch_size"]
+                    ),
+                    "gradient_accumulation_steps": (
+                        training_config["gradient_accumulation_steps"]
+                    ),
+                    "global_batch_size": training_config["global_batch_size"],
+                    "world_size": WORLD_SIZE,
+                    "learning_rate": training_config["learning_rate"],
+                    "precision": "bf16",
+                    "max_length": MAX_LENGTH,
+                    "n_train": len(train_ds),
+                    "n_validation": len(validation_ds),
+                    "n_test": len(test_ds),
+                }
+            )
 
         # Model Training
         rank_zero_print("\nStarting BF16 LoRA fine-tuning...")
@@ -569,9 +561,7 @@ def run_finetune() -> None:
             return
 
         # Model Unwrapping
-        inference_model = trainer.accelerator.unwrap_model(
-            trainer.model_wrapped
-        )
+        inference_model = trainer.accelerator.unwrap_model(trainer.model_wrapped)
 
         inference_model.eval()
 
@@ -588,13 +578,15 @@ def run_finetune() -> None:
         )
 
         # MLflow Metric Logging
-        mlflow.log_metrics({
-            "test_f1": eval_metrics["f1"],
-            "test_accuracy": eval_metrics["accuracy"],
-            "test_precision": eval_metrics["precision"],
-            "test_recall": eval_metrics["recall"],
-            "n_evaluated": eval_metrics["n_evaluated"],
-        })
+        mlflow.log_metrics(
+            {
+                "test_f1": eval_metrics["f1"],
+                "test_accuracy": eval_metrics["accuracy"],
+                "test_precision": eval_metrics["precision"],
+                "test_recall": eval_metrics["recall"],
+                "n_evaluated": eval_metrics["n_evaluated"],
+            }
+        )
 
         # Report Logging
         rank_zero_print("\nClassification Report:")

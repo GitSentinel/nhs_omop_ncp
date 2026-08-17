@@ -96,8 +96,7 @@ async def run_agent(person_id: int, query: str) -> str:
 
         if tool_calls:
             tool_calls_made.extend(
-                tool_call.get("name", "unknown")
-                for tool_call in tool_calls
+                tool_call.get("name", "unknown") for tool_call in tool_calls
             )
 
         if content and isinstance(content, str):

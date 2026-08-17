@@ -1,7 +1,9 @@
 """
 FastPIFU Model Evaluation
 
-Evaluates the base model and fine-tuned PIFU LoRA adapter on the external test and challenge splits using exact label-sequence log probabilities.
+Evaluates the base model and fine-tuned PIFU LoRA adapter on the
+external test and challenge splits using exact label-sequence
+log probabilities.
 
 Run:
 uv run --extra finetune python src/scripts/evaluate_pifu.py
@@ -16,21 +18,12 @@ import sys
 from collections import Counter
 from pathlib import Path
 
-# Project Root Setup
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
-
 # Experiment Tracking
 import mlflow
 
 # Data and Numerical Libraries
 import numpy as np
 import torch
-
-# PEFT Model Loading
-from peft import PeftModel
 
 # Evaluation Metrics
 from sklearn.metrics import (
@@ -41,14 +34,14 @@ from sklearn.metrics import (
     f1_score,
 )
 
-# Model Loading Components
-from transformers import (
-    AutoModelForCausalLM,
-    AutoTokenizer,
-)
+# Project Root Setup
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 # Project Configuration
-from src.config.pifu_settings import (
+from src.config.pifu_settings import (  # noqa: E402
     MLFLOW_EXPERIMENT_FINETUNE,
     PIFU_BASE_MODEL,
     PIFU_CHALLENGE_PATH,
@@ -62,8 +55,14 @@ from src.config.pifu_settings import (
     PIFU_PROMPT_TEMPLATE,
     PIFU_TEST_PATH,
 )
+from src.config.settings import settings  # noqa: E402
 
-from src.config.settings import settings
+# Project-Specific Imports
+from src.inference.pifu_classifier import (  # noqa: E402
+    load_base_model,
+    load_finetuned_model,
+    score_probabilities,
+)
 
 # Evaluation Configuration
 PIFU_EVAL_BATCH_SIZE = 2
@@ -77,7 +76,7 @@ def load_samples(path: Path) -> list[dict]:
         raise FileNotFoundError(f"PIFU split not found: {path}")
 
     # Split Loading
-    with open(path, "r", encoding="utf-8") as file:
+    with open(path, encoding="utf-8") as file:
         payload = json.load(file)
 
     samples = payload.get("samples")
@@ -91,324 +90,14 @@ def load_samples(path: Path) -> list[dict]:
     # Sample Validation
     for index, sample in enumerate(samples):
         if "text" not in sample or "label" not in sample:
-            raise ValueError(
-                f"Sample {index} in {path} must contain text and label."
-            )
+            raise ValueError(f"Sample {index} in {path} must contain text and label.")
 
         label = int(sample["label"])
 
         if label not in PIFU_LABEL_IDS:
-            raise ValueError(
-                f"Unexpected label {label} in sample {index} from {path}."
-            )
+            raise ValueError(f"Unexpected label {label} in sample {index} from {path}.")
 
     return samples
-
-
-def setup_tokenizer(model_path: str | Path):
-    """Load tokenizer from adapter or base model."""
-
-    # Tokeniser Loading
-    tokenizer = AutoTokenizer.from_pretrained(
-        model_path,
-        trust_remote_code=True,
-    )
-
-    # Padding Token Setup
-    if tokenizer.pad_token is None:
-        tokenizer.pad_token = tokenizer.eos_token
-        tokenizer.pad_token_id = tokenizer.eos_token_id
-
-    tokenizer.padding_side = "right"
-
-    return tokenizer
-
-
-def get_model_device(model) -> torch.device:
-    """Return the first real device used by the model."""
-
-    # Device Detection
-    for parameter in model.parameters():
-        if parameter.device.type != "meta":
-            return parameter.device
-
-    return torch.device("cuda:0")
-
-
-def load_base_model():
-    """Load the unfine-tuned BF16 base model."""
-
-    # GPU Check
-    if not torch.cuda.is_available():
-        raise RuntimeError("CUDA GPU is required for PIFU evaluation.")
-
-    # Base Model Loading
-    print(f"Loading base model: {PIFU_BASE_MODEL}")
-
-    tokenizer = setup_tokenizer(PIFU_BASE_MODEL)
-
-    model = AutoModelForCausalLM.from_pretrained(
-        PIFU_BASE_MODEL,
-        torch_dtype=torch.bfloat16,
-        device_map={"": 0},
-        low_cpu_mem_usage=True,
-        trust_remote_code=True,
-    )
-
-    model.config.pad_token_id = tokenizer.pad_token_id
-    model.config.use_cache = False
-    model.eval()
-
-    return model, tokenizer
-
-
-def load_finetuned_model():
-    """Load the BF16 base model with the PIFU LoRA adapter."""
-
-    # GPU Check
-    if not torch.cuda.is_available():
-        raise RuntimeError("CUDA GPU is required for PIFU evaluation.")
-
-    # Adapter Configuration Check
-    adapter_config_path = PIFU_OUTPUT_DIR / "adapter_config.json"
-
-    if not adapter_config_path.exists():
-        raise FileNotFoundError(
-            f"Adapter config not found: {adapter_config_path}. "
-            "Run finetune_pifu.py first."
-        )
-
-    print(f"Loading fine-tuned PIFU model from: {PIFU_OUTPUT_DIR}")
-
-    # Tokeniser Loading
-    try:
-        tokenizer = setup_tokenizer(PIFU_OUTPUT_DIR)
-    except OSError:
-        tokenizer = setup_tokenizer(PIFU_BASE_MODEL)
-
-    # Base Model Loading
-    base_model = AutoModelForCausalLM.from_pretrained(
-        PIFU_BASE_MODEL,
-        torch_dtype=torch.bfloat16,
-        device_map={"": 0},
-        low_cpu_mem_usage=True,
-        trust_remote_code=True,
-    )
-
-    base_model.config.pad_token_id = tokenizer.pad_token_id
-    base_model.config.use_cache = False
-
-    # Adapter Loading
-    model = PeftModel.from_pretrained(
-        base_model,
-        str(PIFU_OUTPUT_DIR),
-        is_trainable=False,
-    )
-
-    model.eval()
-
-    return model, tokenizer
-
-
-def label_token_sequences(
-    tokenizer,
-) -> dict[int, list[int]]:
-    """Return exact token sequences for labels 0, 1 and 2."""
-
-    # Label Token Construction
-    sequences = {
-        label: tokenizer.encode(
-            f" {label}",
-            add_special_tokens=False,
-        )
-        for label in PIFU_LABEL_IDS
-    }
-
-    # Label Token Validation
-    for label, token_ids in sequences.items():
-        if not token_ids:
-            raise ValueError(f"Label {label} produced no token IDs.")
-
-    if len({tuple(value) for value in sequences.values()}) != len(PIFU_LABEL_IDS):
-        raise ValueError(
-            f"Label token sequences are not unique: {sequences}"
-        )
-
-    return sequences
-
-
-def build_prompt_ids(
-    tokenizer,
-    text: str,
-    max_label_length: int,
-) -> list[int]:
-    """Tokenise and truncate one PIFU prompt."""
-
-    # Prompt Formatting
-    prompt = PIFU_PROMPT_TEMPLATE.format(
-        text=str(text),
-    )
-
-    prompt_ids = tokenizer.encode(
-        prompt,
-        add_special_tokens=False,
-    )
-
-    # Prompt Length Control
-    max_prompt_length = PIFU_MAX_LENGTH - max_label_length
-
-    if max_prompt_length < 1:
-        raise ValueError(
-            f"PIFU_MAX_LENGTH={PIFU_MAX_LENGTH} is too small "
-            "for the label tokens."
-        )
-
-    prompt_ids = prompt_ids[:max_prompt_length]
-
-    if not prompt_ids:
-        raise ValueError("The formatted PIFU prompt produced no token IDs.")
-
-    return prompt_ids
-
-
-def score_probabilities(
-    model,
-    tokenizer,
-    texts: list[str],
-    batch_size: int = PIFU_EVAL_BATCH_SIZE,
-) -> np.ndarray:
-    """Score exact label sequences and normalise across the three classes."""
-
-    # Scoring Setup
-    model.eval()
-
-    device = get_model_device(model)
-    token_map = label_token_sequences(tokenizer)
-
-    max_label_length = max(
-        len(tokens)
-        for tokens in token_map.values()
-    )
-
-    all_probabilities = []
-
-    print(
-        "Label token sequences: "
-        + ", ".join(
-            f"{label}={token_map[label]}"
-            for label in PIFU_LABEL_IDS
-        )
-    )
-
-    # Batch Scoring Loop
-    for start in range(0, len(texts), batch_size):
-        batch_texts = texts[start:start + batch_size]
-
-        sequences = []
-        metadata = []
-
-        # Candidate Sequence Construction
-        for text in batch_texts:
-            prompt_ids = build_prompt_ids(
-                tokenizer,
-                text,
-                max_label_length,
-            )
-
-            for label in PIFU_LABEL_IDS:
-                candidate_ids = token_map[label]
-
-                sequences.append(prompt_ids + candidate_ids)
-                metadata.append((len(prompt_ids), candidate_ids))
-
-        # Tensor Construction
-        max_sequence_length = max(
-            len(sequence)
-            for sequence in sequences
-        )
-
-        input_ids = torch.full(
-            (len(sequences), max_sequence_length),
-            tokenizer.pad_token_id,
-            dtype=torch.long,
-            device=device,
-        )
-
-        attention_mask = torch.zeros_like(input_ids)
-
-        for row_index, sequence in enumerate(sequences):
-            sequence_length = len(sequence)
-
-            input_ids[row_index, :sequence_length] = torch.tensor(
-                sequence,
-                dtype=torch.long,
-                device=device,
-            )
-
-            attention_mask[row_index, :sequence_length] = 1
-
-        # Model Forward Pass
-        with torch.inference_mode():
-            outputs = model(
-                input_ids=input_ids,
-                attention_mask=attention_mask,
-                use_cache=False,
-            )
-
-        candidate_scores = []
-
-        # Candidate Log-Probability Calculation
-        for row_index, (prompt_length, candidate_ids) in enumerate(metadata):
-            score = torch.zeros(
-                (),
-                dtype=torch.float32,
-                device=device,
-            )
-
-            for offset, token_id in enumerate(candidate_ids):
-                logits_position = prompt_length + offset - 1
-
-                logits = outputs.logits[
-                    row_index,
-                    logits_position,
-                    :,
-                ].float()
-
-                score = score + torch.log_softmax(
-                    logits,
-                    dim=-1,
-                )[token_id]
-
-            candidate_scores.append(score)
-
-        # Class Probability Calculation
-        score_matrix = torch.stack(candidate_scores).reshape(
-            len(batch_texts),
-            len(PIFU_LABEL_IDS),
-        )
-
-        probabilities = torch.softmax(
-            score_matrix,
-            dim=-1,
-        )
-
-        all_probabilities.extend(
-            probabilities.detach().cpu().numpy().tolist()
-        )
-
-        completed = min(start + len(batch_texts), len(texts))
-
-        if completed % 25 == 0 or completed == len(texts):
-            print(f"  {completed:,}/{len(texts):,} evaluated...")
-
-        # Batch Memory Cleanup
-        del outputs
-        del input_ids
-        del attention_mask
-        del score_matrix
-        del probabilities
-
-    return np.asarray(all_probabilities, dtype=float)
 
 
 def compute_metrics(
@@ -425,10 +114,7 @@ def compute_metrics(
     )
 
     # Classification Report
-    target_names = [
-        PIFU_ID_TO_LABEL[label]
-        for label in PIFU_LABEL_IDS
-    ]
+    target_names = [PIFU_ID_TO_LABEL[label] for label in PIFU_LABEL_IDS]
 
     report_dict = classification_report(
         labels,
@@ -489,9 +175,7 @@ def compute_metrics(
         "unsafe_eligible_count": int(unsafe_eligible.sum()),
         "unsafe_eligible_rate": unsafe_rate,
         "manual_review_rate": float(np.mean(predictions == 1)),
-        "prediction_counts": dict(
-            Counter(int(value) for value in predictions)
-        ),
+        "prediction_counts": dict(Counter(int(value) for value in predictions)),
         "confusion_matrix": matrix.tolist(),
         "report": report_dict,
         "report_text": report_text,
@@ -515,20 +199,12 @@ def write_split_artifacts(
 
     metrics_path = PIFU_EVALUATION_DIR / f"{output_prefix}_metrics.json"
     predictions_path = PIFU_EVALUATION_DIR / f"{output_prefix}_predictions.csv"
-    report_path = (
-        PIFU_EVALUATION_DIR
-        / f"{output_prefix}_classification_report.txt"
-    )
-    confusion_path = (
-        PIFU_EVALUATION_DIR
-        / f"{output_prefix}_confusion_matrix.csv"
-    )
+    report_path = PIFU_EVALUATION_DIR / f"{output_prefix}_classification_report.txt"
+    confusion_path = PIFU_EVALUATION_DIR / f"{output_prefix}_confusion_matrix.csv"
 
     # Metrics JSON
     serialisable = {
-        key: value
-        for key, value in metrics.items()
-        if key != "report_text"
+        key: value for key, value in metrics.items() if key != "report_text"
     }
 
     metrics_path.write_text(
@@ -578,20 +254,21 @@ def write_split_artifacts(
         ):
             true_label = int(sample["label"])
 
-            writer.writerow({
-                "sample_id": sample.get("sample_id"),
-                "source": sample.get("source"),
-                "true_label": true_label,
-                "true_label_name": (
-                    sample.get("label_name")
-                    or PIFU_ID_TO_LABEL[true_label]
-                ),
-                "predicted_label": int(prediction),
-                "predicted_label_name": PIFU_ID_TO_LABEL[int(prediction)],
-                "prob_not_eligible": float(row_probabilities[0]),
-                "prob_borderline": float(row_probabilities[1]),
-                "prob_eligible": float(row_probabilities[2]),
-            })
+            writer.writerow(
+                {
+                    "sample_id": sample.get("sample_id"),
+                    "source": sample.get("source"),
+                    "true_label": true_label,
+                    "true_label_name": (
+                        sample.get("label_name") or PIFU_ID_TO_LABEL[true_label]
+                    ),
+                    "predicted_label": int(prediction),
+                    "predicted_label_name": PIFU_ID_TO_LABEL[int(prediction)],
+                    "prob_not_eligible": float(row_probabilities[0]),
+                    "prob_borderline": float(row_probabilities[1]),
+                    "prob_eligible": float(row_probabilities[2]),
+                }
+            )
 
     # Confusion Matrix CSV
     with open(
@@ -602,23 +279,24 @@ def write_split_artifacts(
     ) as file:
         writer = csv.writer(file)
 
-        writer.writerow([
-            "true/predicted",
-            *[
-                PIFU_ID_TO_LABEL[label]
-                for label in PIFU_LABEL_IDS
-            ],
-        ])
+        writer.writerow(
+            [
+                "true/predicted",
+                *[PIFU_ID_TO_LABEL[label] for label in PIFU_LABEL_IDS],
+            ]
+        )
 
         for label, row in zip(
             PIFU_LABEL_IDS,
             metrics["confusion_matrix"],
             strict=True,
         ):
-            writer.writerow([
-                PIFU_ID_TO_LABEL[label],
-                *row,
-            ])
+            writer.writerow(
+                [
+                    PIFU_ID_TO_LABEL[label],
+                    *row,
+                ]
+            )
 
     return {
         "metrics_path": metrics_path,
@@ -638,16 +316,10 @@ def evaluate_split(
     """Evaluate one model on one PIFU split and save artifacts."""
 
     # Split Data Extraction
-    texts = [
-        str(sample["text"])
-        for sample in samples
-    ]
+    texts = [str(sample["text"]) for sample in samples]
 
     labels = np.asarray(
-        [
-            int(sample["label"])
-            for sample in samples
-        ],
+        [int(sample["label"]) for sample in samples],
         dtype=int,
     )
 
@@ -764,84 +436,111 @@ def comparison_summary(
         "",
     ]
 
-    # Fine-Tuned Only Case
-    if base_external is None:
-        lines.extend([
-            "Base-model evaluation was skipped.",
-            "",
-            "Fine-tuned external-test metrics:",
-            json.dumps(
-                metric_subset(fine_external),
-                indent=2,
-            ),
-            "",
-            "Fine-tuned challenge-set metrics:",
-            json.dumps(
-                metric_subset(fine_challenge),
-                indent=2,
-            ),
-        ])
+    # Fine-Tuned Only Evaluation Case
+    if base_external is None or base_challenge is None:
+        lines.extend(
+            [
+                "Base-model evaluation was skipped.",
+                "",
+                "Fine-tuned external-test metrics:",
+                json.dumps(
+                    metric_subset(fine_external),
+                    indent=2,
+                ),
+                "",
+                "Fine-tuned challenge-set metrics:",
+                json.dumps(
+                    metric_subset(fine_challenge),
+                    indent=2,
+                ),
+            ]
+        )
 
         return "\n".join(lines)
 
+    # Metric Deltas
+    external_macro_f1_delta = fine_external["macro_f1"] - base_external["macro_f1"]
+
+    external_balanced_accuracy_delta = (
+        fine_external["balanced_accuracy"] - base_external["balanced_accuracy"]
+    )
+
+    external_not_eligible_recall_delta = (
+        fine_external["not_eligible_recall"] - base_external["not_eligible_recall"]
+    )
+
+    external_eligible_precision_delta = (
+        fine_external["eligible_precision"] - base_external["eligible_precision"]
+    )
+
+    challenge_macro_f1_delta = fine_challenge["macro_f1"] - base_challenge["macro_f1"]
+
+    challenge_not_eligible_recall_delta = (
+        fine_challenge["not_eligible_recall"] - base_challenge["not_eligible_recall"]
+    )
+
     # External Test Comparison
-    lines.extend([
-        "External test",
-        "-" * 68,
-        (
-            "Macro F1: "
-            f"{base_external['macro_f1']:.4f} -> "
-            f"{fine_external['macro_f1']:.4f} "
-            f"({fine_external['macro_f1'] - base_external['macro_f1']:+.4f})"
-        ),
-        (
-            "Balanced accuracy: "
-            f"{base_external['balanced_accuracy']:.4f} -> "
-            f"{fine_external['balanced_accuracy']:.4f} "
-            f"({fine_external['balanced_accuracy'] - base_external['balanced_accuracy']:+.4f})"
-        ),
-        (
-            "NOT_ELIGIBLE recall: "
-            f"{base_external['not_eligible_recall']:.4f} -> "
-            f"{fine_external['not_eligible_recall']:.4f} "
-            f"({fine_external['not_eligible_recall'] - base_external['not_eligible_recall']:+.4f})"
-        ),
-        (
-            "ELIGIBLE precision: "
-            f"{base_external['eligible_precision']:.4f} -> "
-            f"{fine_external['eligible_precision']:.4f} "
-            f"({fine_external['eligible_precision'] - base_external['eligible_precision']:+.4f})"
-        ),
-        (
-            "Unsafe eligible count: "
-            f"{base_external['unsafe_eligible_count']} -> "
-            f"{fine_external['unsafe_eligible_count']}"
-        ),
-        "",
-    ])
+    lines.extend(
+        [
+            "External test",
+            "-" * 68,
+            (
+                "Macro F1: "
+                f"{base_external['macro_f1']:.4f} -> "
+                f"{fine_external['macro_f1']:.4f} "
+                f"({external_macro_f1_delta:+.4f})"
+            ),
+            (
+                "Balanced accuracy: "
+                f"{base_external['balanced_accuracy']:.4f} -> "
+                f"{fine_external['balanced_accuracy']:.4f} "
+                f"({external_balanced_accuracy_delta:+.4f})"
+            ),
+            (
+                "NOT_ELIGIBLE recall: "
+                f"{base_external['not_eligible_recall']:.4f} -> "
+                f"{fine_external['not_eligible_recall']:.4f} "
+                f"({external_not_eligible_recall_delta:+.4f})"
+            ),
+            (
+                "ELIGIBLE precision: "
+                f"{base_external['eligible_precision']:.4f} -> "
+                f"{fine_external['eligible_precision']:.4f} "
+                f"({external_eligible_precision_delta:+.4f})"
+            ),
+            (
+                "Unsafe eligible count: "
+                f"{base_external['unsafe_eligible_count']} -> "
+                f"{fine_external['unsafe_eligible_count']}"
+            ),
+            "",
+        ]
+    )
 
     # Challenge Set Comparison
-    lines.extend([
-        "Challenge set",
-        "-" * 68,
-        (
-            "Macro F1: "
-            f"{base_challenge['macro_f1']:.4f} -> "
-            f"{fine_challenge['macro_f1']:.4f} "
-            f"({fine_challenge['macro_f1'] - base_challenge['macro_f1']:+.4f})"
-        ),
-        (
-            "NOT_ELIGIBLE recall: "
-            f"{base_challenge['not_eligible_recall']:.4f} -> "
-            f"{fine_challenge['not_eligible_recall']:.4f} "
-            f"({fine_challenge['not_eligible_recall'] - base_challenge['not_eligible_recall']:+.4f})"
-        ),
-        (
-            "Unsafe eligible count: "
-            f"{base_challenge['unsafe_eligible_count']} -> "
-            f"{fine_challenge['unsafe_eligible_count']}"
-        ),
-    ])
+    lines.extend(
+        [
+            "Challenge set",
+            "-" * 68,
+            (
+                "Macro F1: "
+                f"{base_challenge['macro_f1']:.4f} -> "
+                f"{fine_challenge['macro_f1']:.4f} "
+                f"({challenge_macro_f1_delta:+.4f})"
+            ),
+            (
+                "NOT_ELIGIBLE recall: "
+                f"{base_challenge['not_eligible_recall']:.4f} -> "
+                f"{fine_challenge['not_eligible_recall']:.4f} "
+                f"({challenge_not_eligible_recall_delta:+.4f})"
+            ),
+            (
+                "Unsafe eligible count: "
+                f"{base_challenge['unsafe_eligible_count']} -> "
+                f"{fine_challenge['unsafe_eligible_count']}"
+            ),
+        ]
+    )
 
     return "\n".join(lines)
 
@@ -872,10 +571,9 @@ def log_metric_block(
     """Log finite numeric metrics to MLflow with a prefix."""
 
     # Metric Logging
-    mlflow.log_metrics({
-        f"{prefix}_{key}": value
-        for key, value in metric_subset(metrics).items()
-    })
+    mlflow.log_metrics(
+        {f"{prefix}_{key}": value for key, value in metric_subset(metrics).items()}
+    )
 
 
 def run_evaluation(
@@ -992,14 +690,16 @@ def run_evaluation(
         },
     ):
         # Parameter Logging
-        mlflow.log_params({
-            "base_model": PIFU_BASE_MODEL,
-            "adapter_path": str(PIFU_OUTPUT_DIR),
-            "max_length": PIFU_MAX_LENGTH,
-            "n_external_test": len(test_samples),
-            "n_challenge": len(challenge_samples),
-            "include_base": include_base,
-        })
+        mlflow.log_params(
+            {
+                "base_model": PIFU_BASE_MODEL,
+                "adapter_path": str(PIFU_OUTPUT_DIR),
+                "max_length": PIFU_MAX_LENGTH,
+                "n_external_test": len(test_samples),
+                "n_challenge": len(challenge_samples),
+                "include_base": include_base,
+            }
+        )
 
         # Metric Logging
         log_metric_block("ft_external", fine_external)
@@ -1012,24 +712,25 @@ def run_evaluation(
             log_metric_block("base_challenge", base_challenge)
 
         if base_external is not None:
-            mlflow.log_metrics({
-                "external_macro_f1_delta": (
-                    fine_external["macro_f1"]
-                    - base_external["macro_f1"]
-                ),
-                "external_balanced_accuracy_delta": (
-                    fine_external["balanced_accuracy"]
-                    - base_external["balanced_accuracy"]
-                ),
-                "external_not_eligible_recall_delta": (
-                    fine_external["not_eligible_recall"]
-                    - base_external["not_eligible_recall"]
-                ),
-                "external_eligible_precision_delta": (
-                    fine_external["eligible_precision"]
-                    - base_external["eligible_precision"]
-                ),
-            })
+            mlflow.log_metrics(
+                {
+                    "external_macro_f1_delta": (
+                        fine_external["macro_f1"] - base_external["macro_f1"]
+                    ),
+                    "external_balanced_accuracy_delta": (
+                        fine_external["balanced_accuracy"]
+                        - base_external["balanced_accuracy"]
+                    ),
+                    "external_not_eligible_recall_delta": (
+                        fine_external["not_eligible_recall"]
+                        - base_external["not_eligible_recall"]
+                    ),
+                    "external_eligible_precision_delta": (
+                        fine_external["eligible_precision"]
+                        - base_external["eligible_precision"]
+                    ),
+                }
+            )
 
         # Text Artifact Logging
         mlflow.log_text(

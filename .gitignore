@@ -57,3 +57,6 @@ secrets/
 #MLRuns
 mlflow_runs/
 mlruns/
+
+# Inference Runs
+data/inference_runs/

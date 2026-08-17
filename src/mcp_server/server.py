@@ -33,22 +33,16 @@ async def omop_lifespan(server: FastMCP) -> AsyncIterator[dict]:
     db_path = Path(settings.duckdb_path).expanduser().resolve()
 
     if not db_path.is_file():
-        raise FileNotFoundError(
-            f"OMOP DuckDB database not found at: {db_path}"
-        )
+        raise FileNotFoundError(f"OMOP DuckDB database not found at: {db_path}")
 
     log.info("OMOP MCP server starting")
     log.info("Connecting to DuckDB: %s", db_path)
 
     # Open one read-only connection when the server starts
-    connection = ibis.duckdb.connect(
-        database=str(db_path),
-        read_only=True
-    )
+    connection = ibis.duckdb.connect(database=str(db_path), read_only=True)
 
     log.info(
-        "DuckDB connection established with %d tables",
-        len(connection.list_tables())
+        "DuckDB connection established with %d tables", len(connection.list_tables())
     )
 
     try:
@@ -68,7 +62,7 @@ mcp = FastMCP(
         "synthetic dataset. Use get_patient_summary first, then call "
         "the relevant clinical-domain tools."
     ),
-    lifespan=omop_lifespan
+    lifespan=omop_lifespan,
 )
 
 
@@ -79,17 +73,11 @@ def _serialise(value: Any) -> Any:
 
     # Recursively serialise dictionaries
     if isinstance(value, dict):
-        return {
-            key: _serialise(item)
-            for key, item in value.items()
-        }
+        return {key: _serialise(item) for key, item in value.items()}
 
     # Recursively serialise lists and tuples
     if isinstance(value, (list, tuple)):
-        return [
-            _serialise(item)
-            for item in value
-        ]
+        return [_serialise(item) for item in value]
 
     # Convert dates into ISO-formatted strings
     if isinstance(value, (date, datetime)):
@@ -122,30 +110,21 @@ def get_patient_summary(person_id: int, ctx: Context) -> dict:
 
 
 @mcp.tool()
-def get_patient_conditions(
-    person_id: int,
-    ctx: Context
-) -> list[dict]:
+def get_patient_conditions(person_id: int, ctx: Context) -> list[dict]:
     # Return condition records for a patient
     log.info("get_patient_conditions person_id=%s", person_id)
     return _serialise(get_conditions(person_id))
 
 
 @mcp.tool()
-def get_patient_medications(
-    person_id: int,
-    ctx: Context
-) -> list[dict]:
+def get_patient_medications(person_id: int, ctx: Context) -> list[dict]:
     # Return medication records for a patient
     log.info("get_patient_medications person_id=%s", person_id)
     return _serialise(get_medications(person_id))
 
 
 @mcp.tool()
-def get_patient_visits(
-    person_id: int,
-    ctx: Context
-) -> list[dict]:
+def get_patient_visits(person_id: int, ctx: Context) -> list[dict]:
     # Return healthcare visit records for a patient
     log.info("get_patient_visits person_id=%s", person_id)
     return _serialise(get_visits(person_id))
@@ -153,59 +132,39 @@ def get_patient_visits(
 
 @mcp.tool()
 def get_patient_measurements(
-    person_id: int,
-    ctx: Context,
-    limit: int = 50
+    person_id: int, ctx: Context, limit: int = 50
 ) -> list[dict]:
     # Restrict the number of returned measurement records
     limit = _validate_limit(limit)
 
-    log.info(
-        "get_patient_measurements person_id=%s limit=%s",
-        person_id,
-        limit
-    )
+    log.info("get_patient_measurements person_id=%s limit=%s", person_id, limit)
 
-    return _serialise(
-        get_measurements(person_id, limit=limit)
-    )
+    return _serialise(get_measurements(person_id, limit=limit))
 
 
 @mcp.tool()
-def get_patient_observations(
-    person_id: int,
-    ctx: Context
-) -> list[dict]:
+def get_patient_observations(person_id: int, ctx: Context) -> list[dict]:
     # Return observation records for a patient
     log.info("get_patient_observations person_id=%s", person_id)
     return _serialise(get_observations(person_id))
 
 
 @mcp.tool()
-def get_patient_notes(
-    person_id: int,
-    ctx: Context
-) -> list[dict]:
+def get_patient_notes(person_id: int, ctx: Context) -> list[dict]:
     # Return clinical notes for a patient
     log.info("get_patient_notes person_id=%s", person_id)
     return _serialise(get_notes(person_id))
 
 
 @mcp.tool()
-def get_patient_procedures(
-    person_id: int,
-    ctx: Context
-) -> list[dict]:
+def get_patient_procedures(person_id: int, ctx: Context) -> list[dict]:
     # Return procedure records for a patient
     log.info("get_patient_procedures person_id=%s", person_id)
     return _serialise(get_procedures(person_id))
 
 
 @mcp.tool()
-def list_available_patients(
-    ctx: Context,
-    limit: int = 20
-) -> list[int]:    
+def list_available_patients(ctx: Context, limit: int = 20) -> list[int]:
     # Restrict the requested number of identifiers
     limit = _validate_limit(limit)
 
@@ -215,8 +174,7 @@ def list_available_patients(
 
     # Retrieve a consistent ordered sample of patient identifiers
     patient_ids = (
-        database
-        .table("person")
+        database.table("person")
         .select("person_id")
         .order_by("person_id")
         .limit(limit)
@@ -224,10 +182,7 @@ def list_available_patients(
     )
 
     # Convert NumPy integer values into standard Python integers
-    return [
-        int(person_id)
-        for person_id in patient_ids["person_id"].tolist()
-    ]
+    return [int(person_id) for person_id in patient_ids["person_id"].tolist()]
 
 
 # Start the stdio server when this file is executed directly

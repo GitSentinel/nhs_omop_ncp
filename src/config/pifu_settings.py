@@ -14,12 +14,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 PYTHON_BIN = str(Path(sys.executable))
 
 # FastPIFU Data Root
-PIFU_DATA_ROOT = (
-    PROJECT_ROOT
-    / "data"
-    / "external"
-    / "fastpifu_cardiology"
-)
+PIFU_DATA_ROOT = PROJECT_ROOT / "data" / "external" / "fastpifu_cardiology"
 
 # FastPIFU Data Directories
 PIFU_RAW_DIR = PIFU_DATA_ROOT / "raw"
@@ -48,23 +43,11 @@ PIFU_SPLIT_PATHS = {
 }
 
 # Fine-Tuning Output Paths
-PIFU_FINETUNE_DIR = (
-    PROJECT_ROOT
-    / "data"
-    / "finetune"
-)
+PIFU_FINETUNE_DIR = PROJECT_ROOT / "data" / "finetune"
 
-PIFU_OUTPUT_DIR = (
-    PIFU_FINETUNE_DIR
-    / "qwen35_9b_pifu_lora"
-)
+PIFU_OUTPUT_DIR = PIFU_FINETUNE_DIR / "qwen35_9b_pifu_lora"
 
-PIFU_EVALUATION_DIR = (
-    PROJECT_ROOT
-    / "data"
-    / "evaluations"
-    / "pifu_cardiology"
-)
+PIFU_EVALUATION_DIR = PROJECT_ROOT / "data" / "evaluations" / "pifu_cardiology"
 
 # MLflow Configuration
 MLFLOW_TRACKING_URI = "sqlite:///mlflow_runs/mlflow.db"
@@ -91,18 +74,12 @@ PIFU_LABEL_TO_ID = {
 }
 
 PIFU_ID_TO_LABEL = {
-    label_id: label_name
-    for label_name, label_id in PIFU_LABEL_TO_ID.items()
+    label_id: label_name for label_name, label_id in PIFU_LABEL_TO_ID.items()
 }
 
-PIFU_LABEL_IDS = tuple(
-    sorted(PIFU_ID_TO_LABEL)
-)
+PIFU_LABEL_IDS = tuple(sorted(PIFU_ID_TO_LABEL))
 
-PIFU_CLASS_NAMES = [
-    PIFU_ID_TO_LABEL[label_id]
-    for label_id in PIFU_LABEL_IDS
-]
+PIFU_CLASS_NAMES = [PIFU_ID_TO_LABEL[label_id] for label_id in PIFU_LABEL_IDS]
 
 # Multi-GPU Policy
 PIFU_GPU_CONFIG = {
@@ -118,9 +95,7 @@ PIFU_GPU_CONFIG = {
 # Backward-Compatible GPU Aliases
 PIFU_GPU_IDS = PIFU_GPU_CONFIG["gpu_ids"]
 PIFU_MASTER_PORT = PIFU_GPU_CONFIG["master_port"]
-PIFU_TARGET_GLOBAL_BATCH_SIZE = PIFU_GPU_CONFIG[
-    "target_global_batch_size"
-]
+PIFU_TARGET_GLOBAL_BATCH_SIZE = PIFU_GPU_CONFIG["target_global_batch_size"]
 PIFU_EPOCHS = 3
 
 # LoRA Configuration
@@ -177,38 +152,24 @@ def build_pifu_training_config(
         1,
         round(
             PIFU_GPU_CONFIG["target_global_batch_size"]
-            / (
-                per_device_train_batch_size
-                * world_size
-            )
+            / (per_device_train_batch_size * world_size)
         ),
     )
 
     global_batch_size = (
-        per_device_train_batch_size
-        * gradient_accumulation_steps
-        * world_size
+        per_device_train_batch_size * gradient_accumulation_steps * world_size
     )
 
     # Step Calculation
-    samples_per_rank = math.ceil(
-        n_train / world_size
-    )
+    samples_per_rank = math.ceil(n_train / world_size)
 
-    micro_batches_per_epoch = math.ceil(
-        samples_per_rank
-        / per_device_train_batch_size
-    )
+    micro_batches_per_epoch = math.ceil(samples_per_rank / per_device_train_batch_size)
 
     optimiser_steps_per_epoch = math.ceil(
-        micro_batches_per_epoch
-        / gradient_accumulation_steps
+        micro_batches_per_epoch / gradient_accumulation_steps
     )
 
-    total_optimiser_steps = (
-        optimiser_steps_per_epoch
-        * epochs
-    )
+    total_optimiser_steps = optimiser_steps_per_epoch * epochs
 
     warmup_steps = max(
         1,
