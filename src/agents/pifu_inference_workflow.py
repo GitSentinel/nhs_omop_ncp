@@ -30,12 +30,18 @@ from typing_extensions import TypedDict
 from src.agents.pifu_decision_models import (
     PIFUExplanation,
     PIFUInferenceReport,
+    PIFUJudgeAssessment,
     PIFUModelPrediction,
     PIFUSafetyAssessment,
 )
 
 # FastPIFU Explanation Agent
 from src.agents.pifu_inference_agent import create_pifu_explanation
+
+# FastPIFU LLM-as-a-Judge Agent
+from src.agents.pifu_llm_judge import (
+    judge_pifu_explanation,
+)
 
 # FastPIFU Safety Rules
 from src.agents.pifu_safety import assess_pifu_safety
@@ -67,6 +73,7 @@ class PIFUInferenceState(
     prediction: dict[str, Any]
     safety: dict[str, Any]
     explanation: dict[str, Any]
+    judge: dict[str, Any]
     final_report: dict[str, Any]
 
 
@@ -144,6 +151,66 @@ def markdown_report(
 
         lines.append("")
 
+    # LLM-as-a-Judge Section
+    lines.extend(
+        [
+            "## LLM-as-a-Judge",
+            "",
+            "| Criterion | Score |",
+            "|---|---:|",
+            (
+                "| Explanation faithfulness | "
+                f"{report.judge.explanation_faithfulness}/5 |"
+            ),
+            (
+                "| Evidence grounding | "
+                f"{report.judge.evidence_grounding}/5 |"
+            ),
+            (
+                "| Prediction consistency | "
+                f"{report.judge.prediction_consistency}/5 |"
+            ),
+            (
+                "| Safety compliance | "
+                f"{report.judge.safety_compliance}/5 |"
+            ),
+            "",
+            (
+                "**Judge result:** "
+                + (
+                    "PASS"
+                    if report.judge.judge_pass
+                    else "FAIL"
+                )
+            ),
+            "",
+            (
+                "**Hallucination detected:** "
+                + (
+                    "YES"
+                    if report.judge.hallucination_detected
+                    else "NO"
+                )
+            ),
+            "",
+            report.judge.judge_summary,
+            "",
+        ]
+    )
+
+    if report.judge.unsupported_claims:
+        lines.extend(
+            [
+                "### Unsupported Claims",
+                "",
+            ]
+        )
+
+        for claim in report.judge.unsupported_claims:
+            lines.append(f"- {claim}")
+
+        lines.append("")
+
     # Review Flags Section
     if report.safety.flags:
         lines.extend(
@@ -192,6 +259,7 @@ def validate_config(config: dict[str, Any]) -> None:
         "run_id",
         "run_dir",
         "use_llm_explanation",
+        "use_llm_judge",
     }
 
     missing = [key for key in required_keys if key not in config]
@@ -234,6 +302,8 @@ def log_inference_to_mlflow(
             "task": "pifu_inference",
             "research_use_only": "true",
             "human_review_required": "true",
+            "llm_judge": "enabled",
+            "judge_scope": "explanation_quality",
         },
     ):
         # Parameter Logging
@@ -257,6 +327,30 @@ def log_inference_to_mlflow(
                 "prob_borderline": report.prediction.probabilities.borderline,
                 "prob_eligible": report.prediction.probabilities.eligible,
                 "top_two_margin": report.safety.top_two_margin,
+
+                "judge_faithfulness": float(
+                    report.judge
+                    .explanation_faithfulness
+                ),
+                "judge_grounding": float(
+                    report.judge
+                    .evidence_grounding
+                ),
+                "judge_prediction_consistency": float(
+                    report.judge
+                    .prediction_consistency
+                ),
+                "judge_safety": float(
+                    report.judge
+                    .safety_compliance
+                ),
+                "judge_pass": float(
+                    report.judge.judge_pass
+                ),
+                "judge_hallucination": float(
+                    report.judge
+                    .hallucination_detected
+                ),
             }
         )
 
@@ -333,6 +427,48 @@ def build_pifu_inference_graph():
             "explanation": explanation.model_dump(mode="json"),
         }
 
+    
+    async def judge_node(
+        state: PIFUInferenceState,
+    ) -> dict[str, Any]:
+        """Evaluate the explanation using LLM-as-a-Judge."""
+
+        # Evidence Validation
+        prediction = (
+            PIFUModelPrediction.model_validate(
+                state["prediction"]
+            )
+        )
+
+        # Safety Validation
+        safety = (
+            PIFUSafetyAssessment.model_validate(
+                state["safety"]
+            )
+        )
+
+        # Explanation Validation
+        explanation = (
+            PIFUExplanation.model_validate(
+                state["explanation"]
+            )
+        )
+
+        # LLM-as-a-Judge Assessment
+        judge = await judge_pifu_explanation(
+            text=state["text"],
+            prediction=prediction,
+            safety=safety,
+            explanation=explanation,
+            use_llm=state["config"]["use_llm_judge"],
+        )
+
+        return {
+            "judge": judge.model_dump(
+                mode="json"
+            ),
+        }
+
     def save_node(
         state: PIFUInferenceState,
     ) -> dict[str, Any]:
@@ -355,10 +491,9 @@ def build_pifu_inference_graph():
 
         # Component Validation
         prediction = PIFUModelPrediction.model_validate(state["prediction"])
-
         safety = PIFUSafetyAssessment.model_validate(state["safety"])
-
         explanation = PIFUExplanation.model_validate(state["explanation"])
+        judge = PIFUJudgeAssessment.model_validate(state["judge"])
 
         # Report Construction
         report = PIFUInferenceReport(
@@ -370,6 +505,7 @@ def build_pifu_inference_graph():
             prediction=prediction,
             safety=safety,
             explanation=explanation,
+            judge=judge,
             report_json=report_json.resolve(),
             report_markdown=report_markdown.resolve(),
         )
@@ -407,6 +543,11 @@ def build_pifu_inference_graph():
     )
 
     graph.add_node(
+        "llm_judge",
+        judge_node,
+    )
+
+    graph.add_node(
         "save",
         save_node,
     )
@@ -434,6 +575,11 @@ def build_pifu_inference_graph():
 
     graph.add_edge(
         "explain",
+        "llm_judge",
+    )
+
+    graph.add_edge(
+        "llm_judge",
         "save",
     )
 
