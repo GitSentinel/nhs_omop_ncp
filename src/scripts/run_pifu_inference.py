@@ -5,13 +5,16 @@ Runs the fine-tuned FastPIFU inference agent on one synthetic clinic letter
 provided either as a text file or as direct command-line text.
 
 Run with a file:
-uv run --extra finetune python src/scripts/run_pifu_inference.py --letter-file letter.txt
+uv run --extra finetune python src/scripts/run_pifu_inference.py \
+--letter-file letter.txt
 
 Run with direct text:
-uv run --extra finetune python src/scripts/run_pifu_inference.py --text "Clinic letter text here"
+uv run --extra finetune python src/scripts/run_pifu_inference.py \
+--text "Clinic letter text here"
 
 Disable LLM explanation:
-uv run --extra finetune python src/scripts/run_pifu_inference.py --letter-file letter.txt --no-llm-explanation
+uv run --extra finetune python src/scripts/run_pifu_inference.py \
+--letter-file letter.txt --no-llm-explanation
 """
 
 from __future__ import annotations
@@ -22,6 +25,8 @@ import os
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
+
+import mlflow
 
 # Project Root Setup
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -69,6 +74,13 @@ def parse_args() -> argparse.Namespace:
         "--no-llm-explanation",
         action="store_true",
         help="Skip Pydantic AI narrative generation.",
+    )
+
+    # LLM-as-a-Judge Control
+    parser.add_argument(
+        "--no-llm-judge",
+        action="store_true",
+        help="Skip the LLM-as-a-Judge evaluation stage.",
     )
 
     # Optional Run ID
@@ -143,16 +155,34 @@ def print_final_summary(
 
     # Report Extraction
     prediction = report["prediction"]
+    judge = report["judge"]
 
     # Console Summary
     print()
     print("=" * 68)
     print("PIFU INFERENCE COMPLETE")
     print("=" * 68)
+
     print(f"Prediction : {prediction['predicted_class']}")
+
     print(f"Confidence : {prediction['confidence']:.4f}")
+
     print("Review     : REQUIRED")
+
+    print("Judge      : " + ("PASS" if judge["judge_pass"] else "FAIL"))
+
+    print(f"Faithful   : {judge['explanation_faithfulness']}/5")
+
+    print(f"Grounding  : {judge['evidence_grounding']}/5")
+
+    print(f"Consistency: {judge['prediction_consistency']}/5")
+
+    print(f"Safety     : {judge['safety_compliance']}/5")
+
+    print("Hallucinate: " + ("YES" if judge["hallucination_detected"] else "NO"))
+
     print(f"JSON       : {report['report_json']}")
+
     print(f"Markdown   : {report['report_markdown']}")
 
 
@@ -173,7 +203,23 @@ async def main() -> None:
     run_dir = build_run_directory(run_id)
 
     # Import after CUDA_VISIBLE_DEVICES has been configured.
-    from src.agents.pifu_inference_workflow import build_pifu_inference_graph
+    from src.agents.pifu_inference_workflow import (
+        PIFU_INFERENCE_EXPERIMENT,
+        build_pifu_inference_graph,
+    )
+
+    # MLflow Experiment Setup
+    from src.config.settings import settings
+
+    # MLflow Tracing
+    mlflow.set_tracking_uri(settings.mlflow_tracking_uri)
+
+    mlflow.set_experiment(PIFU_INFERENCE_EXPERIMENT)
+
+    mlflow.langchain.autolog(
+        log_traces=True,
+        run_tracer_inline=True,
+    )
 
     # Graph Execution
     graph = build_pifu_inference_graph()
@@ -184,6 +230,7 @@ async def main() -> None:
                 "run_id": run_id,
                 "run_dir": str(run_dir.resolve()),
                 "use_llm_explanation": not args.no_llm_explanation,
+                "use_llm_judge": (not args.no_llm_judge),
             },
             "text": text,
         }

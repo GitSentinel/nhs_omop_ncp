@@ -149,6 +149,37 @@ class PIFUExplanation(BaseModel):
     evidence_summary: list[str] = Field(default_factory=list)
     limitations: list[str] = Field(default_factory=list)
 
+class PIFUJudgeAssessment(BaseModel):
+    """Structured LLM-as-a-Judge assessment."""
+
+    explanation_faithfulness: int = Field(
+        ge=1,
+        le=5,
+    )
+
+    evidence_grounding: int = Field(
+        ge=1,
+        le=5,
+    )
+
+    prediction_consistency: int = Field(
+        ge=1,
+        le=5,
+    )
+
+    safety_compliance: int = Field(
+        ge=1,
+        le=5,
+    )
+
+    hallucination_detected: bool
+
+    unsupported_claims: list[str] = Field(
+        default_factory=list
+    )
+
+    judge_pass: bool
+    judge_summary: str
 
 class PIFUInferenceReport(BaseModel):
     """Final validated PIFU inference report."""
@@ -168,6 +199,7 @@ class PIFUInferenceReport(BaseModel):
     prediction: PIFUModelPrediction
     safety: PIFUSafetyAssessment
     explanation: PIFUExplanation
+    judge: PIFUJudgeAssessment
 
     classifier_authoritative: bool = True
     research_use_only: bool = True
