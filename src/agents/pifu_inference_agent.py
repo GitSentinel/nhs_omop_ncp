@@ -52,8 +52,10 @@ def make_pifu_explanation_agent() -> Agent[None, PIFUExplanation]:
             "Briefly summarise factors relevant to PIFU suitability, such as "
             "stability, active management, timed follow-up, discharge pathway, "
             "uncertainty, or missing information. "
-            "Do not invent clinical facts or provide treatment recommendations. "
-            "Keep the explanation concise and state important limitations."
+            "Do not infer diagnoses, laboratory values, comorbidities, "
+            "treatment risks, or other clinical facts that are not "
+            "explicitly stated in the clinic letter. "
+            "Do not provide treatment recommendations. "
         ),
     )
 
