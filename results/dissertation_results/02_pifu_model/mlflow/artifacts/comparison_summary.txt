@@ -1,0 +1,19 @@
+Base Model vs Fine-Tuned PIFU Model - Qwen/Qwen3.5-9B
+====================================================================
+Adapter: /home/jacinth/nhs_omop_ncp/data/finetune/qwen35_9b_pifu_lora
+External test: /home/jacinth/nhs_omop_ncp/data/external/fastpifu_cardiology/processed/pifu_external_test_150.json
+Challenge set: /home/jacinth/nhs_omop_ncp/data/external/fastpifu_cardiology/processed/pifu_challenge_24.json
+
+External test
+--------------------------------------------------------------------
+Macro F1: 0.2994 -> 0.9468 (+0.6474)
+Balanced accuracy: 0.3533 -> 0.9467 (+0.5933)
+NOT_ELIGIBLE recall: 0.0600 -> 0.9600 (+0.9000)
+ELIGIBLE precision: 0.3077 -> 0.9796 (+0.6719)
+Unsafe eligible count: 20 -> 0
+
+Challenge set
+--------------------------------------------------------------------
+Macro F1: 0.0635 -> 0.6162 (+0.5527)
+NOT_ELIGIBLE recall: 0.1053 -> 0.7368 (+0.6316)
+Unsafe eligible count: 7 -> 0

@@ -1,0 +1,8 @@
+                  precision    recall  f1-score   support
+
+routine_followup     0.8869    0.6963    0.7801       214
+ treatment_event     0.8492    0.9506    0.8971       385
+
+        accuracy                         0.8598       599
+       macro avg     0.8680    0.8235    0.8386       599
+    weighted avg     0.8627    0.8598    0.8553       599

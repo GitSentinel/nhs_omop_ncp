@@ -1,0 +1,9 @@
+{
+  "mlflow.user": "jacinth",
+  "mlflow.source.name": "src/scripts/evaluate_model.py",
+  "mlflow.source.type": "LOCAL",
+  "mlflow.source.git.commit": "b0942bf7b7358888bbf1221fe302b7ec616dd5e1",
+  "mlflow.source.git.branch": "main",
+  "mlflow.source.git.repoURL": "https://github.com/GitSentinel/nhs_omop_ncp.git",
+  "mlflow.runName": "evaluation_base_vs_finetuned"
+}

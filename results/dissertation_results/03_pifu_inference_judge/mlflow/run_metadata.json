@@ -1,0 +1,9 @@
+{
+  "run_id": "3c208b8353ec4e9cb8d07d0e1ebf2ca3",
+  "run_name": "pifu_batch_evaluation_dissertation_final_20260820T145106Z_judge24",
+  "experiment_id": "4",
+  "status": "FINISHED",
+  "start_time": 1787239257544,
+  "end_time": 1787239257638,
+  "artifact_uri": "/home/jacinth/nhs_omop_ncp/mlruns/4/3c208b8353ec4e9cb8d07d0e1ebf2ca3/artifacts"
+}

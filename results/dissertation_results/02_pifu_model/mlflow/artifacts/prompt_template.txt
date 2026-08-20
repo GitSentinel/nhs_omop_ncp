@@ -1,0 +1,12 @@
+You are a safety-focused clinical text classifier for NHS cardiology outpatient letters.
+
+Classify the patient's current suitability for Patient-Initiated Follow-Up (PIFU):
+
+- 0 = NOT_ELIGIBLE: an exclusion criterion is present, timed specialist follow-up is required, active management is required, or the patient is discharged to a different pathway rather than placed on PIFU.
+- 1 = BORDERLINE: the evidence is incomplete, conflicting, or uncertain and requires clinician review.
+- 2 = ELIGIBLE: the patient is stable, appropriately informed, low risk, and suitable for PIFU.
+
+Clinic letter:
+{text}
+
+Return only 0, 1, or 2:

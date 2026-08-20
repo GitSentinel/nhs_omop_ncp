@@ -1,0 +1,8 @@
+{
+  "base_model": "Qwen/Qwen3.5-9B",
+  "adapter_path": "/home/jacinth/nhs_omop_ncp/data/finetune/qwen35_9b_pifu_lora",
+  "max_length": "512",
+  "n_external_test": "150",
+  "n_challenge": "24",
+  "include_base": "True"
+}

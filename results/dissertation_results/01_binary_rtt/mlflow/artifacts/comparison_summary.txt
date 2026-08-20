@@ -1,0 +1,17 @@
+Base Model vs Fine-Tuned - Qwen/Qwen3.5-9B
+============================================================
+f1                 0.7831 -> 0.8971 (+0.1140)
+macro_f1           0.4864 -> 0.8386 (+0.3522)
+accuracy           0.6578 -> 0.8598 (+0.2020)
+balanced_accuracy  0.5366 -> 0.8235 (+0.2869)
+precision          0.6607 -> 0.8492 (+0.1885)
+recall             0.9610 -> 0.9506 (-0.0104)
+roc_auc            0.6214 -> 0.9547 (+0.3333)
+pr_auc             0.7948 -> 0.9728 (+0.1780)
+
+Dataset: /home/jacinth/nhs_omop_ncp/data/finetune/clinic_letters_azure_labelled.json
+Adapter: /home/jacinth/nhs_omop_ncp/data/finetune/qwen35_9b_qlora_adapter_3epochs_recall_v2
+Minimum validation recall: 0.95Base threshold: 0.222700
+Fine-tuned threshold: 0.531209
+Evaluation batch size: 4
+Text input: full stored clinic letter with token truncation

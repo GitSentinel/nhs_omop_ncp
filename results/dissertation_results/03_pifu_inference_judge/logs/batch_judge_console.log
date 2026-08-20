@@ -1,0 +1,197 @@
+====================================================================
+PIFU INFERENCE-SYSTEM BATCH EVALUATION
+====================================================================
+Model   : Qwen/Qwen3.5-9B
+Adapter : /home/jacinth/nhs_omop_ncp/data/finetune/qwen35_9b_pifu_lora
+GPU     : 0
+
+`torch_dtype` is deprecated! Use `dtype` instead!
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Fetching 4 files:   0%|          | 0/4 [00:00<?, ?it/s]Fetching 4 files: 100%|██████████| 4/4 [00:00<00:00, 3004.52it/s]
+The fast path is not available because one of the required library is not installed. Falling back to torch implementation. To install follow https://github.com/fla-org/flash-linear-attention#installation and https://github.com/Dao-AILab/causal-conv1d
+Loading weights:   0%|          | 0/427 [00:00<?, ?it/s]Loading weights:   0%|          | 1/427 [00:00<02:08,  3.31it/s]Loading weights:   0%|          | 2/427 [00:00<02:21,  3.00it/s]Loading weights:   3%|▎         | 12/427 [00:00<00:18, 22.28it/s]Loading weights:   7%|▋         | 29/427 [00:00<00:07, 53.08it/s]Loading weights:  10%|▉         | 42/427 [00:00<00:05, 69.78it/s]Loading weights:  12%|█▏        | 52/427 [00:01<00:05, 72.01it/s]Loading weights:  15%|█▌        | 66/427 [00:01<00:04, 83.44it/s]Loading weights:  18%|█▊        | 76/427 [00:01<00:04, 87.45it/s]Loading weights:  20%|██        | 86/427 [00:01<00:04, 82.91it/s]Loading weights:  22%|██▏       | 96/427 [00:01<00:04, 75.98it/s]Loading weights:  25%|██▍       | 105/427 [00:01<00:04, 74.65it/s]Loading weights:  28%|██▊       | 119/427 [00:01<00:03, 81.04it/s]Loading weights:  31%|███       | 133/427 [00:02<00:03, 90.43it/s]Loading weights:  34%|███▎      | 144/427 [00:02<00:03, 93.59it/s]Loading weights:  36%|███▌      | 154/427 [00:02<00:03, 79.20it/s]Loading weights:  40%|████      | 171/427 [00:02<00:02, 99.54it/s]Loading weights:  44%|████▎     | 186/427 [00:02<00:02, 104.74it/s]Loading weights:  47%|████▋     | 199/427 [00:02<00:02, 109.24it/s]Loading weights:  49%|████▉     | 211/427 [00:02<00:02, 90.23it/s] Loading weights:  53%|█████▎    | 226/427 [00:02<00:02, 93.95it/s]Loading weights:  56%|█████▌    | 240/427 [00:03<00:01, 103.39it/s]Loading weights:  59%|█████▉    | 253/427 [00:03<00:01, 99.18it/s] Loading weights:  64%|██████▍   | 275/427 [00:03<00:01, 128.02it/s]Loading weights:  68%|██████▊   | 292/427 [00:03<00:00, 136.44it/s]Loading weights:  72%|███████▏  | 307/427 [00:03<00:00, 139.62it/s]Loading weights:  75%|███████▌  | 322/427 [00:03<00:00, 141.10it/s]Loading weights:  79%|███████▉  | 337/427 [00:03<00:00, 142.16it/s]Loading weights:  82%|████████▏ | 352/427 [00:03<00:00, 143.12it/s]Loading weights:  86%|████████▌ | 367/427 [00:04<00:00, 122.77it/s]Loading weights:  90%|█████████ | 385/427 [00:04<00:00, 135.41it/s]Loading weights:  94%|█████████▎| 400/427 [00:04<00:00, 129.27it/s]Loading weights:  97%|█████████▋| 416/427 [00:04<00:00, 136.97it/s]Loading weights: 100%|██████████| 427/427 [00:04<00:00, 95.79it/s] 
+
+--------------------------------------------------------------------
+external_test: 150 cases
+--------------------------------------------------------------------
+PIFU label token sequences: 0=[220, 15], 1=[220, 16], 2=[220, 17]
+2/150 evaluated
+4/150 evaluated
+6/150 evaluated
+8/150 evaluated
+10/150 evaluated
+12/150 evaluated
+14/150 evaluated
+16/150 evaluated
+18/150 evaluated
+20/150 evaluated
+22/150 evaluated
+24/150 evaluated
+26/150 evaluated
+28/150 evaluated
+30/150 evaluated
+32/150 evaluated
+34/150 evaluated
+36/150 evaluated
+38/150 evaluated
+40/150 evaluated
+42/150 evaluated
+44/150 evaluated
+46/150 evaluated
+48/150 evaluated
+50/150 evaluated
+52/150 evaluated
+54/150 evaluated
+56/150 evaluated
+58/150 evaluated
+60/150 evaluated
+62/150 evaluated
+64/150 evaluated
+66/150 evaluated
+68/150 evaluated
+70/150 evaluated
+72/150 evaluated
+74/150 evaluated
+76/150 evaluated
+78/150 evaluated
+80/150 evaluated
+82/150 evaluated
+84/150 evaluated
+86/150 evaluated
+88/150 evaluated
+90/150 evaluated
+92/150 evaluated
+94/150 evaluated
+96/150 evaluated
+98/150 evaluated
+100/150 evaluated
+102/150 evaluated
+104/150 evaluated
+106/150 evaluated
+108/150 evaluated
+110/150 evaluated
+112/150 evaluated
+114/150 evaluated
+116/150 evaluated
+118/150 evaluated
+120/150 evaluated
+122/150 evaluated
+124/150 evaluated
+126/150 evaluated
+128/150 evaluated
+130/150 evaluated
+132/150 evaluated
+134/150 evaluated
+136/150 evaluated
+138/150 evaluated
+140/150 evaluated
+142/150 evaluated
+144/150 evaluated
+146/150 evaluated
+148/150 evaluated
+150/150 evaluated
+
+Accuracy            : 0.9467
+Macro F1            : 0.9468
+NOT_ELIGIBLE recall : 0.9600
+ELIGIBLE precision  : 0.9796
+Unsafe eligible     : 0
+Safety flag rate    : 0.3600
+
+--------------------------------------------------------------------
+challenge: 24 cases
+--------------------------------------------------------------------
+PIFU label token sequences: 0=[220, 15], 1=[220, 16], 2=[220, 17]
+2/24 evaluated
+4/24 evaluated
+6/24 evaluated
+8/24 evaluated
+10/24 evaluated
+12/24 evaluated
+14/24 evaluated
+16/24 evaluated
+18/24 evaluated
+20/24 evaluated
+22/24 evaluated
+24/24 evaluated
+/home/jacinth/nhs_omop_ncp/.venv/lib/python3.11/site-packages/sklearn/metrics/_classification.py:2939: UserWarning: y_pred contains classes not in y_true
+  warnings.warn("y_pred contains classes not in y_true")
+
+Accuracy            : 0.7917
+Macro F1            : 0.6162
+NOT_ELIGIBLE recall : 0.7368
+ELIGIBLE precision  : 1.0000
+Unsafe eligible     : 0
+Safety flag rate    : 0.2500
+
+====================================================================
+PIFU EXPLANATION + LLM-AS-A-JUDGE
+====================================================================
+Selected cases: 24
+[01/24] external_test | eval_267 | NOT_ELIGIBLE
+[02/24] external_test | eval_387 | NOT_ELIGIBLE
+[03/24] external_test | eval_714 | ELIGIBLE
+[04/24] challenge | HN_POTS_PARTIAL_710 | BORDERLINE
+[05/24] challenge | HN_HF_POSTADMIT_605 | BORDERLINE
+[06/24] external_test | eval_2124 | BORDERLINE
+[07/24] challenge | HN_HF_ARNI_EGF_374 | BORDERLINE
+[08/24] external_test | eval_507 | NOT_ELIGIBLE
+[09/24] external_test | eval_3115 | NOT_ELIGIBLE
+[10/24] external_test | eval_2715 | BORDERLINE
+[11/24] challenge | HN_AF_AMIO_559 | BORDERLINE
+[12/24] challenge | HN_VD_MR_LVD_463 | BORDERLINE
+[13/24] challenge | HN_HF_NONCOMPLIANT_242 | NOT_ELIGIBLE
+[14/24] challenge | CS_EC_HCM_PIFU_849 | ELIGIBLE
+[15/24] external_test | eval_2040 | NOT_ELIGIBLE
+[16/24] external_test | eval_647 | BORDERLINE
+[17/24] external_test | eval_3947 | ELIGIBLE
+[18/24] challenge | HN_VD_WARF_488 | NOT_ELIGIBLE
+[19/24] challenge | CS_EC_WPW_PIFU_745 | ELIGIBLE
+[20/24] external_test | eval_1075 | NOT_ELIGIBLE
+[21/24] external_test | eval_935 | BORDERLINE
+[22/24] external_test | eval_3821 | ELIGIBLE
+[23/24] challenge | CS_EC_HTN_DISC_577 | NOT_ELIGIBLE
+[24/24] challenge | CS_EC_IHD_PIFU_720 | ELIGIBLE
+
+LLM-AS-A-JUDGE SUMMARY
+--------------------------------------------------------------------
+Selected cases      : 24
+Judge available     : 24
+Judge pass rate     : 0.8333
+Hallucination rate  : 0.1667
+Mean faithfulness   : 4.7917
+Mean grounding      : 4.8333
+Mean consistency    : 5.0000
+Mean safety         : 5.0000
+
+====================================================================
+BATCH EVALUATION COMPLETE
+====================================================================
+Output directory: /home/jacinth/nhs_omop_ncp/data/evaluations/pifu_inference_agent/dissertation_final_20260820T145106Z_judge24
+Summary JSON    : /home/jacinth/nhs_omop_ncp/data/evaluations/pifu_inference_agent/dissertation_final_20260820T145106Z_judge24/combined_summary.json
+Summary Markdown: /home/jacinth/nhs_omop_ncp/data/evaluations/pifu_inference_agent/dissertation_final_20260820T145106Z_judge24/combined_summary.md
+Judge cases CSV : /home/jacinth/nhs_omop_ncp/data/evaluations/pifu_inference_agent/dissertation_final_20260820T145106Z_judge24/llm_judge_cases.csv
+Judge summary   : /home/jacinth/nhs_omop_ncp/data/evaluations/pifu_inference_agent/dissertation_final_20260820T145106Z_judge24/llm_judge_summary.json
+	Command being timed: "uv run --extra finetune python -u src/scripts/evaluate_pifu_inference_agent.py --gpu 0 --batch-size 2 --judge-sample-size 24 --run-id dissertation_final_20260820T145106Z_judge24"
+	User time (seconds): 373.75
+	System time (seconds): 7.96
+	Percent of CPU this job got: 41%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 15:20.58
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 18794944
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 774470
+	Voluntary context switches: 56951
+	Involuntary context switches: 160737
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 2112
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

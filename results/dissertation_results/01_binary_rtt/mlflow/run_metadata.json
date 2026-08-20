@@ -1,0 +1,9 @@
+{
+  "run_id": "8c6d62fd78bd44ceb1069523b3595fc3",
+  "run_name": "evaluation_base_vs_finetuned",
+  "experiment_id": "1",
+  "status": "FINISHED",
+  "start_time": 1787238028181,
+  "end_time": 1787238028428,
+  "artifact_uri": "/home/jacinth/nhs_omop_ncp/mlruns/1/8c6d62fd78bd44ceb1069523b3595fc3/artifacts"
+}

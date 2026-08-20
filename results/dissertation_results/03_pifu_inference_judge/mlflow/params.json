@@ -1,0 +1,13 @@
+{
+  "run_id": "dissertation_final_20260820T145106Z_judge24",
+  "model": "Qwen/Qwen3.5-9B",
+  "adapter": "/home/jacinth/nhs_omop_ncp/data/finetune/qwen35_9b_pifu_lora",
+  "gpu": "0",
+  "batch_size": "2",
+  "confidence_threshold": "0.8",
+  "margin_threshold": "0.15",
+  "judge_sample_size_requested": "24",
+  "judge_sample_size_selected": "24",
+  "use_llm_explanation": "True",
+  "use_llm_judge": "True"
+}

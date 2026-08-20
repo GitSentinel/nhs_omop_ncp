@@ -1,0 +1,347 @@
+====================================================================
+FASTPIFU MODEL EVALUATION
+====================================================================
+Base model     : Qwen/Qwen3.5-9B
+Adapter        : /home/jacinth/nhs_omop_ncp/data/finetune/qwen35_9b_pifu_lora
+External test  : 150
+Challenge test : 24
+
+========================================
+Evaluating BASE model...
+========================================
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+`torch_dtype` is deprecated! Use `dtype` instead!
+Fetching 4 files:   0%|          | 0/4 [00:00<?, ?it/s]Fetching 4 files: 100%|██████████| 4/4 [00:00<00:00, 5029.14it/s]
+The fast path is not available because one of the required library is not installed. Falling back to torch implementation. To install follow https://github.com/fla-org/flash-linear-attention#installation and https://github.com/Dao-AILab/causal-conv1d
+Loading weights:   0%|          | 0/427 [00:00<?, ?it/s]Loading weights:   0%|          | 1/427 [00:00<02:36,  2.72it/s]Loading weights:   0%|          | 2/427 [00:00<03:14,  2.19it/s]Loading weights:   4%|▎         | 15/427 [00:01<00:19, 21.31it/s]Loading weights:   7%|▋         | 29/427 [00:01<00:09, 40.70it/s]Loading weights:  10%|█         | 43/427 [00:01<00:06, 57.77it/s]Loading weights:  12%|█▏        | 53/427 [00:01<00:06, 60.67it/s]Loading weights:  15%|█▌        | 66/427 [00:01<00:05, 69.27it/s]Loading weights:  18%|█▊        | 75/427 [00:01<00:05, 69.70it/s]Loading weights:  20%|█▉        | 84/427 [00:01<00:05, 65.70it/s]Loading weights:  22%|██▏       | 95/427 [00:01<00:04, 71.51it/s]Loading weights:  24%|██▍       | 103/427 [00:02<00:04, 68.87it/s]Loading weights:  28%|██▊       | 119/427 [00:02<00:03, 87.17it/s]Loading weights:  30%|███       | 130/427 [00:02<00:03, 80.00it/s]Loading weights:  34%|███▍      | 147/427 [00:02<00:02, 99.57it/s]Loading weights:  37%|███▋      | 158/427 [00:02<00:02, 93.49it/s]Loading weights:  41%|████      | 173/427 [00:02<00:02, 106.21it/s]Loading weights:  44%|████▍     | 187/427 [00:02<00:02, 114.51it/s]Loading weights:  47%|████▋     | 201/427 [00:02<00:01, 115.62it/s]Loading weights:  50%|████▉     | 213/427 [00:03<00:02, 105.87it/s]Loading weights:  53%|█████▎    | 227/427 [00:03<00:01, 108.30it/s]Loading weights:  56%|█████▋    | 241/427 [00:03<00:01, 113.08it/s]Loading weights:  60%|█████▉    | 255/427 [00:03<00:01, 117.06it/s]Loading weights:  63%|██████▎   | 267/427 [00:03<00:01, 113.05it/s]Loading weights:  65%|██████▌   | 279/427 [00:03<00:01, 107.17it/s]Loading weights:  69%|██████▉   | 294/427 [00:03<00:01, 115.88it/s]Loading weights:  72%|███████▏  | 307/427 [00:03<00:01, 114.66it/s]Loading weights:  75%|███████▍  | 319/427 [00:04<00:00, 109.39it/s]Loading weights:  78%|███████▊  | 332/427 [00:04<00:00, 112.02it/s]Loading weights:  81%|████████  | 344/427 [00:04<00:00, 103.85it/s]Loading weights:  84%|████████▍ | 359/427 [00:04<00:00, 112.24it/s]Loading weights:  87%|████████▋ | 371/427 [00:04<00:00, 96.60it/s] Loading weights:  90%|█████████ | 385/427 [00:04<00:00, 99.88it/s]Loading weights:  93%|█████████▎| 398/427 [00:04<00:00, 103.78it/s]Loading weights:  96%|█████████▌| 409/427 [00:04<00:00, 94.26it/s] Loading weights:  98%|█████████▊| 419/427 [00:05<00:00, 81.97it/s]Loading weights: 100%|██████████| 427/427 [00:05<00:00, 83.30it/s]
+PIFU label token sequences: 0=[220, 15], 1=[220, 16], 2=[220, 17]
+2/150 evaluated
+4/150 evaluated
+6/150 evaluated
+8/150 evaluated
+10/150 evaluated
+12/150 evaluated
+14/150 evaluated
+16/150 evaluated
+18/150 evaluated
+20/150 evaluated
+22/150 evaluated
+24/150 evaluated
+26/150 evaluated
+28/150 evaluated
+30/150 evaluated
+32/150 evaluated
+34/150 evaluated
+36/150 evaluated
+38/150 evaluated
+40/150 evaluated
+42/150 evaluated
+44/150 evaluated
+46/150 evaluated
+48/150 evaluated
+50/150 evaluated
+52/150 evaluated
+54/150 evaluated
+56/150 evaluated
+58/150 evaluated
+60/150 evaluated
+62/150 evaluated
+64/150 evaluated
+66/150 evaluated
+68/150 evaluated
+70/150 evaluated
+72/150 evaluated
+74/150 evaluated
+76/150 evaluated
+78/150 evaluated
+80/150 evaluated
+82/150 evaluated
+84/150 evaluated
+86/150 evaluated
+88/150 evaluated
+90/150 evaluated
+92/150 evaluated
+94/150 evaluated
+96/150 evaluated
+98/150 evaluated
+100/150 evaluated
+102/150 evaluated
+104/150 evaluated
+106/150 evaluated
+108/150 evaluated
+110/150 evaluated
+112/150 evaluated
+114/150 evaluated
+116/150 evaluated
+118/150 evaluated
+120/150 evaluated
+122/150 evaluated
+124/150 evaluated
+126/150 evaluated
+128/150 evaluated
+130/150 evaluated
+132/150 evaluated
+134/150 evaluated
+136/150 evaluated
+138/150 evaluated
+140/150 evaluated
+142/150 evaluated
+144/150 evaluated
+146/150 evaluated
+148/150 evaluated
+150/150 evaluated
+
+====================================================================
+BASE MODEL - EXTERNAL TEST
+====================================================================
+Accuracy            : 0.3533
+Balanced accuracy   : 0.3533
+Macro F1            : 0.2994
+NOT_ELIGIBLE recall : 0.0600
+ELIGIBLE precision  : 0.3077
+Unsafe eligible     : 20 (0.4000)
+Manual review rate  : 0.6200
+Confusion matrix    : [[3, 27, 20], [0, 34, 16], [2, 32, 16]]
+              precision    recall  f1-score   support
+
+NOT_ELIGIBLE     0.6000    0.0600    0.1091        50
+  BORDERLINE     0.3656    0.6800    0.4755        50
+    ELIGIBLE     0.3077    0.3200    0.3137        50
+
+    accuracy                         0.3533       150
+   macro avg     0.4244    0.3533    0.2994       150
+weighted avg     0.4244    0.3533    0.2994       150
+
+Metrics saved     : /home/jacinth/nhs_omop_ncp/data/evaluations/pifu_cardiology/base_external_test_metrics.json
+Predictions saved : /home/jacinth/nhs_omop_ncp/data/evaluations/pifu_cardiology/base_external_test_predictions.csv
+PIFU label token sequences: 0=[220, 15], 1=[220, 16], 2=[220, 17]
+2/24 evaluated
+4/24 evaluated
+6/24 evaluated
+8/24 evaluated
+10/24 evaluated
+12/24 evaluated
+14/24 evaluated
+16/24 evaluated
+18/24 evaluated
+20/24 evaluated
+22/24 evaluated
+24/24 evaluated
+/home/jacinth/nhs_omop_ncp/.venv/lib/python3.11/site-packages/sklearn/metrics/_classification.py:2939: UserWarning: y_pred contains classes not in y_true
+  warnings.warn("y_pred contains classes not in y_true")
+
+====================================================================
+BASE MODEL - CHALLENGE TEST
+====================================================================
+Accuracy            : 0.0833
+Balanced accuracy   : 0.0526
+Macro F1            : 0.0635
+NOT_ELIGIBLE recall : 0.1053
+ELIGIBLE precision  : 0.0000
+Unsafe eligible     : 7 (0.3684)
+Manual review rate  : 0.6250
+Confusion matrix    : [[2, 10, 7], [0, 0, 0], [0, 5, 0]]
+              precision    recall  f1-score   support
+
+NOT_ELIGIBLE     1.0000    0.1053    0.1905        19
+  BORDERLINE     0.0000    0.0000    0.0000         0
+    ELIGIBLE     0.0000    0.0000    0.0000         5
+
+    accuracy                         0.0833        24
+   macro avg     0.3333    0.0351    0.0635        24
+weighted avg     0.7917    0.0833    0.1508        24
+
+Metrics saved     : /home/jacinth/nhs_omop_ncp/data/evaluations/pifu_cardiology/base_challenge_metrics.json
+Predictions saved : /home/jacinth/nhs_omop_ncp/data/evaluations/pifu_cardiology/base_challenge_predictions.csv
+Base model unloaded.
+
+========================================
+Evaluating FINE-TUNED PIFU model...
+========================================
+Fetching 4 files:   0%|          | 0/4 [00:00<?, ?it/s]Fetching 4 files: 100%|██████████| 4/4 [00:00<00:00, 39383.14it/s]
+Loading weights:   0%|          | 0/427 [00:00<?, ?it/s]Loading weights:   0%|          | 1/427 [00:00<02:22,  2.99it/s]Loading weights:   0%|          | 2/427 [00:00<02:35,  2.73it/s]Loading weights:   3%|▎         | 13/427 [00:00<00:18, 22.68it/s]Loading weights:   7%|▋         | 29/427 [00:00<00:08, 49.61it/s]Loading weights:  10%|█         | 43/427 [00:01<00:05, 68.25it/s]Loading weights:  12%|█▏        | 53/427 [00:01<00:05, 72.14it/s]Loading weights:  15%|█▌        | 66/427 [00:01<00:04, 84.41it/s]Loading weights:  18%|█▊        | 77/427 [00:01<00:05, 69.08it/s]Loading weights:  22%|██▏       | 93/427 [00:01<00:03, 85.22it/s]Loading weights:  24%|██▍       | 104/427 [00:01<00:04, 79.00it/s]Loading weights:  28%|██▊       | 118/427 [00:01<00:03, 91.48it/s]Loading weights:  30%|███       | 129/427 [00:02<00:03, 94.44it/s]Loading weights:  33%|███▎      | 140/427 [00:02<00:02, 97.30it/s]Loading weights:  35%|███▌      | 151/427 [00:02<00:02, 95.53it/s]Loading weights:  38%|███▊      | 162/427 [00:02<00:02, 94.74it/s]Loading weights:  41%|████      | 174/427 [00:02<00:02, 99.68it/s]Loading weights:  44%|████▍     | 188/427 [00:02<00:02, 108.21it/s]Loading weights:  47%|████▋     | 202/427 [00:02<00:01, 113.37it/s]Loading weights:  52%|█████▏    | 221/427 [00:02<00:01, 129.30it/s]Loading weights:  56%|█████▌    | 237/427 [00:02<00:01, 136.54it/s]Loading weights:  59%|█████▉    | 251/427 [00:03<00:01, 129.50it/s]Loading weights:  62%|██████▏   | 265/427 [00:03<00:01, 119.19it/s]Loading weights:  65%|██████▌   | 279/427 [00:03<00:01, 122.95it/s]Loading weights:  69%|██████▉   | 294/427 [00:03<00:01, 125.16it/s]Loading weights:  72%|███████▏  | 308/427 [00:03<00:00, 126.24it/s]Loading weights:  75%|███████▌  | 321/427 [00:03<00:00, 123.60it/s]Loading weights:  78%|███████▊  | 335/427 [00:03<00:00, 127.56it/s]Loading weights:  81%|████████▏ | 348/427 [00:03<00:00, 124.42it/s]Loading weights:  85%|████████▍ | 361/427 [00:03<00:00, 120.13it/s]Loading weights:  88%|████████▊ | 374/427 [00:04<00:00, 116.24it/s]Loading weights:  90%|█████████ | 386/427 [00:04<00:00, 112.65it/s]Loading weights:  94%|█████████▎| 400/427 [00:04<00:00, 117.18it/s]Loading weights:  97%|█████████▋| 414/427 [00:04<00:00, 122.79it/s]Loading weights: 100%|██████████| 427/427 [00:04<00:00, 95.60it/s] 
+PIFU label token sequences: 0=[220, 15], 1=[220, 16], 2=[220, 17]
+2/150 evaluated
+4/150 evaluated
+6/150 evaluated
+8/150 evaluated
+10/150 evaluated
+12/150 evaluated
+14/150 evaluated
+16/150 evaluated
+18/150 evaluated
+20/150 evaluated
+22/150 evaluated
+24/150 evaluated
+26/150 evaluated
+28/150 evaluated
+30/150 evaluated
+32/150 evaluated
+34/150 evaluated
+36/150 evaluated
+38/150 evaluated
+40/150 evaluated
+42/150 evaluated
+44/150 evaluated
+46/150 evaluated
+48/150 evaluated
+50/150 evaluated
+52/150 evaluated
+54/150 evaluated
+56/150 evaluated
+58/150 evaluated
+60/150 evaluated
+62/150 evaluated
+64/150 evaluated
+66/150 evaluated
+68/150 evaluated
+70/150 evaluated
+72/150 evaluated
+74/150 evaluated
+76/150 evaluated
+78/150 evaluated
+80/150 evaluated
+82/150 evaluated
+84/150 evaluated
+86/150 evaluated
+88/150 evaluated
+90/150 evaluated
+92/150 evaluated
+94/150 evaluated
+96/150 evaluated
+98/150 evaluated
+100/150 evaluated
+102/150 evaluated
+104/150 evaluated
+106/150 evaluated
+108/150 evaluated
+110/150 evaluated
+112/150 evaluated
+114/150 evaluated
+116/150 evaluated
+118/150 evaluated
+120/150 evaluated
+122/150 evaluated
+124/150 evaluated
+126/150 evaluated
+128/150 evaluated
+130/150 evaluated
+132/150 evaluated
+134/150 evaluated
+136/150 evaluated
+138/150 evaluated
+140/150 evaluated
+142/150 evaluated
+144/150 evaluated
+146/150 evaluated
+148/150 evaluated
+150/150 evaluated
+
+====================================================================
+FINE-TUNED MODEL - EXTERNAL TEST
+====================================================================
+Accuracy            : 0.9467
+Balanced accuracy   : 0.9467
+Macro F1            : 0.9468
+NOT_ELIGIBLE recall : 0.9600
+ELIGIBLE precision  : 0.9796
+Unsafe eligible     : 0 (0.0000)
+Manual review rate  : 0.3200
+Confusion matrix    : [[48, 2, 0], [3, 46, 1], [2, 0, 48]]
+              precision    recall  f1-score   support
+
+NOT_ELIGIBLE     0.9057    0.9600    0.9320        50
+  BORDERLINE     0.9583    0.9200    0.9388        50
+    ELIGIBLE     0.9796    0.9600    0.9697        50
+
+    accuracy                         0.9467       150
+   macro avg     0.9479    0.9467    0.9468       150
+weighted avg     0.9479    0.9467    0.9468       150
+
+Metrics saved     : /home/jacinth/nhs_omop_ncp/data/evaluations/pifu_cardiology/finetuned_external_test_metrics.json
+Predictions saved : /home/jacinth/nhs_omop_ncp/data/evaluations/pifu_cardiology/finetuned_external_test_predictions.csv
+PIFU label token sequences: 0=[220, 15], 1=[220, 16], 2=[220, 17]
+2/24 evaluated
+4/24 evaluated
+6/24 evaluated
+8/24 evaluated
+10/24 evaluated
+12/24 evaluated
+14/24 evaluated
+16/24 evaluated
+18/24 evaluated
+20/24 evaluated
+22/24 evaluated
+24/24 evaluated
+/home/jacinth/nhs_omop_ncp/.venv/lib/python3.11/site-packages/sklearn/metrics/_classification.py:2939: UserWarning: y_pred contains classes not in y_true
+  warnings.warn("y_pred contains classes not in y_true")
+
+====================================================================
+FINE-TUNED MODEL - CHALLENGE TEST
+====================================================================
+Accuracy            : 0.7917
+Balanced accuracy   : 0.8684
+Macro F1            : 0.6162
+NOT_ELIGIBLE recall : 0.7368
+ELIGIBLE precision  : 1.0000
+Unsafe eligible     : 0 (0.0000)
+Manual review rate  : 0.2083
+Confusion matrix    : [[14, 5, 0], [0, 0, 0], [0, 0, 5]]
+              precision    recall  f1-score   support
+
+NOT_ELIGIBLE     1.0000    0.7368    0.8485        19
+  BORDERLINE     0.0000    0.0000    0.0000         0
+    ELIGIBLE     1.0000    1.0000    1.0000         5
+
+    accuracy                         0.7917        24
+   macro avg     0.6667    0.5789    0.6162        24
+weighted avg     1.0000    0.7917    0.8801        24
+
+Metrics saved     : /home/jacinth/nhs_omop_ncp/data/evaluations/pifu_cardiology/finetuned_challenge_metrics.json
+Predictions saved : /home/jacinth/nhs_omop_ncp/data/evaluations/pifu_cardiology/finetuned_challenge_predictions.csv
+
+====================================================================
+COMPARISON: BASE VS FINE-TUNED
+====================================================================
+Base Model vs Fine-Tuned PIFU Model - Qwen/Qwen3.5-9B
+====================================================================
+Adapter: /home/jacinth/nhs_omop_ncp/data/finetune/qwen35_9b_pifu_lora
+External test: /home/jacinth/nhs_omop_ncp/data/external/fastpifu_cardiology/processed/pifu_external_test_150.json
+Challenge set: /home/jacinth/nhs_omop_ncp/data/external/fastpifu_cardiology/processed/pifu_challenge_24.json
+
+External test
+--------------------------------------------------------------------
+Macro F1: 0.2994 -> 0.9468 (+0.6474)
+Balanced accuracy: 0.3533 -> 0.9467 (+0.5933)
+NOT_ELIGIBLE recall: 0.0600 -> 0.9600 (+0.9000)
+ELIGIBLE precision: 0.3077 -> 0.9796 (+0.6719)
+Unsafe eligible count: 20 -> 0
+
+Challenge set
+--------------------------------------------------------------------
+Macro F1: 0.0635 -> 0.6162 (+0.5527)
+NOT_ELIGIBLE recall: 0.1053 -> 0.7368 (+0.6316)
+Unsafe eligible count: 7 -> 0
+	Command being timed: "uv run --extra finetune python -u src/scripts/evaluate_pifu.py"
+	User time (seconds): 686.07
+	System time (seconds): 12.14
+	Percent of CPU this job got: 475%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 2:26.97
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 19669452
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 1123706
+	Voluntary context switches: 78031
+	Involuntary context switches: 313074
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 2960
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

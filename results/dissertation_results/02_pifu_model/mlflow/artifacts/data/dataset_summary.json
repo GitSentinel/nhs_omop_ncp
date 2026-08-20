@@ -1,0 +1,29 @@
+{
+  "source_zip": "/home/jacinth/nhs_omop_ncp/data/external/fastpifu_cardiology/raw/fastpifu-cardiology.zip",
+  "raw_training_rows": 5000,
+  "external_test_rows": 150,
+  "external_test_rows_removed_from_training": 150,
+  "training_pool_after_leakage_removal": 4850,
+  "train_rows": 4365,
+  "validation_rows": 485,
+  "challenge_rows": 24,
+  "train_class_counts": {
+    "NOT_ELIGIBLE": 1755,
+    "ELIGIBLE": 1755,
+    "BORDERLINE": 855
+  },
+  "validation_class_counts": {
+    "BORDERLINE": 95,
+    "NOT_ELIGIBLE": 195,
+    "ELIGIBLE": 195
+  },
+  "external_test_class_counts": {
+    "ELIGIBLE": 50,
+    "NOT_ELIGIBLE": 50,
+    "BORDERLINE": 50
+  },
+  "challenge_class_counts": {
+    "ELIGIBLE": 5,
+    "NOT_ELIGIBLE": 19
+  }
+}

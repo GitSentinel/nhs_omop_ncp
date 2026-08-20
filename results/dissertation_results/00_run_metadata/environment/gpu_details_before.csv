@@ -1,0 +1,4 @@
+index, name, driver_version, memory.total [MiB], memory.used [MiB], utilization.gpu [%]
+0, NVIDIA L40S, 590.48.01, 46068 MiB, 0 MiB, 0 %
+1, NVIDIA L40S, 590.48.01, 46068 MiB, 42639 MiB, 0 %
+2, NVIDIA L40S, 590.48.01, 46068 MiB, 42639 MiB, 0 %

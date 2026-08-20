@@ -1,0 +1,13 @@
+{
+  "base_model": "Qwen/Qwen3.5-9B",
+  "adapter_path": "/home/jacinth/nhs_omop_ncp/data/finetune/qwen35_9b_qlora_adapter_3epochs_recall_v2",
+  "n_validation_samples": "301",
+  "n_test_samples": "599",
+  "dataset": "/home/jacinth/nhs_omop_ncp/data/finetune/clinic_letters_azure_labelled.json",
+  "minimum_validation_recall": "0.95",
+  "base_threshold": "0.2227000594139099",
+  "finetuned_threshold": "0.531209409236908",
+  "eval_batch_size": "4",
+  "scoring_method": "exact_label_sequence_log_probability",
+  "threshold_selection": "max_precision_at_minimum_recall"
+}

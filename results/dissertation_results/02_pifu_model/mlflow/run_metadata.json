@@ -1,0 +1,9 @@
+{
+  "run_id": "f015b63af2134e5e849ca20128226ef4",
+  "run_name": "evaluation_pifu_base_vs_finetuned",
+  "experiment_id": "2",
+  "status": "FINISHED",
+  "start_time": 1787238208014,
+  "end_time": 1787238208263,
+  "artifact_uri": "/home/jacinth/nhs_omop_ncp/mlruns/2/f015b63af2134e5e849ca20128226ef4/artifacts"
+}

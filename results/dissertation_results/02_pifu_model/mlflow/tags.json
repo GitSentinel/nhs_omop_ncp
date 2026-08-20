@@ -1,0 +1,14 @@
+{
+  "mlflow.user": "jacinth",
+  "mlflow.source.name": "src/scripts/evaluate_pifu.py",
+  "mlflow.source.type": "LOCAL",
+  "mlflow.source.git.commit": "b0942bf7b7358888bbf1221fe302b7ec616dd5e1",
+  "mlflow.source.git.branch": "main",
+  "mlflow.source.git.repoURL": "https://github.com/GitSentinel/nhs_omop_ncp.git",
+  "task": "pifu_eligibility_3class",
+  "dataset": "fastpifu_cardiology",
+  "base_model": "Qwen/Qwen3.5-9B",
+  "adapter": "/home/jacinth/nhs_omop_ncp/data/finetune/qwen35_9b_pifu_lora",
+  "comparison_protocol": "same_as_original_letters",
+  "mlflow.runName": "evaluation_pifu_base_vs_finetuned"
+}

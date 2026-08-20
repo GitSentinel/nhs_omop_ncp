@@ -1,0 +1,15 @@
+{
+  "selected_case_count": 24,
+  "explanation_available_count": 24,
+  "explanation_coverage_rate": 1.0,
+  "judge_available_count": 24,
+  "judge_unavailable_count": 0,
+  "judge_coverage_rate": 1.0,
+  "judge_pass_rate": 0.8333333333333334,
+  "judge_hallucination_rate": 0.16666666666666666,
+  "unsupported_claim_rate": 0.16666666666666666,
+  "mean_judge_faithfulness": 4.791666666666667,
+  "mean_judge_grounding": 4.833333333333333,
+  "mean_judge_prediction_consistency": 5.0,
+  "mean_judge_safety": 5.0
+}

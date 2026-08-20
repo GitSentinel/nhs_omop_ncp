@@ -1,0 +1,14 @@
+{
+  "mlflow.user": "jacinth",
+  "mlflow.source.name": "src/scripts/evaluate_pifu_inference_agent.py",
+  "mlflow.source.type": "LOCAL",
+  "mlflow.source.git.commit": "b0942bf7b7358888bbf1221fe302b7ec616dd5e1",
+  "mlflow.source.git.branch": "main",
+  "mlflow.source.git.repoURL": "https://github.com/GitSentinel/nhs_omop_ncp.git",
+  "task": "pifu_inference_batch",
+  "run_type": "quantitative_plus_judge_evaluation",
+  "synthetic_data_only": "true",
+  "human_review_required": "true",
+  "llm_explanation_enabled": "explanation_quality",
+  "mlflow.runName": "pifu_batch_evaluation_dissertation_final_20260820T145106Z_judge24"
+}
