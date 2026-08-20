@@ -15,6 +15,7 @@ uv run --extra finetune python src/scripts/evaluate_pifu_inference_agent.py \
 from __future__ import annotations
 
 import argparse
+import asyncio
 import csv
 import gc
 import hashlib
@@ -24,6 +25,7 @@ import os
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 # Experiment Tracking
 import mlflow
@@ -75,6 +77,29 @@ def parse_args() -> argparse.Namespace:
     )
 
     parser.add_argument(
+        "--judge-sample-size",
+        type=int,
+        default=24,
+        help=(
+            "Number of cases selected across external and challenge splits "
+            "for explanation and LLM-as-a-Judge evaluation. "
+            "Use 0 to skip judge evaluation."
+        ),
+    )
+
+    parser.add_argument(
+        "--no-llm-explanation",
+        action="store_true",
+        help="Disable LLM explanation generation for the judge subset.",
+    )
+
+    parser.add_argument(
+        "--no-llm-judge",
+        action="store_true",
+        help="Disable LLM-as-a-Judge evaluation for the selected subset.",
+    )
+
+    parser.add_argument(
         "--run-id",
         default=None,
         help="Optional evaluation run identifier.",
@@ -84,6 +109,9 @@ def parse_args() -> argparse.Namespace:
 
     if args.batch_size < 1:
         raise ValueError("--batch-size must be at least 1.")
+
+    if args.judge_sample_size < 0:
+        raise ValueError("--judge-sample-size must be zero or greater.")
 
     return args
 
@@ -380,6 +408,201 @@ def build_case_prediction_row(
     }
 
 
+def judge_case_sort_key(
+    record: dict[str, Any],
+) -> tuple:
+    """Return deterministic ordering for judge-case selection."""
+
+    row = record["row"]
+
+    return (
+        float(row["confidence"]),
+        float(row["top_two_margin"]),
+        str(row["split"]),
+        str(row.get("sample_id") or ""),
+    )
+
+
+def select_judge_cases(
+    records: list[dict[str, Any]],
+    sample_size: int,
+) -> list[dict[str, Any]]:
+    """Select representative difficult cases for explanation judging."""
+
+    if sample_size <= 0 or not records:
+        return []
+
+    target = min(
+        sample_size,
+        len(records),
+    )
+
+    selected: list[dict[str, Any]] = []
+    selected_ids: set[int] = set()
+
+    def add_case(
+        record: dict[str, Any],
+        reason: str,
+    ) -> bool:
+        """Add one case once."""
+
+        if len(selected) >= target:
+            return False
+
+        record_id = id(record)
+
+        if record_id in selected_ids:
+            return False
+
+        selected_ids.add(record_id)
+
+        selected.append(
+            {
+                **record,
+                "selection_reason": reason,
+            }
+        )
+
+        return True
+
+    # Reserve around half of the subset for difficult cases.
+    priority_limit = max(
+        1,
+        target // 2,
+    )
+
+    priority_cases = [
+        record
+        for record in records
+        if (
+            not record["row"]["correct"]
+            or bool(record["safety"].flags)
+            or int(record["row"]["predicted_label"]) == 1
+        )
+    ]
+
+    priority_cases.sort(
+        key=lambda record: (
+            bool(record["row"]["correct"]),
+            -int(record["row"]["safety_flag_count"]),
+            *judge_case_sort_key(record),
+        )
+    )
+
+    for record in priority_cases:
+        if len(selected) >= priority_limit:
+            break
+
+        if not record["row"]["correct"]:
+            reason = "misclassified_priority"
+
+        elif record["safety"].flags:
+            reason = "safety_flag_priority"
+
+        else:
+            reason = "borderline_priority"
+
+        add_case(
+            record,
+            reason,
+        )
+
+    # Fill remaining slots with a balanced selection across splits and classes
+    buckets: dict[
+        tuple[str, int],
+        list[dict[str, Any]],
+    ] = {}
+
+    for record in records:
+        key = (
+            str(record["row"]["split"]),
+            int(record["row"]["predicted_label"]),
+        )
+
+        buckets.setdefault(
+            key,
+            [],
+        ).append(record)
+
+    for bucket in buckets.values():
+        bucket.sort(key=judge_case_sort_key)
+
+    bucket_keys = sorted(buckets)
+
+    positions = {key: 0 for key in bucket_keys}
+
+    while len(selected) < target:
+        made_progress = False
+
+        for key in bucket_keys:
+            bucket = buckets[key]
+
+            position = positions[key]
+
+            while position < len(bucket) and id(bucket[position]) in selected_ids:
+                position += 1
+
+            positions[key] = position
+
+            if position >= len(bucket):
+                continue
+
+            record = bucket[position]
+
+            positions[key] += 1
+
+            if add_case(
+                record,
+                "split_class_representative",
+            ):
+                made_progress = True
+
+            if len(selected) >= target:
+                break
+
+        if not made_progress:
+            break
+
+    # Fill remaining slots with low-confidence cases if needed
+    if len(selected) < target:
+        remaining = sorted(
+            records,
+            key=judge_case_sort_key,
+        )
+
+        for record in remaining:
+            add_case(
+                record,
+                "low_confidence_fill",
+            )
+
+            if len(selected) >= target:
+                break
+
+    return selected
+
+
+def explanation_available(
+    explanation,
+) -> bool:
+    """Return whether real explanation generation succeeded."""
+
+    return (
+        explanation.clinical_summary
+        != "Automated narrative explanation was unavailable."
+    )
+
+
+def judge_available(
+    judge,
+) -> bool:
+    """Return whether the real LLM judge ran successfully."""
+
+    return not judge.judge_summary.startswith(
+        "LLM-as-a-Judge evaluation was unavailable:"
+    )
+
+
 def finite_numeric_metrics(
     summaries: dict[str, dict],
 ) -> dict[str, float]:
@@ -399,9 +622,30 @@ def finite_numeric_metrics(
     return numeric_metrics
 
 
+def finite_judge_metrics(
+    summary: dict | None,
+) -> dict[str, float]:
+    """Return finite judge summary metrics for MLflow."""
+
+    if not summary:
+        return {}
+
+    metrics: dict[str, float] = {}
+
+    for key, value in summary.items():
+        if isinstance(value, (int, float)) and value is not None:
+            number = float(value)
+
+            if math.isfinite(number):
+                metrics[f"judge_{key}"] = number
+
+    return metrics
+
+
 def write_summary_outputs(
     output_dir: Path,
     summaries: dict[str, dict],
+    judge_summary: dict | None,
 ) -> tuple[Path, Path]:
     """Write combined JSON and Markdown summaries."""
 
@@ -409,10 +653,16 @@ def write_summary_outputs(
     combined_json = output_dir / "combined_summary.json"
     combined_md = output_dir / "combined_summary.md"
 
+    # Combined JSON Payload
+    combined_payload = {
+        "classification_and_safety": (summaries),
+        "explanation_and_llm_judge": (judge_summary),
+    }
+
     # Combined JSON Saving
     combined_json.write_text(
         json.dumps(
-            summaries,
+            combined_payload,
             indent=2,
         ),
         encoding="utf-8",
@@ -425,6 +675,167 @@ def write_summary_outputs(
     )
 
     return combined_json, combined_md
+
+
+async def evaluate_judge_subset(
+    selected_cases: list[dict[str, Any]],
+    *,
+    use_llm_explanation: bool,
+    use_llm_judge: bool,
+) -> tuple[list[dict], dict]:
+    """Generate explanations and judge them for selected batch cases."""
+
+    from src.agents.pifu_inference_agent import (
+        create_pifu_explanation,
+    )
+    from src.agents.pifu_llm_judge import (
+        fallback_judge,
+        judge_pifu_explanation,
+    )
+
+    judge_rows: list[dict] = []
+
+    print()
+    print("=" * 68)
+    print("PIFU EXPLANATION + LLM-AS-A-JUDGE")
+    print("=" * 68)
+
+    print(f"Selected cases: {len(selected_cases)}")
+
+    for index, record in enumerate(
+        selected_cases,
+        start=1,
+    ):
+        sample = record["sample"]
+        prediction = record["prediction"]
+        safety = record["safety"]
+        row = record["row"]
+
+        print(
+            f"[{index:02d}/{len(selected_cases):02d}] "
+            f"{row['split']} | "
+            f"{row['sample_id']} | "
+            f"{row['predicted_class']}"
+        )
+
+        # Explanation
+        explanation = await create_pifu_explanation(
+            text=str(sample["text"]),
+            prediction=prediction,
+            safety=safety,
+            use_llm=use_llm_explanation,
+        )
+
+        explanation_ok = explanation_available(explanation)
+
+        # Judge
+        if explanation_ok:
+            judge = await judge_pifu_explanation(
+                text=str(sample["text"]),
+                prediction=prediction,
+                safety=safety,
+                explanation=explanation,
+                use_llm=use_llm_judge,
+            )
+
+        else:
+            judge = fallback_judge(
+                "Explanation generation was unavailable, "
+                "so explanation quality was not submitted "
+                "to the LLM judge."
+            )
+
+        judge_ok = judge_available(judge)
+
+        # Save case-level output
+        judge_rows.append(
+            {
+                "sample_id": row["sample_id"],
+                "split": row["split"],
+                "text_sha256": row["text_sha256"],
+                "selection_reason": record["selection_reason"],
+                "true_label": row["true_label"],
+                "true_class": row["true_class"],
+                "predicted_label": row["predicted_label"],
+                "predicted_class": row["predicted_class"],
+                "correct": row["correct"],
+                "confidence": row["confidence"],
+                "top_two_margin": row["top_two_margin"],
+                "safety_flags": row["safety_flags"],
+                "explanation_available": (explanation_ok),
+                "clinical_summary": (explanation.clinical_summary),
+                "evidence_summary": " | ".join(explanation.evidence_summary),
+                "limitations": " | ".join(explanation.limitations),
+                "judge_available": judge_ok,
+                "judge_faithfulness": (judge.explanation_faithfulness),
+                "judge_grounding": (judge.evidence_grounding),
+                "judge_prediction_consistency": (judge.prediction_consistency),
+                "judge_safety": (judge.safety_compliance),
+                "judge_hallucination": (judge.hallucination_detected),
+                "unsupported_claim_count": len(judge.unsupported_claims),
+                "unsupported_claims": " | ".join(judge.unsupported_claims),
+                "judge_pass": (judge.judge_pass),
+                "judge_summary": (judge.judge_summary),
+            }
+        )
+
+    # Only successful judge calls contribute to judge-quality metrics.
+    valid_judge_rows = [row for row in judge_rows if row["judge_available"]]
+
+    explanation_count = sum(bool(row["explanation_available"]) for row in judge_rows)
+
+    judge_count = len(valid_judge_rows)
+
+    total = len(judge_rows)
+
+    judge_summary = {
+        "selected_case_count": total,
+        "explanation_available_count": explanation_count,
+        "explanation_coverage_rate": (
+            float(explanation_count / total) if total else None
+        ),
+        "judge_available_count": judge_count,
+        "judge_unavailable_count": (total - judge_count),
+        "judge_coverage_rate": (float(judge_count / total) if total else None),
+        "judge_pass_rate": (
+            float(np.mean([row["judge_pass"] for row in valid_judge_rows]))
+            if valid_judge_rows
+            else None
+        ),
+        "judge_hallucination_rate": (
+            float(np.mean([row["judge_hallucination"] for row in valid_judge_rows]))
+            if valid_judge_rows
+            else None
+        ),
+        "unsupported_claim_rate": (
+            float(
+                np.mean(
+                    [row["unsupported_claim_count"] > 0 for row in valid_judge_rows]
+                )
+            )
+            if valid_judge_rows
+            else None
+        ),
+        "mean_judge_faithfulness": safe_mean(
+            [float(row["judge_faithfulness"]) for row in valid_judge_rows]
+        ),
+        "mean_judge_grounding": safe_mean(
+            [float(row["judge_grounding"]) for row in valid_judge_rows]
+        ),
+        "mean_judge_prediction_consistency": (
+            safe_mean(
+                [float(row["judge_prediction_consistency"]) for row in valid_judge_rows]
+            )
+        ),
+        "mean_judge_safety": safe_mean(
+            [float(row["judge_safety"]) for row in valid_judge_rows]
+        ),
+    }
+
+    return (
+        judge_rows,
+        judge_summary,
+    )
 
 
 def main() -> None:
@@ -485,6 +896,8 @@ def main() -> None:
     model, tokenizer = load_finetuned_model()
 
     all_summaries: dict[str, dict] = {}
+
+    all_case_records: list[dict[str, Any]] = []
 
     try:
         for split_name, split_path in splits.items():
@@ -565,18 +978,27 @@ def main() -> None:
                 safety_flags.append(safety.flags)
                 human_review.append(safety.requires_human_review)
 
-                rows.append(
-                    build_case_prediction_row(
-                        sample=sample,
-                        split_name=split_name,
-                        true_label=true_label_int,
-                        predicted_label=predicted_label,
-                        probabilities=class_probabilities,
-                        confidence=confidence,
-                        margin=margin,
-                        safety=safety,
-                        label_map=PIFU_ID_TO_LABEL,
-                    )
+                case_row = build_case_prediction_row(
+                    sample=sample,
+                    split_name=split_name,
+                    true_label=true_label_int,
+                    predicted_label=predicted_label,
+                    probabilities=class_probabilities,
+                    confidence=confidence,
+                    margin=margin,
+                    safety=safety,
+                    label_map=PIFU_ID_TO_LABEL,
+                )
+
+                rows.append(case_row)
+
+                all_case_records.append(
+                    {
+                        "sample": sample,
+                        "prediction": model_prediction,
+                        "safety": safety,
+                        "row": case_row,
+                    }
                 )
 
             prediction_array = np.asarray(
@@ -644,10 +1066,74 @@ def main() -> None:
         gc.collect()
         torch.cuda.empty_cache()
 
+    # Judge Subset Selection and Evaluation
+    selected_judge_cases = select_judge_cases(
+        all_case_records,
+        args.judge_sample_size,
+    )
+
+    judge_rows: list[dict] = []
+    judge_summary: dict | None = None
+
+    if selected_judge_cases:
+        judge_rows, judge_summary = asyncio.run(
+            evaluate_judge_subset(
+                selected_judge_cases,
+                use_llm_explanation=(not args.no_llm_explanation),
+                use_llm_judge=(not args.no_llm_judge),
+            )
+        )
+
+        judge_cases_path = output_dir / "llm_judge_cases.csv"
+
+        judge_summary_path = output_dir / "llm_judge_summary.json"
+
+        write_predictions(
+            judge_cases_path,
+            judge_rows,
+        )
+
+        judge_summary_path.write_text(
+            json.dumps(
+                judge_summary,
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+
+        print()
+        print("LLM-AS-A-JUDGE SUMMARY")
+        print("-" * 68)
+
+        print(f"Selected cases      : {judge_summary['selected_case_count']}")
+
+        print(f"Judge available     : {judge_summary['judge_available_count']}")
+
+        if judge_summary["judge_pass_rate"] is not None:
+            print(f"Judge pass rate     : {judge_summary['judge_pass_rate']:.4f}")
+
+            print(
+                f"Hallucination rate  : {judge_summary['judge_hallucination_rate']:.4f}"
+            )
+
+            print(
+                f"Mean faithfulness   : {judge_summary['mean_judge_faithfulness']:.4f}"
+            )
+
+            print(f"Mean grounding      : {judge_summary['mean_judge_grounding']:.4f}")
+
+            print(
+                "Mean consistency    : "
+                f"{judge_summary['mean_judge_prediction_consistency']:.4f}"
+            )
+
+            print(f"Mean safety         : {judge_summary['mean_judge_safety']:.4f}")
+
     # Combined Summary Outputs
     combined_json, combined_md = write_summary_outputs(
         output_dir,
         all_summaries,
+        judge_summary,
     )
 
     # MLflow Logging
@@ -658,9 +1144,10 @@ def main() -> None:
         run_name=f"pifu_batch_evaluation_{run_id}",
         tags={
             "task": "pifu_inference_batch",
-            "run_type": "quantitative_evaluation",
+            "run_type": "quantitative_plus_judge_evaluation",
             "synthetic_data_only": "true",
             "human_review_required": "true",
+            "llm_explanation_enabled": "explanation_quality",
         },
     ):
         mlflow.log_params(
@@ -672,10 +1159,16 @@ def main() -> None:
                 "batch_size": args.batch_size,
                 "confidence_threshold": CONFIDENCE_THRESHOLD,
                 "margin_threshold": MARGIN_THRESHOLD,
+                "judge_sample_size_requested": args.judge_sample_size,
+                "judge_sample_size_selected": len(selected_judge_cases),
+                "use_llm_explanation": not args.no_llm_explanation,
+                "use_llm_judge": not args.no_llm_judge,
             }
         )
 
-        mlflow.log_metrics(finite_numeric_metrics(all_summaries))
+        mlflow_metrics = finite_numeric_metrics(all_summaries)
+        mlflow_metrics.update(finite_judge_metrics(judge_summary))
+        mlflow.log_metrics(mlflow_metrics)
 
         mlflow.log_artifacts(
             str(output_dir),
@@ -690,6 +1183,10 @@ def main() -> None:
     print(f"Output directory: {output_dir}")
     print(f"Summary JSON    : {combined_json}")
     print(f"Summary Markdown: {combined_md}")
+
+    if selected_judge_cases:
+        print(f"Judge cases CSV : {output_dir / 'llm_judge_cases.csv'}")
+        print(f"Judge summary   : {output_dir / 'llm_judge_summary.json'}")
 
 
 if __name__ == "__main__":
