@@ -1,0 +1,338 @@
+{
+  "analysis": {
+    "bootstrap_replicates": 10000,
+    "external_seed": 20260826,
+    "challenge_seed": 20260827,
+    "bootstrap_type": "paired_stratified_nonparametric",
+    "confidence_level": 0.95,
+    "mcnemar": "exact_two_sided"
+  },
+  "external_test": {
+    "dataset": "external_test",
+    "n_cases": 150,
+    "class_counts": {
+      "0": 50,
+      "1": 50,
+      "2": 50
+    },
+    "bootstrap": [
+      {
+        "metric": "accuracy",
+        "base": 0.35333333333333333,
+        "base_ci_low": 0.29333333333333333,
+        "base_ci_high": 0.42,
+        "finetuned": 0.9466666666666667,
+        "finetuned_ci_low": 0.9066666666666666,
+        "finetuned_ci_high": 0.98,
+        "delta_ft_minus_base": 0.5933333333333333,
+        "delta_ci_low": 0.52,
+        "delta_ci_high": 0.6666666666666666,
+        "bootstrap_replicates": 10000,
+        "bootstrap_seed": 20260826,
+        "resampling": "paired_stratified_by_true_class",
+        "dataset": "external_test"
+      },
+      {
+        "metric": "balanced_accuracy",
+        "base": 0.35333333333333333,
+        "base_ci_low": 0.2933333333333333,
+        "base_ci_high": 0.42,
+        "finetuned": 0.9466666666666667,
+        "finetuned_ci_low": 0.9066666666666666,
+        "finetuned_ci_high": 0.98,
+        "delta_ft_minus_base": 0.5933333333333333,
+        "delta_ci_low": 0.52,
+        "delta_ci_high": 0.6666666666666665,
+        "bootstrap_replicates": 10000,
+        "bootstrap_seed": 20260826,
+        "resampling": "paired_stratified_by_true_class",
+        "dataset": "external_test"
+      },
+      {
+        "metric": "macro_f1",
+        "base": 0.2994469582704877,
+        "base_ci_low": 0.2343749192907471,
+        "base_ci_high": 0.36597170785412814,
+        "finetuned": 0.946837104950836,
+        "finetuned_ci_low": 0.9072992917061485,
+        "finetuned_ci_high": 0.97999799979998,
+        "delta_ft_minus_base": 0.6473901466803482,
+        "delta_ci_low": 0.5721364742794154,
+        "delta_ci_high": 0.7206198286429828,
+        "bootstrap_replicates": 10000,
+        "bootstrap_seed": 20260826,
+        "resampling": "paired_stratified_by_true_class",
+        "dataset": "external_test"
+      },
+      {
+        "metric": "not_eligible_recall",
+        "base": 0.06,
+        "base_ci_low": 0.0,
+        "base_ci_high": 0.14,
+        "finetuned": 0.96,
+        "finetuned_ci_low": 0.9,
+        "finetuned_ci_high": 1.0,
+        "delta_ft_minus_base": 0.8999999999999999,
+        "delta_ci_low": 0.8,
+        "delta_ci_high": 0.98,
+        "bootstrap_replicates": 10000,
+        "bootstrap_seed": 20260826,
+        "resampling": "paired_stratified_by_true_class",
+        "dataset": "external_test"
+      },
+      {
+        "metric": "unsafe_eligible_rate",
+        "base": 0.4,
+        "base_ci_low": 0.26,
+        "base_ci_high": 0.54,
+        "finetuned": 0.0,
+        "finetuned_ci_low": 0.0,
+        "finetuned_ci_high": 0.0,
+        "delta_ft_minus_base": -0.4,
+        "delta_ci_low": -0.54,
+        "delta_ci_high": -0.26,
+        "bootstrap_replicates": 10000,
+        "bootstrap_seed": 20260826,
+        "resampling": "paired_stratified_by_true_class",
+        "dataset": "external_test"
+      }
+    ],
+    "wilson": [
+      {
+        "model": "base",
+        "metric": "accuracy",
+        "successes": 53,
+        "total": 150,
+        "estimate": 0.35333333333333333,
+        "wilson_ci_low": 0.2813726509048464,
+        "wilson_ci_high": 0.4326186207764561,
+        "dataset": "external_test"
+      },
+      {
+        "model": "base",
+        "metric": "not_eligible_recall",
+        "successes": 3,
+        "total": 50,
+        "estimate": 0.06,
+        "wilson_ci_low": 0.02061497034897397,
+        "wilson_ci_high": 0.16217091688838173,
+        "dataset": "external_test"
+      },
+      {
+        "model": "base",
+        "metric": "unsafe_eligible_rate",
+        "successes": 20,
+        "total": 50,
+        "estimate": 0.4,
+        "wilson_ci_low": 0.27608389730256544,
+        "wilson_ci_high": 0.5381856225241064,
+        "dataset": "external_test"
+      },
+      {
+        "model": "finetuned",
+        "metric": "accuracy",
+        "successes": 142,
+        "total": 150,
+        "estimate": 0.9466666666666667,
+        "wilson_ci_low": 0.8982961216180454,
+        "wilson_ci_high": 0.9727304600798061,
+        "dataset": "external_test"
+      },
+      {
+        "model": "finetuned",
+        "metric": "not_eligible_recall",
+        "successes": 48,
+        "total": 50,
+        "estimate": 0.96,
+        "wilson_ci_low": 0.8653990931249297,
+        "wilson_ci_high": 0.9889611156723802,
+        "dataset": "external_test"
+      },
+      {
+        "model": "finetuned",
+        "metric": "unsafe_eligible_rate",
+        "successes": 0,
+        "total": 50,
+        "estimate": 0.0,
+        "wilson_ci_low": 6.938893903907228e-18,
+        "wilson_ci_high": 0.07134759913335872,
+        "dataset": "external_test"
+      }
+    ],
+    "mcnemar": {
+      "dataset": "external_test",
+      "n_cases": 150,
+      "both_correct": 50,
+      "base_only_correct": 3,
+      "finetuned_only_correct": 92,
+      "both_wrong": 5,
+      "discordant_pairs": 95,
+      "exact_mcnemar_p": 7.21844331423228e-24,
+      "interpretation": "primary_external_evaluation"
+    }
+  },
+  "challenge": {
+    "dataset": "challenge",
+    "n_cases": 24,
+    "class_counts": {
+      "0": 19,
+      "1": 0,
+      "2": 5
+    },
+    "bootstrap": [
+      {
+        "metric": "accuracy",
+        "base": 0.08333333333333333,
+        "base_ci_low": 0.0,
+        "base_ci_high": 0.20833333333333334,
+        "finetuned": 0.7916666666666666,
+        "finetuned_ci_low": 0.625,
+        "finetuned_ci_high": 0.9166666666666666,
+        "delta_ft_minus_base": 0.7083333333333333,
+        "delta_ci_low": 0.5,
+        "delta_ci_high": 0.9166666666666666,
+        "bootstrap_replicates": 10000,
+        "bootstrap_seed": 20260827,
+        "resampling": "paired_stratified_by_true_class",
+        "dataset": "challenge"
+      },
+      {
+        "metric": "balanced_accuracy",
+        "base": 0.05263157894736842,
+        "base_ci_low": 0.0,
+        "base_ci_high": 0.13157894736842105,
+        "finetuned": 0.868421052631579,
+        "finetuned_ci_low": 0.763157894736842,
+        "finetuned_ci_high": 0.9473684210526316,
+        "delta_ft_minus_base": 0.8157894736842106,
+        "delta_ci_low": 0.6842105263157894,
+        "delta_ci_high": 0.9473684210526315,
+        "bootstrap_replicates": 10000,
+        "bootstrap_seed": 20260827,
+        "resampling": "paired_stratified_by_true_class",
+        "dataset": "challenge"
+      },
+      {
+        "metric": "macro_f1",
+        "base": 0.06349206349206349,
+        "base_ci_low": 0.0,
+        "base_ci_high": 0.1388888888888889,
+        "finetuned": 0.6161616161616162,
+        "finetuned_ci_low": 0.5632183908045977,
+        "finetuned_ci_high": 0.6481481481481481,
+        "delta_ft_minus_base": 0.5526695526695528,
+        "delta_ci_low": 0.4525089605734767,
+        "delta_ci_high": 0.638095238095238,
+        "bootstrap_replicates": 10000,
+        "bootstrap_seed": 20260827,
+        "resampling": "paired_stratified_by_true_class",
+        "dataset": "challenge"
+      },
+      {
+        "metric": "not_eligible_recall",
+        "base": 0.10526315789473684,
+        "base_ci_low": 0.0,
+        "base_ci_high": 0.2631578947368421,
+        "finetuned": 0.7368421052631579,
+        "finetuned_ci_low": 0.5263157894736842,
+        "finetuned_ci_high": 0.8947368421052632,
+        "delta_ft_minus_base": 0.631578947368421,
+        "delta_ci_low": 0.3684210526315789,
+        "delta_ci_high": 0.894736842105263,
+        "bootstrap_replicates": 10000,
+        "bootstrap_seed": 20260827,
+        "resampling": "paired_stratified_by_true_class",
+        "dataset": "challenge"
+      },
+      {
+        "metric": "unsafe_eligible_rate",
+        "base": 0.3684210526315789,
+        "base_ci_low": 0.15789473684210525,
+        "base_ci_high": 0.5789473684210527,
+        "finetuned": 0.0,
+        "finetuned_ci_low": 0.0,
+        "finetuned_ci_high": 0.0,
+        "delta_ft_minus_base": -0.3684210526315789,
+        "delta_ci_low": -0.5789473684210527,
+        "delta_ci_high": -0.15789473684210525,
+        "bootstrap_replicates": 10000,
+        "bootstrap_seed": 20260827,
+        "resampling": "paired_stratified_by_true_class",
+        "dataset": "challenge"
+      }
+    ],
+    "wilson": [
+      {
+        "model": "base",
+        "metric": "accuracy",
+        "successes": 2,
+        "total": 24,
+        "estimate": 0.08333333333333333,
+        "wilson_ci_low": 0.023158815297043306,
+        "wilson_ci_high": 0.25848802193210685,
+        "dataset": "challenge"
+      },
+      {
+        "model": "base",
+        "metric": "not_eligible_recall",
+        "successes": 2,
+        "total": 19,
+        "estimate": 0.10526315789473684,
+        "wilson_ci_low": 0.02935856029887013,
+        "wilson_ci_high": 0.31394082711109006,
+        "dataset": "challenge"
+      },
+      {
+        "model": "base",
+        "metric": "unsafe_eligible_rate",
+        "successes": 7,
+        "total": 19,
+        "estimate": 0.3684210526315789,
+        "wilson_ci_low": 0.19149512745135072,
+        "wilson_ci_high": 0.5896046683519693,
+        "dataset": "challenge"
+      },
+      {
+        "model": "finetuned",
+        "metric": "accuracy",
+        "successes": 19,
+        "total": 24,
+        "estimate": 0.7916666666666666,
+        "wilson_ci_low": 0.5952954674681133,
+        "wilson_ci_high": 0.9075517464714814,
+        "dataset": "challenge"
+      },
+      {
+        "model": "finetuned",
+        "metric": "not_eligible_recall",
+        "successes": 14,
+        "total": 19,
+        "estimate": 0.7368421052631579,
+        "wilson_ci_low": 0.5120844910218489,
+        "wilson_ci_high": 0.8819358765321748,
+        "dataset": "challenge"
+      },
+      {
+        "model": "finetuned",
+        "metric": "unsafe_eligible_rate",
+        "successes": 0,
+        "total": 19,
+        "estimate": 0.0,
+        "wilson_ci_low": 0.0,
+        "wilson_ci_high": 0.16817922405261626,
+        "dataset": "challenge"
+      }
+    ],
+    "mcnemar": {
+      "dataset": "challenge",
+      "n_cases": 24,
+      "both_correct": 1,
+      "base_only_correct": 1,
+      "finetuned_only_correct": 18,
+      "both_wrong": 4,
+      "discordant_pairs": 19,
+      "exact_mcnemar_p": 7.62939453125e-05,
+      "interpretation": "exploratory_only"
+    }
+  }
+}

@@ -1,0 +1,7 @@
+model,metric,successes,total,estimate,wilson_ci_low,wilson_ci_high,dataset
+base,accuracy,53,150,0.35333333333333333,0.2813726509048464,0.4326186207764561,external_test
+base,not_eligible_recall,3,50,0.06,0.02061497034897397,0.16217091688838173,external_test
+base,unsafe_eligible_rate,20,50,0.4,0.27608389730256544,0.5381856225241064,external_test
+finetuned,accuracy,142,150,0.9466666666666667,0.8982961216180454,0.9727304600798061,external_test
+finetuned,not_eligible_recall,48,50,0.96,0.8653990931249297,0.9889611156723802,external_test
+finetuned,unsafe_eligible_rate,0,50,0.0,6.938893903907228e-18,0.07134759913335872,external_test

@@ -493,34 +493,55 @@ def plot_confusion_matrix(
     matrix: np.ndarray,
     output_dir: Path,
     filename: str,
-    cmap: str,
+    title: str,
 ) -> None:
-    """Plot one annotated FastPIFU confusion matrix."""
+    """Plot one row-normalised annotated FastPIFU confusion matrix."""
 
-    # Figure Construction
+    # Row-normalised percentages
+    row_totals = matrix.sum(
+        axis=1,
+        keepdims=True,
+    )
+
+    percentages = np.divide(
+        matrix.astype(float),
+        row_totals,
+        out=np.zeros_like(
+            matrix,
+            dtype=float,
+        ),
+        where=row_totals != 0,
+    ) * 100.0
+
+    # Figure
     figure, axis = plt.subplots(
         figsize=(7, 6),
     )
 
     image = axis.imshow(
-        matrix,
-        cmap=cmap,
+        percentages,
+        cmap="Blues",
+        vmin=0,
+        vmax=100,
     )
 
-    figure.colorbar(
+    colorbar = figure.colorbar(
         image,
         ax=axis,
         fraction=0.046,
         pad=0.04,
     )
 
-    # Axis Labels
-    axis.set_xlabel("Predicted class")
+    colorbar.set_label(
+        "Percentage within true class (%)",
+    )
 
+    # Title and axes
+    axis.set_title(title)
+    axis.set_xlabel("Predicted class")
     axis.set_ylabel("True class")
 
     axis.set_xticks(np.arange(len(CLASS_NAMES)))
-
     axis.set_yticks(np.arange(len(CLASS_NAMES)))
 
     axis.set_xticklabels(
@@ -533,27 +554,41 @@ def plot_confusion_matrix(
         CLASS_NAMES,
     )
 
-    # Annotation Contrast Threshold
-    threshold = matrix.max() / 2 if matrix.size else 0
-
-    # Matrix Annotations
+    # Cell annotations
     for row in range(matrix.shape[0]):
         for column in range(matrix.shape[1]):
+
             value = int(
-                matrix[
-                    row,
-                    column,
-                ]
+                matrix[row, column]
             )
+
+            row_total = int(
+                row_totals[row, 0]
+            )
+
+            percentage = float(
+                percentages[row, column]
+            )
+
+            if row_total == 0:
+                annotation = f"{value}\n(N/A)"
+            else:
+                annotation = (
+                    f"{value}\n({percentage:.0f}%)"
+                )
 
             axis.text(
                 column,
                 row,
-                str(value),
+                annotation,
                 ha="center",
                 va="center",
-                color=("white" if value > threshold else "black"),
-                fontsize=12,
+                color=(
+                    "white"
+                    if percentage >= 50
+                    else "black"
+                ),
+                fontsize=11,
             )
 
     figure.tight_layout()
@@ -564,37 +599,65 @@ def plot_confusion_matrix(
         filename,
     )
 
-
 def figure_pifu_confusion_matrices(
     tables_dir: Path,
     output_dir: Path,
 ) -> None:
-    """Generate fine-tuned FastPIFU confusion matrices."""
+    """Generate base and fine-tuned FastPIFU confusion matrices."""
 
-    # External-Test Matrix
-    external_matrix = load_confusion_matrix(
-        tables_dir / "finetuned_external_test_confusion_matrix.csv"
+    # External-test matrices
+    base_external_matrix = load_confusion_matrix(
+        tables_dir
+        / "base_external_test_confusion_matrix.csv"
     )
 
-    # Challenge-Set Matrix
-    challenge_matrix = load_confusion_matrix(
-        tables_dir / "finetuned_challenge_confusion_matrix.csv"
+    fine_tuned_external_matrix = load_confusion_matrix(
+        tables_dir
+        / "finetuned_external_test_confusion_matrix.csv"
     )
 
+    # Challenge-set matrices
+    base_challenge_matrix = load_confusion_matrix(
+        tables_dir
+        / "base_challenge_confusion_matrix.csv"
+    )
+
+    fine_tuned_challenge_matrix = load_confusion_matrix(
+        tables_dir
+        / "finetuned_challenge_confusion_matrix.csv"
+    )
+
+    # External-test base
     plot_confusion_matrix(
-        external_matrix,
+        base_external_matrix,
+        output_dir,
+        "figure_04_pifu_external_base_confusion_matrix",
+        title="External test — pretrained model",
+    )
+
+    # External-test fine-tuned
+    plot_confusion_matrix(
+        fine_tuned_external_matrix,
         output_dir,
         "figure_04_pifu_external_finetuned_confusion_matrix",
-        cmap="Blues",
+        title="External test — fine-tuned model",
     )
 
+    # Challenge-set base
     plot_confusion_matrix(
-        challenge_matrix,
+        base_challenge_matrix,
+        output_dir,
+        "figure_05_pifu_challenge_base_confusion_matrix",
+        title="Challenge set — pretrained model",
+    )
+
+    # Challenge-set fine-tuned
+    plot_confusion_matrix(
+        fine_tuned_challenge_matrix,
         output_dir,
         "figure_05_pifu_challenge_finetuned_confusion_matrix",
-        cmap="Oranges",
+        title="Challenge set — fine-tuned model",
     )
-
 
 def figure_judge_quality_scores(
     tables_dir: Path,
@@ -801,17 +864,17 @@ def write_figure_manifest(
         "figure_03_pifu_challenge_base_vs_finetuned": (
             "PIFU challenge-set base versus fine-tuned performance."
         ),
+        "figure_04_pifu_external_base_confusion_matrix": (
+            "Row-normalised pretrained PIFU external-test confusion matrix."
+        ),
         "figure_04_pifu_external_finetuned_confusion_matrix": (
-            "Fine-tuned PIFU external-test confusion matrix."
+            "Row-normalised fine-tuned PIFU external-test confusion matrix."
+        ),
+        "figure_05_pifu_challenge_base_confusion_matrix": (
+            "Row-normalised pretrained PIFU challenge-set confusion matrix."
         ),
         "figure_05_pifu_challenge_finetuned_confusion_matrix": (
-            "Fine-tuned PIFU challenge-set confusion matrix."
-        ),
-        "figure_06_llm_judge_quality_scores": (
-            "Mean LLM-as-a-Judge explanation-quality scores."
-        ),
-        "figure_07_llm_judge_outcomes": (
-            "LLM-as-a-Judge pass and flagged-outcome rates."
+            "Row-normalised fine-tuned PIFU challenge-set confusion matrix."
         ),
     }
 

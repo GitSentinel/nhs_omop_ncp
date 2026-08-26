@@ -1,0 +1,17 @@
+Statistical uncertainty for the FastPIFU model comparison was examined using
+10,000 paired non-parametric bootstrap resamples. Resampling was
+performed at the case level and stratified by ground-truth class so that each
+replicate retained the class counts of the original evaluation set. The same
+sampled case indices were applied to the pretrained and fine-tuned predictions,
+thereby preserving the paired design. Two-sided 95\% percentile confidence
+intervals were calculated for each model and for the fine-tuned-minus-pretrained
+difference in accuracy, balanced accuracy, macro F1,
+\texttt{NOT\_ELIGIBLE} recall, and the unsafe-eligible rate. A fixed random
+seed of 20260826 was used for reproducibility. Overall paired classification
+correctness was additionally compared using an exact two-sided McNemar test on
+the discordant case pairs. Wilson score intervals were also calculated for
+simple proportions, including the unsafe-eligible rate, because a conventional
+non-parametric bootstrap interval can be degenerate when no events are
+observed. Statistical inference from the 24-case challenge set was treated as
+exploratory because that set was deliberately selected, was small, and
+contained no ground-truth \texttt{BORDERLINE} cases.

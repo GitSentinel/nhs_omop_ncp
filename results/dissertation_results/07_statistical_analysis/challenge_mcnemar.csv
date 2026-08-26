@@ -1,0 +1,2 @@
+dataset,n_cases,both_correct,base_only_correct,finetuned_only_correct,both_wrong,discordant_pairs,exact_mcnemar_p,interpretation
+challenge,24,1,1,18,4,19,7.62939453125e-05,exploratory_only

@@ -1,0 +1,2 @@
+dataset,n_cases,both_correct,base_only_correct,finetuned_only_correct,both_wrong,discordant_pairs,exact_mcnemar_p,interpretation
+external_test,150,50,3,92,5,95,7.21844331423228e-24,primary_external_evaluation

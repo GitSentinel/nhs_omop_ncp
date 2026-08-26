@@ -1,0 +1,16 @@
+\begin{table}[htbp]
+\centering
+\caption{Paired stratified bootstrap estimates for the FastPIFU challenge set. Values are point estimate [95\% percentile CI]; $\Delta$ is fine-tuned minus base. These intervals are exploratory because the challenge set was deliberately selected and is not prevalence-representative.}
+\label{tab:pifu_challenge_set_bootstrap}
+\begin{tabular}{lccc}
+\toprule
+Metric & Base & Fine-tuned & $\Delta$ \\
+\midrule
+Accuracy & 0.0833 [0.0000, 0.2083] & 0.7917 [0.6250, 0.9167] & 0.7083 [0.5000, 0.9167] \\
+Balanced accuracy & 0.0526 [0.0000, 0.1316] & 0.8684 [0.7632, 0.9474] & 0.8158 [0.6842, 0.9474] \\
+Macro F1 & 0.0635 [0.0000, 0.1389] & 0.6162 [0.5632, 0.6481] & 0.5527 [0.4525, 0.6381] \\
+\texttt{NOT\_ELIGIBLE} recall & 0.1053 [0.0000, 0.2632] & 0.7368 [0.5263, 0.8947] & 0.6316 [0.3684, 0.8947] \\
+Unsafe-eligible rate & 0.3684 [0.1579, 0.5789] & 0.0000 [0.0000, 0.0000] & -0.3684 [-0.5789, -0.1579] \\
+\bottomrule
+\end{tabular}
+\end{table}
