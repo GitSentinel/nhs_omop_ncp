@@ -1,0 +1,14 @@
+{
+  "mlflow.user": "jacinth",
+  "mlflow.source.name": "src/scripts/evaluate_pifu_combined.py",
+  "mlflow.source.type": "LOCAL",
+  "mlflow.source.git.commit": "bad49d0dd4c1c08c799fc41df857a1189f54323f",
+  "mlflow.source.git.branch": "main",
+  "mlflow.source.git.repoURL": "https://github.com/GitSentinel/nhs_omop_ncp.git",
+  "task": "pifu_eligibility_3class",
+  "analysis": "combined_external_challenge",
+  "evaluation_only": "true",
+  "stratified_bootstrap": "true",
+  "human_review_required": "true",
+  "mlflow.runName": "evaluation_pifu_combined_external_challenge_stratified"
+}

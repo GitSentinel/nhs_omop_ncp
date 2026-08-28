@@ -1,0 +1,11 @@
+{
+  "adapter": "/home/jacinth/nhs_omop_ncp/data/finetune/qwen35_9b_pifu_lora",
+  "n_external": "150",
+  "n_challenge": "24",
+  "n_combined": "174",
+  "n_not_eligible": "69",
+  "n_borderline": "50",
+  "n_eligible": "55",
+  "bootstrap_replicates": "1000",
+  "bootstrap_seed": "42"
+}

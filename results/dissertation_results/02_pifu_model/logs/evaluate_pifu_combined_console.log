@@ -1,0 +1,148 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+`torch_dtype` is deprecated! Use `dtype` instead!
+====================================================================
+COMBINED FASTPIFU EXTERNAL + CHALLENGE EVALUATION
+====================================================================
+External test : 150
+Challenge     : 24
+Combined      : 174
+Class counts  : {'NOT_ELIGIBLE': 69, 'BORDERLINE': 50, 'ELIGIBLE': 55}
+
+Evaluation only: no training or threshold selection is performed.
+Fetching 4 files:   0%|          | 0/4 [00:00<?, ?it/s]Fetching 4 files: 100%|██████████| 4/4 [00:00<00:00, 2875.77it/s]
+The fast path is not available because one of the required library is not installed. Falling back to torch implementation. To install follow https://github.com/fla-org/flash-linear-attention#installation and https://github.com/Dao-AILab/causal-conv1d
+Loading weights:   0%|          | 0/427 [00:00<?, ?it/s]Loading weights:   0%|          | 1/427 [00:00<01:57,  3.62it/s]Loading weights:   0%|          | 2/427 [00:00<02:15,  3.15it/s]Loading weights:   5%|▌         | 23/427 [00:00<00:08, 45.99it/s]Loading weights:   9%|▉         | 38/427 [00:00<00:05, 68.87it/s]Loading weights:  12%|█▏        | 50/427 [00:00<00:04, 76.41it/s]Loading weights:  16%|█▌        | 68/427 [00:01<00:03, 94.44it/s]Loading weights:  19%|█▉        | 82/427 [00:01<00:03, 104.31it/s]Loading weights:  22%|██▏       | 96/427 [00:01<00:02, 111.70it/s]Loading weights:  27%|██▋       | 114/427 [00:01<00:02, 124.95it/s]Loading weights:  31%|███       | 131/427 [00:01<00:02, 131.95it/s]Loading weights:  35%|███▍      | 148/427 [00:01<00:02, 130.22it/s]Loading weights:  39%|███▊      | 165/427 [00:01<00:01, 137.88it/s]Loading weights:  44%|████▎     | 186/427 [00:01<00:01, 150.68it/s]Loading weights:  47%|████▋     | 202/427 [00:02<00:01, 136.55it/s]Loading weights:  52%|█████▏    | 221/427 [00:02<00:01, 145.64it/s]Loading weights:  56%|█████▌    | 239/427 [00:02<00:01, 153.50it/s]Loading weights:  60%|█████▉    | 255/427 [00:02<00:01, 145.72it/s]Loading weights:  65%|██████▍   | 277/427 [00:02<00:00, 157.01it/s]Loading weights:  69%|██████▊   | 293/427 [00:02<00:00, 156.95it/s]Loading weights:  72%|███████▏  | 309/427 [00:02<00:00, 155.56it/s]Loading weights:  77%|███████▋  | 328/427 [00:02<00:00, 163.46it/s]Loading weights:  81%|████████  | 345/427 [00:02<00:00, 141.12it/s]Loading weights:  84%|████████▍ | 360/427 [00:03<00:00, 133.28it/s]Loading weights:  89%|████████▊ | 378/427 [00:03<00:00, 140.14it/s]Loading weights:  93%|█████████▎| 395/427 [00:03<00:00, 135.36it/s]Loading weights:  97%|█████████▋| 414/427 [00:03<00:00, 146.00it/s]Loading weights: 100%|██████████| 427/427 [00:03<00:00, 120.07it/s]
+PIFU label token sequences: 0=[220, 15], 1=[220, 16], 2=[220, 17]
+2/174 evaluated
+4/174 evaluated
+6/174 evaluated
+8/174 evaluated
+10/174 evaluated
+12/174 evaluated
+14/174 evaluated
+16/174 evaluated
+18/174 evaluated
+20/174 evaluated
+22/174 evaluated
+24/174 evaluated
+26/174 evaluated
+28/174 evaluated
+30/174 evaluated
+32/174 evaluated
+34/174 evaluated
+36/174 evaluated
+38/174 evaluated
+40/174 evaluated
+42/174 evaluated
+44/174 evaluated
+46/174 evaluated
+48/174 evaluated
+50/174 evaluated
+52/174 evaluated
+54/174 evaluated
+56/174 evaluated
+58/174 evaluated
+60/174 evaluated
+62/174 evaluated
+64/174 evaluated
+66/174 evaluated
+68/174 evaluated
+70/174 evaluated
+72/174 evaluated
+74/174 evaluated
+76/174 evaluated
+78/174 evaluated
+80/174 evaluated
+82/174 evaluated
+84/174 evaluated
+86/174 evaluated
+88/174 evaluated
+90/174 evaluated
+92/174 evaluated
+94/174 evaluated
+96/174 evaluated
+98/174 evaluated
+100/174 evaluated
+102/174 evaluated
+104/174 evaluated
+106/174 evaluated
+108/174 evaluated
+110/174 evaluated
+112/174 evaluated
+114/174 evaluated
+116/174 evaluated
+118/174 evaluated
+120/174 evaluated
+122/174 evaluated
+124/174 evaluated
+126/174 evaluated
+128/174 evaluated
+130/174 evaluated
+132/174 evaluated
+134/174 evaluated
+136/174 evaluated
+138/174 evaluated
+140/174 evaluated
+142/174 evaluated
+144/174 evaluated
+146/174 evaluated
+148/174 evaluated
+150/174 evaluated
+152/174 evaluated
+154/174 evaluated
+156/174 evaluated
+158/174 evaluated
+160/174 evaluated
+162/174 evaluated
+164/174 evaluated
+166/174 evaluated
+168/174 evaluated
+170/174 evaluated
+172/174 evaluated
+174/174 evaluated
+
+--------------------------------------------------------------------
+COMBINED 174-CASE RESULTS
+--------------------------------------------------------------------
+Accuracy            : 0.9253
+Balanced accuracy   : 0.9274
+Macro F1            : 0.9258
+NOT_ELIGIBLE recall : 0.8986
+BORDERLINE recall   : 0.9200
+ELIGIBLE precision  : 0.9815
+ELIGIBLE recall     : 0.9636
+Unsafe eligible     : 0 (0.0000)
+Confusion matrix    : [[62, 7, 0], [3, 46, 1], [2, 0, 53]]
+
+====================================================================
+STRATIFIED BOOTSTRAP (1,000 replicates)
+====================================================================
+Bootstrap 100/1,000
+Bootstrap 200/1,000
+Bootstrap 300/1,000
+Bootstrap 400/1,000
+Bootstrap 500/1,000
+Bootstrap 600/1,000
+Bootstrap 700/1,000
+Bootstrap 800/1,000
+Bootstrap 900/1,000
+Bootstrap 1,000/1,000
+
+95% STRATIFIED BOOTSTRAP INTERVALS
+--------------------------------------------------------------------
+accuracy                : 0.9253 [0.8851, 0.9598]
+balanced_accuracy       : 0.9274 [0.8880, 0.9625]
+macro_f1                : 0.9258 [0.8857, 0.9605]
+not_eligible_recall     : 0.8986 [0.8116, 0.9565]
+borderline_recall       : 0.9200 [0.8400, 0.9800]
+eligible_precision      : 0.9815 [0.9444, 1.0000]
+eligible_recall         : 0.9636 [0.9091, 1.0000]
+
+====================================================================
+COMBINED EVALUATION COMPLETE
+====================================================================
+Combined dataset : /home/jacinth/nhs_omop_ncp/data/evaluations/pifu_cardiology/combined_external_challenge_174.json
+Metrics          : /home/jacinth/nhs_omop_ncp/data/evaluations/pifu_cardiology/finetuned_combined_external_challenge_metrics.json
+Predictions      : /home/jacinth/nhs_omop_ncp/data/evaluations/pifu_cardiology/finetuned_combined_external_challenge_predictions.csv
+Confusion matrix : /home/jacinth/nhs_omop_ncp/data/evaluations/pifu_cardiology/finetuned_combined_external_challenge_confusion_matrix.csv
+Bootstrap        : /home/jacinth/nhs_omop_ncp/data/evaluations/pifu_cardiology/finetuned_combined_stratified_bootstrap.json

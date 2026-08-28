@@ -1,0 +1,9 @@
+{
+  "run_id": "7024ddcc0217404696ccace69063c389",
+  "run_name": "evaluation_pifu_combined_external_challenge_stratified",
+  "experiment_id": "2",
+  "status": "FINISHED",
+  "start_time": 1787935744858,
+  "end_time": 1787935744943,
+  "artifact_uri": "/home/jacinth/nhs_omop_ncp/mlruns/2/7024ddcc0217404696ccace69063c389/artifacts"
+}

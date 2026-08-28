@@ -503,15 +503,18 @@ def plot_confusion_matrix(
         keepdims=True,
     )
 
-    percentages = np.divide(
-        matrix.astype(float),
-        row_totals,
-        out=np.zeros_like(
-            matrix,
-            dtype=float,
-        ),
-        where=row_totals != 0,
-    ) * 100.0
+    percentages = (
+        np.divide(
+            matrix.astype(float),
+            row_totals,
+            out=np.zeros_like(
+                matrix,
+                dtype=float,
+            ),
+            where=row_totals != 0,
+        )
+        * 100.0
+    )
 
     # Figure
     figure, axis = plt.subplots(
@@ -557,25 +560,16 @@ def plot_confusion_matrix(
     # Cell annotations
     for row in range(matrix.shape[0]):
         for column in range(matrix.shape[1]):
+            value = int(matrix[row, column])
 
-            value = int(
-                matrix[row, column]
-            )
+            row_total = int(row_totals[row, 0])
 
-            row_total = int(
-                row_totals[row, 0]
-            )
-
-            percentage = float(
-                percentages[row, column]
-            )
+            percentage = float(percentages[row, column])
 
             if row_total == 0:
                 annotation = f"{value}\n(N/A)"
             else:
-                annotation = (
-                    f"{value}\n({percentage:.0f}%)"
-                )
+                annotation = f"{value}\n({percentage:.0f}%)"
 
             axis.text(
                 column,
@@ -583,11 +577,7 @@ def plot_confusion_matrix(
                 annotation,
                 ha="center",
                 va="center",
-                color=(
-                    "white"
-                    if percentage >= 50
-                    else "black"
-                ),
+                color=("white" if percentage >= 50 else "black"),
                 fontsize=11,
             )
 
@@ -599,6 +589,7 @@ def plot_confusion_matrix(
         filename,
     )
 
+
 def figure_pifu_confusion_matrices(
     tables_dir: Path,
     output_dir: Path,
@@ -607,24 +598,20 @@ def figure_pifu_confusion_matrices(
 
     # External-test matrices
     base_external_matrix = load_confusion_matrix(
-        tables_dir
-        / "base_external_test_confusion_matrix.csv"
+        tables_dir / "base_external_test_confusion_matrix.csv"
     )
 
     fine_tuned_external_matrix = load_confusion_matrix(
-        tables_dir
-        / "finetuned_external_test_confusion_matrix.csv"
+        tables_dir / "finetuned_external_test_confusion_matrix.csv"
     )
 
     # Challenge-set matrices
     base_challenge_matrix = load_confusion_matrix(
-        tables_dir
-        / "base_challenge_confusion_matrix.csv"
+        tables_dir / "base_challenge_confusion_matrix.csv"
     )
 
     fine_tuned_challenge_matrix = load_confusion_matrix(
-        tables_dir
-        / "finetuned_challenge_confusion_matrix.csv"
+        tables_dir / "finetuned_challenge_confusion_matrix.csv"
     )
 
     # External-test base
@@ -658,6 +645,31 @@ def figure_pifu_confusion_matrices(
         "figure_05_pifu_challenge_finetuned_confusion_matrix",
         title="Challenge set — fine-tuned model",
     )
+
+
+def figure_pifu_combined_confusion_matrix(
+    tables_dir: Path,
+    output_dir: Path,
+) -> bool:
+    """Generate combined external and challenge confusion matrix."""
+
+    path = tables_dir / ("finetuned_combined_external_challenge_confusion_matrix.csv")
+
+    if not path.exists():
+        print(f"Skipping combined PIFU confusion matrix: {path} not found.")
+        return False
+
+    matrix = load_confusion_matrix(path)
+
+    plot_confusion_matrix(
+        matrix,
+        output_dir,
+        ("figure_08_pifu_combined_finetuned_confusion_matrix"),
+        title=("Combined external + challenge — fine-tuned model"),
+    )
+
+    return True
+
 
 def figure_judge_quality_scores(
     tables_dir: Path,
@@ -876,6 +888,10 @@ def write_figure_manifest(
         "figure_05_pifu_challenge_finetuned_confusion_matrix": (
             "Row-normalised fine-tuned PIFU challenge-set confusion matrix."
         ),
+        "figure_08_pifu_combined_finetuned_confusion_matrix": (
+            "Row-normalised fine-tuned PIFU confusion matrix "
+            "for the pooled 174-case external + challenge analysis."
+        ),
     }
 
     # Manifest Construction
@@ -960,6 +976,12 @@ def main() -> None:
 
     # FastPIFU Confusion Matrices
     figure_pifu_confusion_matrices(
+        tables_dir,
+        output_dir,
+    )
+
+    # Combined PIFU Supplementary Analysis
+    figure_pifu_combined_confusion_matrix(
         tables_dir,
         output_dir,
     )
